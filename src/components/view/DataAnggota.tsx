@@ -39,6 +39,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [globalNotification, setGlobalNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   const { data: wilayahListResponse = [] } = useQuery({
     queryKey: ['wilayah'],
@@ -117,7 +118,12 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
       
       // Extract Tanggal Lahir (DD-MM-YYYY)
       const tglMatch = text.match(/\b\d{2}-\d{2}-\d{4}\b/);
-      if (tglMatch) handleFormChange('tanggalLahir', tglMatch[0]);
+      if (tglMatch) {
+          const parts = tglMatch[0].split('-');
+          if (parts.length === 3) {
+              handleFormChange('tanggalLahir', `${parts[2]}-${parts[1]}-${parts[0]}`);
+          }
+      }
 
       // Extract Jenis Kelamin
       const textLower = text.toLowerCase();
@@ -277,11 +283,14 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
             }
             if (uploadSuccess) {
                 setFormSuccess('Data & Foto berhasil disimpan!');
+                setGlobalNotification({ message: 'Data Anggota & Foto berhasil disimpan!', type: 'success' });
             } else {
                 setFormSuccess('Data disimpan, namun sebagian foto gagal diunggah.');
+                setGlobalNotification({ message: 'Data Anggota disimpan, namun beberapa foto gagal diunggah.', type: 'error' });
             }
         } else {
             setFormSuccess(editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!');
+            setGlobalNotification({ message: editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!', type: 'success' });
         }
 
         setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' });
@@ -290,12 +299,22 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         setOcrStatus('');
         setEditId(null);
         queryClient.invalidateQueries({ queryKey: ['anggota'] });
-        setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
+        
+        setIsModalOpen(false); 
+        setFormSuccess('');
+        
+        setTimeout(() => {
+            setGlobalNotification(null);
+        }, 5000);
       } else {
         setFormError(json.error || 'Gagal menyimpan data anggota');
+        setGlobalNotification({ message: json.error || 'Gagal menyimpan data anggota', type: 'error' });
+        setTimeout(() => setGlobalNotification(null), 5000);
       }
     } catch (err) {
       setFormError('Terjadi kesalahan koneksi');
+      setGlobalNotification({ message: 'Terjadi kesalahan koneksi', type: 'error' });
+      setTimeout(() => setGlobalNotification(null), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -303,6 +322,15 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
 
   return (
     <div id="menu-dataAnggota" className="space-y-5 max-w-6xl mx-auto">
+        {/* GLOBAL TOAST NOTIFICATION */}
+        {globalNotification && mounted && createPortal(
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-top-10 fade-in duration-300">
+                <div className={`px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm text-white ${globalNotification.type === 'success' ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-red-500 shadow-red-500/30'}`}>
+                    <span className="material-icons">{globalNotification.type === 'success' ? 'check_circle' : 'error'}</span>
+                    {globalNotification.message}
+                </div>
+            </div>
+        , document.body)}
         {/* FILTER DATA */}
         {filter !== 'verifikasi' && (
         <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm theme-el mb-6">
@@ -567,7 +595,9 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                             <div className="flex gap-2">
                                 <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-[3]">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">cake</span> TTL (UMUR)</p>
-                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.tanggalLahir || '-'} {selectedAnggota.umur ? `(${selectedAnggota.umur} Tahun)` : ''}</p>
+                                    <p className="font-bold text-slate-700 text-xs">
+                                        {selectedAnggota.tanggalLahir ? selectedAnggota.tanggalLahir.split('-').reverse().join('-') : '-'} {selectedAnggota.umur ? `(${selectedAnggota.umur} Tahun)` : ''}
+                                    </p>
                                 </div>
                                 <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-[2]">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">wc</span> JENIS KELAMIN</p>
@@ -697,7 +727,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Tanggal Lahir</label>
-                                    <input type="text" value={formData.tanggalLahir} onChange={e => handleFormChange('tanggalLahir', e.target.value)} placeholder="DD-MM-YYYY" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                    <input type="date" value={formData.tanggalLahir} onChange={e => handleFormChange('tanggalLahir', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Jenis Kelamin</label>
