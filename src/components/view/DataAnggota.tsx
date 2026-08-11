@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
+function getDirectImageUrl(url: string | null) {
+    if (!url) return null;
+    const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+    if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
+    return url;
+}
+
 export default function DataAnggotaView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -136,7 +145,7 @@ export default function DataAnggotaView() {
                                     <td className="p-3">
                                         <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
                                             {item.passFotoUrl ? (
-                                                <img src={item.passFotoUrl} alt={item.nama} className="w-full h-full object-cover" />
+                                                <img src={getDirectImageUrl(item.passFotoUrl) || ''} alt={item.nama} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-sm">person</span></div>
                                             )}
