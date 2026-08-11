@@ -45,6 +45,11 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
           <span className="material-icons mr-3 text-lg">account_tree</span> Struktur Organisasi
         </button>
 
+        {/* EXPORT LAPORAN */}
+        <button onClick={() => setActiveMenu('laporan')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'laporan' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+          <span className="material-icons mr-3 text-lg">assignment_turned_in</span> Export Laporan
+        </button>
+
         {/* ADMIN SECTION */}
         {(userRole === 'Super Admin' || userRole === 'Admin' || userRole === 'Editor') && (
           <>

@@ -18,7 +18,9 @@ interface AnggotaItem {
 export default function StrukturOrganisasiView() {
   const [bagian, setBagian] = useState('PAC');
   const [desa, setDesa] = useState('');
+  const [dusun, setDusun] = useState('');
   const [desaList, setDesaList] = useState<string[]>([]);
+  const [wilayahList, setWilayahList] = useState<any[]>([]);
   const [data, setData] = useState<AnggotaItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,6 +28,7 @@ export default function StrukturOrganisasiView() {
   useEffect(() => {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
       if (json.success) {
+        setWilayahList(json.data);
         const desas = Array.from(new Set(json.data.map((w: any) => w.desa))).sort() as string[];
         setDesaList(desas);
       }
@@ -34,7 +37,7 @@ export default function StrukturOrganisasiView() {
 
   useEffect(() => {
     fetchData();
-  }, [bagian, desa]);
+  }, [bagian, desa, dusun]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -42,6 +45,7 @@ export default function StrukturOrganisasiView() {
       const params = new URLSearchParams();
       params.append('bagian', bagian);
       if (desa) params.append('desa', desa);
+      if (dusun) params.append('dusun', dusun);
       params.append('limit', '100');
 
       const res = await fetch(`/api/anggota?${params.toString()}`);
@@ -74,32 +78,38 @@ export default function StrukturOrganisasiView() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div>
                     <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Bagian Kepengurusan</label>
-                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full">
+                    <select value={bagian} onChange={e => { setBagian(e.target.value); setDesa(''); setDusun(''); }} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full">
                         <option value="PAC">PAC (Kecamatan)</option>
                         <option value="RANTING">Ranting (Desa)</option>
                         <option value="ANAK RANTING">Anak Ranting (Dusun)</option>
                         <option value="SATGAS">Satgas</option>
                     </select>
                 </div>
-                <div>
-                    <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Pilih Desa</label>
-                    <select value={desa} onChange={e => setDesa(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full">
-                        <option value="">- Semua Desa -</option>
-                        {desaList.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                </div>
-                <div className="flex items-end">
-                    <button onClick={fetchData} className="w-full py-2.5 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center gap-1 text-xs">
-                        <span className="material-icons text-sm">search</span>Tampilkan
-                    </button>
-                </div>
+                {bagian !== 'PAC' && (
+                    <div>
+                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Pilih Desa</label>
+                        <select value={desa} onChange={e => { setDesa(e.target.value); setDusun(''); }} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full">
+                            <option value="">- Semua Desa -</option>
+                            {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                    </div>
+                )}
+                {bagian === 'ANAK RANTING' && (
+                    <div>
+                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Pilih Dusun</label>
+                        <select value={dusun} onChange={e => setDusun(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full">
+                            <option value="">- Semua Dusun -</option>
+                            {wilayahList.filter(w => w.desa === desa && w.dusun).map(w => w.dusun).map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                    </div>
+                )}
             </div>
         </div>
 
         {/* Bagan Organisasi */}
         <div className="p-4 sm:p-8 bg-white border border-slate-200 rounded-3xl min-h-[450px] relative overflow-hidden">
             <h3 className="text-center text-sm font-black text-red-700 uppercase tracking-wider mb-6">
-                Struktur Kepengurusan {bagian} {desa ? `- ${desa}` : ''}
+                Struktur Kepengurusan {bagian} {desa ? `- ${desa}` : ''} {dusun ? `- ${dusun}` : ''}
             </h3>
 
             {isLoading ? (
