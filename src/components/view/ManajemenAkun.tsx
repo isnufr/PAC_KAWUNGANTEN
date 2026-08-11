@@ -88,8 +88,8 @@ export default function ManajemenAkunView() {
   const roleColor = (role: string) => {
     switch (role) {
       case 'Super Admin': return 'bg-red-100 text-red-700 border-red-200';
-      case 'Admin': return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'Editor': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'Admin': return 'bg-red-50 text-red-600 border-red-200';
+      case 'Editor': return 'bg-rose-100 text-rose-700 border-rose-200';
       default: return 'bg-slate-100 text-slate-600 border-slate-200';
     }
   };
@@ -134,7 +134,7 @@ export default function ManajemenAkunView() {
                                 </td>
                                 <td className="p-3 sm:p-4 text-center">
                                     <div className="flex justify-center gap-2">
-                                        <button onClick={() => openEditModal(user)} className="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">edit</span></button>
+                                        <button onClick={() => openEditModal(user)} className="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">edit</span></button>
                                         <button onClick={() => handleDelete(user.id, user.username)} className="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">delete</span></button>
                                     </div>
                                 </td>

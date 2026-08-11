@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import InstallPrompt from '@/components/InstallPrompt';
 import DashboardView from '@/components/view/Dashboard';
 import DataAnggotaView from '@/components/view/DataAnggota';
 import StrukturOrganisasiView from '@/components/view/StrukturOrganisasi';
@@ -72,26 +73,32 @@ function DashboardContent() {
     }
   }, [searchParams, activeMenu]);
 
+  const closeSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+  }, []);
+
   if (!isReady) return <LoadingSpinner fullScreen />;
 
   return (
-    <div className="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+    <div className="bg-[#fafafa] text-slate-800 h-screen flex overflow-hidden">
       <Sidebar 
         isOpen={isSidebarOpen} 
         activeMenu={activeMenu} 
         setActiveMenu={setActiveMenu} 
-        userRole={userRole} 
+        userRole={userRole}
+        onClose={closeSidebar}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <TopHeader 
           isSidebarOpen={isSidebarOpen} 
           setIsSidebarOpen={setIsSidebarOpen} 
           activeMenu={activeMenu} 
         />
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
-           <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#fafafa] p-3 sm:p-6 lg:p-8">
+           {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
+           <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
              {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" />}
              {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
@@ -103,6 +110,9 @@ function DashboardContent() {
            </div>
         </main>
       </div>
+
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }

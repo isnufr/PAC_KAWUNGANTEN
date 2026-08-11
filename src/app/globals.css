@@ -2,12 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   DESIGN SYSTEM — RED & WHITE MODERN PALETTE
+   
+   Primary:     #dc2626 (red-600)
+   Primary Dark: #991b1b (red-800)
+   Primary Light: #fef2f2 (red-50)
+   Accent:       #b91c1c (red-700)
+   Surface:      #ffffff
+   Background:   #fafafa
+   Text Primary: #1e293b (slate-800)
+   Text Secondary: #64748b (slate-500)
+   Border:       #fee2e2 (red-100)
+   ============================================ */
+
 @layer utilities {
   .active-menu {
     background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
     color: white !important;
-    box-shadow: 0 4px 10px -2px rgba(220, 38, 38, 0.4);
-    transform: scale(1.02);
+    box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.35);
   }
 
   .animate-blob {
@@ -18,6 +31,75 @@
   }
 }
 
+/* ============================================
+   SMOOTH PAGE TRANSITIONS (GPU Accelerated)
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.page-transition {
+  animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   SIDEBAR OVERLAY (MOBILE)
+   ============================================ */
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              backdrop-filter 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.sidebar-overlay.active {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+/* ============================================
+   BLOB ANIMATION
+   ============================================ */
+
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
   33% { transform: translate(30px, -50px) scale(1.1); }
@@ -25,9 +107,32 @@
   100% { transform: translate(0px, 0px) scale(1); }
 }
 
+/* ============================================
+   MODAL TRANSITIONS
+   ============================================ */
+
 .modal {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.modal-content {
+  animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 html,
 body {
@@ -42,9 +147,24 @@ body {
   padding: 0;
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ffffff;
+  background-color: #fafafa;
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ============================================
+   MOBILE-OPTIMIZED SCROLLING
+   ============================================ */
+
+main {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ============================================
+   SCROLLBAR — Red theme
+   ============================================ */
 
 ::-webkit-scrollbar {
   width: 4px;
@@ -60,18 +180,92 @@ body {
   border-radius: 4px;
 }
 
+/* Hide scrollbar on mobile for cleaner look */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+}
+
+/* ============================================
+   CHART CONTAINER
+   ============================================ */
+
 .chart-container {
   position: relative;
   height: 220px;
   width: 100%;
 }
 
+/* ============================================
+   SMOOTH TRANSITIONS FOR ALL INTERACTIVE ELEMENTS
+   ============================================ */
+
+button, a, input, select, textarea {
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================
+   CARD HOVER EFFECTS — Modern Red/White
+   ============================================ */
+
+.card-hover {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(220, 38, 38, 0.1),
+              0 4px 10px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   PWA INSTALL BANNER
+   ============================================ */
+
+@keyframes slideUpBanner {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideDownBanner {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.install-banner-enter {
+  animation: slideUpBanner 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.install-banner-exit {
+  animation: slideDownBanner 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
 body.dark-theme {
   background-color: #0f172a !important;
   color: #f1f5f9;
 }
 
-body.dark-theme .bg-white {
+body.dark-theme .bg-white,
+body.dark-theme .bg-\[\\#fafafa\] {
   background-color: #1e293b !important;
   border-color: #334155 !important;
   color: #f8fafc !important;
@@ -79,6 +273,7 @@ body.dark-theme .bg-white {
 
 body.dark-theme .bg-red-50,
 body.dark-theme .bg-red-100,
+body.dark-theme .bg-slate-50,
 body.dark-theme .bg-slate-100,
 body.dark-theme .bg-gray-50,
 body.dark-theme .bg-amber-50,
@@ -119,6 +314,7 @@ body.dark-theme #sidebar {
 
 body.dark-theme input,
 body.dark-theme select,
+body.dark-theme textarea,
 body.dark-theme table {
   background-color: #0f172a !important;
   color: #f8fafc !important;
@@ -140,6 +336,10 @@ body.dark-theme .chart-container canvas {
 }
 
 body.dark-theme .active-menu {
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   color: white !important;
+}
+
+body.dark-theme .sidebar-overlay.active {
+  background-color: rgba(0, 0, 0, 0.7);
 }

@@ -18,7 +18,7 @@ export default function LogAktivitasView() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-red-50 pb-4">
                 <div>
                     <h2 className="text-sm md:text-base font-bold text-red-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span className="material-icons text-slate-500 bg-slate-50 p-1.5 rounded-lg border border-slate-200">history</span>
+                        <span className="material-icons text-red-600 bg-red-50 p-1.5 rounded-lg border border-red-200">history</span>
                         Log Aktivitas Sistem
                     </h2>
                     <p className="text-xs text-red-400 mt-1">Daftar riwayat aksi terbaru yang dilakukan oleh pengguna sistem.</p>
@@ -48,7 +48,7 @@ export default function LogAktivitasView() {
                                 <td className="p-3 sm:p-4 text-slate-500 whitespace-nowrap">{new Date(log.waktu).toLocaleString('id-ID')}</td>
                                 <td className="p-3 sm:p-4 font-bold">{log.pengguna}</td>
                                 <td className="p-3 sm:p-4">
-                                    <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-slate-200">{log.aksi}</span>
+                                    <span className="bg-red-50 text-red-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-red-100">{log.aksi}</span>
                                 </td>
                                 <td className="p-3 sm:p-4 text-slate-600">{log.detail || '-'}</td>
                             </tr>

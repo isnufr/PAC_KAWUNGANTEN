@@ -153,11 +153,11 @@ export default function StrukturOrganisasiView() {
 
 const colorMap: Record<string, { bg: string; border: string; text: string; badge: string }> = {
   red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', badge: 'bg-red-600 text-white' },
-  orange: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', badge: 'bg-orange-500 text-white' },
-  blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', badge: 'bg-blue-600 text-white' },
-  green: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-600 text-white' },
-  purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', badge: 'bg-purple-600 text-white' },
-  slate: { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-700', badge: 'bg-slate-500 text-white' },
+  orange: { bg: 'bg-red-50/70', border: 'border-red-200', text: 'text-red-600', badge: 'bg-red-500 text-white' },
+  blue: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', badge: 'bg-rose-600 text-white' },
+  green: { bg: 'bg-red-50/50', border: 'border-red-100', text: 'text-red-600', badge: 'bg-red-500 text-white' },
+  purple: { bg: 'bg-red-50/60', border: 'border-red-200', text: 'text-red-800', badge: 'bg-red-700 text-white' },
+  slate: { bg: 'bg-white', border: 'border-red-100', text: 'text-red-600', badge: 'bg-red-400 text-white' },
 };
 
 function OrgCard({ person, color, small = false }: { person: AnggotaItem; color: string; small?: boolean }) {

@@ -194,7 +194,7 @@ export default function DashboardView() {
           {/* VISUALISASI DATA BARU */}
           <div className="lg:col-span-3 space-y-5">
               {/* Progress Data */}
-              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 theme-el relative">
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-red-100 theme-el relative">
                   {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
                   <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-black tracking-tight flex items-center gap-2.5 text-slate-800">
@@ -209,17 +209,17 @@ export default function DashboardView() {
                       </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 flex items-center gap-4">
-                          <span className="material-icons text-emerald-600 bg-emerald-100 p-2 rounded-full">verified_user</span>
+                      <div className="bg-red-50/50 border border-red-100 rounded-xl p-4 flex items-center gap-4">
+                          <span className="material-icons text-red-600 bg-red-100 p-2 rounded-full">verified_user</span>
                           <div>
-                              <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Data Lengkap</p>
+                              <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-1">Data Lengkap</p>
                               <p className="text-xl font-black text-slate-800">{dataLengkap}</p>
                           </div>
                       </div>
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 flex items-center gap-4">
-                          <span className="material-icons text-amber-600 bg-amber-100 p-2 rounded-full">privacy_tip</span>
+                      <div className="bg-red-50/30 border border-red-100 rounded-xl p-4 flex items-center gap-4">
+                          <span className="material-icons text-red-400 bg-red-100 p-2 rounded-full">privacy_tip</span>
                           <div>
-                              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-1">Perlu Dilengkapi</p>
+                              <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Perlu Dilengkapi</p>
                               <p className="text-xl font-black text-slate-800">{verification.tidakLengkap}</p>
                           </div>
                       </div>
@@ -376,27 +376,27 @@ export default function DashboardView() {
 
               {/* STATISTIK GENDER */}
               <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
-                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-5">
-                      <span className="material-icons text-blue-600 bg-blue-50 p-2 rounded-xl text-xl">wc</span>
+                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-red-100 pb-4 mb-5">
+                      <span className="material-icons text-red-600 bg-red-50 p-2 rounded-xl text-xl">wc</span>
                       Statistik Gender Anggota
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex items-center gap-4">
-                      <div className="bg-blue-600 text-white p-3 rounded-xl shadow-md shadow-blue-200">
+                    <div className="bg-red-50/50 rounded-2xl p-4 border border-red-100 flex items-center gap-4">
+                      <div className="bg-red-600 text-white p-3 rounded-xl shadow-md shadow-red-200">
                         <span className="material-icons text-2xl">male</span>
                       </div>
                       <div>
-                        <span className="text-2xl font-black text-blue-700">{gender.pria}</span>
-                        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Laki-laki ({priaPercent}%)</p>
+                        <span className="text-2xl font-black text-red-700">{gender.pria}</span>
+                        <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Laki-laki ({priaPercent}%)</p>
                       </div>
                     </div>
-                    <div className="bg-pink-50 rounded-2xl p-4 border border-pink-100 flex items-center gap-4">
-                      <div className="bg-pink-600 text-white p-3 rounded-xl shadow-md shadow-pink-200">
+                    <div className="bg-red-50/50 rounded-2xl p-4 border border-red-100 flex items-center gap-4">
+                      <div className="bg-red-700 text-white p-3 rounded-xl shadow-md shadow-red-200">
                         <span className="material-icons text-2xl">female</span>
                       </div>
                       <div>
-                        <span className="text-2xl font-black text-pink-700">{gender.wanita}</span>
-                        <p className="text-[10px] font-bold text-pink-500 uppercase tracking-wider">Perempuan ({wanitaPercent}%)</p>
+                        <span className="text-2xl font-black text-red-700">{gender.wanita}</span>
+                        <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Perempuan ({wanitaPercent}%)</p>
                       </div>
                     </div>
                   </div>
@@ -406,28 +406,28 @@ export default function DashboardView() {
           <div className="space-y-5 md:space-y-6">
               {/* ULANG TAHUN BULAN INI */}
               <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el h-full flex flex-col">
-                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-4">
-                      <span className="material-icons text-orange-600 bg-orange-50 p-2 rounded-xl text-xl">cake</span>
+                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-red-100 pb-4 mb-4">
+                      <span className="material-icons text-red-600 bg-red-50 p-2 rounded-xl text-xl">cake</span>
                       Ulang Tahun Bulan Ini
                   </h3>
                   
                   <div className="flex-1 overflow-y-auto max-h-80 space-y-3 pr-2">
                       {ulangTahun.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center h-full text-slate-400 opacity-50 py-10">
+                          <div className="flex flex-col items-center justify-center h-full text-red-300 opacity-50 py-10">
                               <span className="material-icons text-4xl mb-2">event_busy</span>
                               <p className="text-xs font-bold uppercase tracking-wider">Tidak ada yang berulang tahun</p>
                           </div>
                       ) : (
                           ulangTahun.map((u: any, i: number) => (
-                              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-orange-50/50 border border-orange-100 hover:bg-orange-50 transition">
-                                  <div className="w-10 h-10 bg-orange-200 text-orange-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0">
+                              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-red-50/50 border border-red-100 hover:bg-red-50 transition">
+                                  <div className="w-10 h-10 bg-red-200 text-red-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0">
                                       {u.nama.charAt(0).toUpperCase()}
                                   </div>
                                   <div className="flex-1 min-w-0">
                                       <h4 className="text-xs font-bold text-slate-800 truncate">{u.nama}</h4>
                                       <p className="text-[10px] text-slate-500 font-medium font-mono mt-0.5">{u.tanggalLahir}</p>
                                   </div>
-                                  <span className="material-icons text-orange-500 text-sm">celebration</span>
+                                  <span className="material-icons text-red-400 text-sm">celebration</span>
                               </div>
                           ))
                       )}

@@ -88,20 +88,29 @@ export default function KasOrganisasiView() {
     <div id="menu-kasOrganisasi" className="space-y-6 max-w-6xl mx-auto">
         {/* Kartu Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-3xl shadow-lg shadow-emerald-500/20 text-white flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">account_balance_wallet</span></div>
-                <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL PEMASUKAN</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.pemasukan.toLocaleString('id-ID')}</span>
+            <div className="bg-white p-5 rounded-3xl shadow-sm border border-red-100 flex flex-col justify-between relative overflow-hidden card-hover">
+                <div className="absolute -right-3 -top-3 opacity-[0.06]"><span className="material-icons text-7xl text-red-600">account_balance_wallet</span></div>
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-white bg-red-500 p-2 rounded-xl text-lg shadow-sm shadow-red-200">trending_up</span>
+                    <span className="font-bold text-[10px] tracking-widest uppercase text-red-400">TOTAL PEMASUKAN</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-black text-red-700">Rp{saldo.pemasukan.toLocaleString('id-ID')}</span>
             </div>
-            <div className="bg-gradient-to-br from-rose-500 to-red-600 p-5 rounded-3xl shadow-lg shadow-red-500/20 text-white flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">shopping_cart</span></div>
-                <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL PENGELUARAN</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.pengeluaran.toLocaleString('id-ID')}</span>
+            <div className="bg-white p-5 rounded-3xl shadow-sm border border-red-100 flex flex-col justify-between relative overflow-hidden card-hover">
+                <div className="absolute -right-3 -top-3 opacity-[0.06]"><span className="material-icons text-7xl text-red-600">shopping_cart</span></div>
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-white bg-red-700 p-2 rounded-xl text-lg shadow-sm shadow-red-200">trending_down</span>
+                    <span className="font-bold text-[10px] tracking-widest uppercase text-red-400">TOTAL PENGELUARAN</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-black text-red-700">Rp{saldo.pengeluaran.toLocaleString('id-ID')}</span>
             </div>
-            <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-5 rounded-3xl shadow-lg shadow-blue-500/20 text-white flex flex-col justify-between relative overflow-hidden">
+            <div className="bg-gradient-to-br from-red-600 to-red-700 p-5 rounded-3xl shadow-lg shadow-red-500/20 text-white flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">savings</span></div>
-                <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">SALDO AKTIF KAS</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.aktif.toLocaleString('id-ID')}</span>
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-red-600 bg-white p-2 rounded-xl text-lg shadow-sm">account_balance</span>
+                    <span className="font-bold text-[10px] tracking-widest uppercase text-red-100">SALDO AKTIF KAS</span>
+                </div>
+                <span className="text-xl sm:text-2xl font-black">Rp{saldo.aktif.toLocaleString('id-ID')}</span>
             </div>
         </div>
 
@@ -112,7 +121,7 @@ export default function KasOrganisasiView() {
                     <span className="material-icons text-red-600 bg-red-100 p-1 rounded-lg">filter_alt</span>Filter Transaksi Kas
                 </h3>
                 <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
-                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all duration-200">
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-200 active:scale-95 transition-all duration-200">
                     <span className="material-icons text-sm">add_circle</span> CATAT TRANSAKSI
                 </button>
             </div>
@@ -191,12 +200,12 @@ export default function KasOrganisasiView() {
         {isModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
                 <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden my-auto flex flex-col border border-red-200">
-                    <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
+                    <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
                         <div className="flex items-center space-x-2">
                             <span className="material-icons text-white text-lg">payments</span>
                             <h3 className="font-extrabold text-sm sm:text-base tracking-wide">Catat Transaksi Kas Baru</h3>
                         </div>
-                        <button onClick={() => setIsModalOpen(false)} className="text-emerald-100 hover:text-white transition bg-emerald-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
+                        <button onClick={() => setIsModalOpen(false)} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
                     <form onSubmit={handleSubmitKas} className="p-4 sm:p-6 space-y-4 text-xs sm:text-sm text-slate-800">
                         {formError && <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center font-bold text-xs">{formError}</div>}
@@ -205,12 +214,12 @@ export default function KasOrganisasiView() {
                         <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Tanggal *</label>
                             <input type="date" value={formData.tanggal} onChange={e => setFormData(p => ({ ...p, tanggal: e.target.value }))}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 transition bg-slate-50 text-xs" />
+                                className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50/30 text-xs" />
                         </div>
                         <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Tipe Transaksi *</label>
                             <select value={formData.tipe} onChange={e => setFormData(p => ({ ...p, tipe: e.target.value }))}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 transition font-semibold text-xs">
+                                className="w-full p-2.5 border border-red-200 rounded-xl bg-red-50/30 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-xs">
                                 <option value="PEMASUKAN">PEMASUKAN</option>
                                 <option value="PENGELUARAN">PENGELUARAN</option>
                             </select>
@@ -218,12 +227,12 @@ export default function KasOrganisasiView() {
                         <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Nominal (Rp) *</label>
                             <input type="number" value={formData.nominal} onChange={e => setFormData(p => ({ ...p, nominal: e.target.value }))} placeholder="Masukkan nominal"
-                                className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 transition bg-slate-50 text-xs" />
+                            className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50/30 text-xs" />
                         </div>
                         <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Kategori</label>
                             <select value={formData.kategori} onChange={e => setFormData(p => ({ ...p, kategori: e.target.value }))}
-                                className="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 transition font-semibold text-xs">
+                                className="w-full p-2.5 border border-red-200 rounded-xl bg-red-50/30 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-xs">
                                 <option value="">- Pilih Kategori -</option>
                                 <option value="Iuran Anggota">Iuran Anggota</option>
                                 <option value="Sumbangan">Sumbangan</option>
@@ -236,11 +245,11 @@ export default function KasOrganisasiView() {
                         <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Keterangan</label>
                             <textarea value={formData.keterangan} onChange={e => setFormData(p => ({ ...p, keterangan: e.target.value }))} placeholder="Keterangan transaksi..."
-                                className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 transition bg-slate-50 text-xs resize-none h-20" />
+                                className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50/30 text-xs resize-none h-20" />
                         </div>
 
                         <button type="submit" disabled={isSubmitting}
-                            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white p-3.5 rounded-xl font-bold shadow-lg transition-all flex justify-center items-center gap-2 text-sm active:scale-95 disabled:opacity-70">
+                            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-3.5 rounded-xl font-bold shadow-lg shadow-red-200 transition-all flex justify-center items-center gap-2 text-sm active:scale-95 disabled:opacity-70">
                             {isSubmitting ? 'Menyimpan...' : <><span className="material-icons text-sm">save</span> SIMPAN TRANSAKSI</>}
                         </button>
                     </form>
