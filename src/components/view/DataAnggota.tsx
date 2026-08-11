@@ -379,9 +379,6 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </h3>
                     <p className="text-xs text-red-400 mt-1">Daftar anggota dengan status <span className="font-bold text-red-700">Belum Lengkap</span>.</p>
                   </div>
-                  <button onClick={() => fetchData()} className="bg-red-700 hover:bg-red-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95">
-                    <span className="material-icons text-sm">refresh</span> Muat Ulang Data
-                  </button>
                 </div>
                 
                 {/* Table View for Verifikasi */}

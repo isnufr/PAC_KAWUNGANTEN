@@ -7,6 +7,19 @@ import { Doughnut, Pie, Bar } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
+function getDirectImageUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+    if (match && match[1]) {
+        return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    const match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (match2 && match2[1]) {
+        return `https://lh3.googleusercontent.com/d/${match2[1]}`;
+    }
+    return url;
+}
+
 export default function DashboardView() {
   const router = useRouter();
   const [selectedDesa, setSelectedDesa] = useState<string>('');
@@ -401,8 +414,8 @@ export default function DashboardView() {
                           ulangTahun.map((u: any, i: number) => (
                               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-red-50/50 border border-red-100 hover:bg-red-50 transition">
                                   <div className="w-10 h-10 bg-red-200 text-red-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0 overflow-hidden relative">
-                                      {u.passFotoUrl ? (
-                                        <img src={u.passFotoUrl} alt={u.nama} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = u.nama.charAt(0).toUpperCase(); }} />
+                                      {(u.passFotoUrl || u.fotoKtpUrl) ? (
+                                        <img src={getDirectImageUrl(u.passFotoUrl || u.fotoKtpUrl) || ''} alt={u.nama} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = u.nama.charAt(0).toUpperCase(); }} />
                                       ) : (
                                         u.nama.charAt(0).toUpperCase()
                                       )}
