@@ -6,7 +6,6 @@ import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import InstallPrompt from '@/components/InstallPrompt';
-import PullToRefresh from '@/components/PullToRefresh';
 import DashboardView from '@/components/view/Dashboard';
 import DataAnggotaView from '@/components/view/DataAnggota';
 import StrukturOrganisasiView from '@/components/view/StrukturOrganisasi';
@@ -97,21 +96,19 @@ function DashboardContent() {
           activeMenu={activeMenu} 
         />
 
-        <PullToRefresh onRefresh={async () => { window.location.reload(); }}>
-            <main className="flex-1 overflow-x-hidden bg-[#fafafa] p-3 sm:p-6 lg:p-8 min-h-full">
-               {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
-               <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
-                 {activeMenu === 'beranda' && <DashboardView />}
-                 {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" />}
-                 {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
-                 {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
-                 {activeMenu === 'kas_organisasi' && <KasOrganisasiView />}
-                 {activeMenu === 'laporan' && <LaporanView />}
-                 {activeMenu === 'manajemen_akun' && <ManajemenAkunView />}
-                 {activeMenu === 'log_aktivitas' && <LogAktivitasView />}
-               </div>
-            </main>
-        </PullToRefresh>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#fafafa] p-3 sm:p-6 lg:p-8">
+           {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
+           <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
+             {activeMenu === 'beranda' && <DashboardView />}
+             {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" />}
+             {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
+             {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
+             {activeMenu === 'kas_organisasi' && <KasOrganisasiView />}
+             {activeMenu === 'laporan' && <LaporanView />}
+             {activeMenu === 'manajemen_akun' && <ManajemenAkunView />}
+             {activeMenu === 'log_aktivitas' && <LogAktivitasView />}
+           </div>
+        </main>
       </div>
 
       {/* PWA Install Prompt */}

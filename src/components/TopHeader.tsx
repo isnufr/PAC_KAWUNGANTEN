@@ -26,6 +26,9 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
       </div>
       
       <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-2 rounded-full hover:bg-slate-100 transition-colors active:scale-95" title="Muat Ulang Halaman">
+          <span className="material-icons text-[20px]">refresh</span>
+        </button>
         <button className="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors active:scale-95" title="Toggle Theme">
           <span className="material-icons text-[20px] sm:text-[24px]">dark_mode</span>
         </button>
