@@ -87,12 +87,25 @@ export default function DataAnggotaView() {
 
       setOcrStatus('Selesai memindai.');
       
-      // Better regex logic for bad quality scans
-      const cleaned = text.replace(/[^a-zA-Z0-9\n:]/g, ' ').replace(/\s+/g, ' ');
-      const rawDigits = cleaned.replace(/\D/g, '');
+      // Extract NIK
+      const cleaned = text.replace(/[^a-zA-Z0-9\n:-]/g, ' ').replace(/\s+/g, ' ');
+      const rawDigits = text.replace(/\D/g, '');
       const nikMatch = rawDigits.match(/\d{16}/);
       if (nikMatch) handleFormChange('nik', nikMatch[0]);
       
+      // Extract Tanggal Lahir (DD-MM-YYYY)
+      const tglMatch = text.match(/\b\d{2}-\d{2}-\d{4}\b/);
+      if (tglMatch) handleFormChange('tanggalLahir', tglMatch[0]);
+
+      // Extract Jenis Kelamin
+      const textLower = text.toLowerCase();
+      if (textLower.includes('laki')) {
+        handleFormChange('jenisKelamin', 'LAKI-LAKI');
+      } else if (textLower.includes('perempuan')) {
+        handleFormChange('jenisKelamin', 'PEREMPUAN');
+      }
+
+      // Extract Nama
       const lines = text.split('\n');
       for (let i = 0; i < lines.length; i++) {
         if (lines[i].toLowerCase().includes('nama')) {
@@ -439,11 +452,19 @@ export default function DataAnggotaView() {
                                 </label>
                                 <span className="text-xs text-slate-400 font-medium">{fileKtp ? fileKtp.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
+
+                            {fileKtp && (
+                                <div className="mt-1 flex flex-col items-center bg-red-50/50 p-3 rounded-xl border border-red-100">
+                                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">PREVIEW KTP:</span>
+                                    <img src={URL.createObjectURL(fileKtp)} alt="Preview KTP" className="max-h-64 object-contain rounded-lg shadow-sm" />
+                                </div>
+                            )}
+
                             <div className="flex items-center gap-3 mt-1">
                                 <button type="button" onClick={handleScanKtp} className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition flex items-center gap-2">
                                     <span className="material-icons text-sm">document_scanner</span> Scan Data dari KTP
                                 </button>
-                                <span className="text-xs text-red-500 font-semibold">{ocrStatus || 'Bantu isi NIK & Nama otomatis'}</span>
+                                <span className="text-xs text-red-500 font-semibold">{ocrStatus || 'Bantu isi NIK, Nama & TTL otomatis'}</span>
                             </div>
                         </div>
 
@@ -527,6 +548,13 @@ export default function DataAnggotaView() {
                                 </label>
                                 <span className="text-xs text-slate-400 font-medium">{filePassFoto ? filePassFoto.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
+
+                            {filePassFoto && (
+                                <div className="mt-1 flex flex-col items-center bg-red-50/50 p-3 rounded-xl border border-red-100">
+                                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">PREVIEW PASS FOTO:</span>
+                                    <img src={URL.createObjectURL(filePassFoto)} alt="Preview Pass Foto" className="max-h-48 object-contain rounded-lg shadow-sm" />
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-3 pt-2">
