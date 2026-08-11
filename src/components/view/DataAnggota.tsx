@@ -5,6 +5,9 @@ import LoadingSpinner from '../LoadingSpinner';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
+    if (url.startsWith('/uploads/')) {
+        return `/api${url}`;
+    }
     const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
     if (match && match[1]) {
         return `https://lh3.googleusercontent.com/d/${match[1]}`;

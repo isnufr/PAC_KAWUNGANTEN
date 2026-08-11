@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const filePath = join(uploadDir, fileName);
     await writeFile(filePath, buffer);
 
-    const fileUrl = `/uploads/${fileName}`;
+    const fileUrl = `/api/uploads/${fileName}`;
 
     // Update Prisma
     if (type.toUpperCase() === 'KTP') {
