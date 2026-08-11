@@ -2,21 +2,34 @@ const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 function parseDate(dateStr) {
     if (!dateStr || dateStr.trim() === '') return null;
     try {
-        const parts = dateStr.split('-');
-        if (parts.length === 3) {
-            // YYYY-MM-DD
+        const [datePart, timePart] = dateStr.trim().split(' ');
+        let day, month, year;
+
+        if (datePart.includes('/')) {
+            [day, month, year] = datePart.split('/');
+        } else if (datePart.includes('-')) {
+            const parts = datePart.split('-');
             if (parts[0].length === 4) {
-                return new Date(dateStr);
+                // YYYY-MM-DD
+                year = parts[0]; month = parts[1]; day = parts[2];
+            } else {
+                // DD-MM-YYYY
+                day = parts[0]; month = parts[1]; year = parts[2];
             }
+        } else {
+            return new Date(dateStr);
         }
-        return new Date(dateStr);
+
+        const isoStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timePart || '00:00:00'}Z`;
+        const d = new Date(isoStr);
+        return isNaN(d.getTime()) ? null : d;
     } catch (e) {
         return null;
     }
