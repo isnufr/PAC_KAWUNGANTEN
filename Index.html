@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PAC KWT">
+    <meta name="theme-color" content="#dc2626">
+    <link id="appleTouchIcon" rel="apple-touch-icon" href="">
+    <title>PAC KAWUNGANTEN APP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <?!= include('CSS'); ?>
+    <?!= include('Logo'); ?>
+    <script>
+        // Synchronously inject icon links to ensure the browser detects them early
+        if (typeof APP_LOGO !== 'undefined' && APP_LOGO) {
+            document.getElementById('appleTouchIcon').href = APP_LOGO;
+            
+            const linkIcon = document.createElement('link');
+            linkIcon.rel = 'icon';
+            linkIcon.type = 'image/png';
+            linkIcon.href = APP_LOGO;
+            document.head.appendChild(linkIcon);
+            
+            const linkShortcut = document.createElement('link');
+            linkShortcut.rel = 'shortcut icon';
+            linkShortcut.type = 'image/png';
+            linkShortcut.href = APP_LOGO;
+            document.head.appendChild(linkShortcut);
+        }
+    </script>
+</head>
+
+<body class="flex flex-col md:flex-row">
+
+    <div id="globalLoader" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-md transition-opacity duration-300">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4 shadow-lg"></div>
+            <span class="text-red-700 font-extrabold text-xs tracking-[0.2em] uppercase animate-pulse">Memuat Data...</span>
+        </div>
+    </div>
+
+    <div id="toastContainer"
+        class="fixed bottom-4 left-4 right-4 md:left-auto md:right-5 z-50 space-y-2 pointer-events-none md:max-w-md">
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginPage"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-600 via-red-700 to-red-900 px-4">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-72 h-72 md:w-96 md:h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob">
+        </div>
+        <div
+            class="absolute bottom-[-10%] right-[-10%] w-72 h-72 md:w-96 md:h-96 bg-red-800 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000">
+        </div>
+
+        <div
+            class="bg-white/95 backdrop-blur-xl p-6 md:p-10 rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.3)] border border-red-200 w-full max-w-md transform transition-all relative z-10">
+            <div class="text-center mb-6 md:mb-8">
+                <!-- PERUBAHAN 2: Menambahkan Logo di Halaman Login -->
+                <div
+                    class="mx-auto h-20 w-20 md:h-24 md:w-24 bg-gradient-to-br from-white to-red-50 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30 mb-4 md:mb-5 transform hover:scale-105 transition duration-300 border-4 border-white p-2">
+                    <img id="loginLogo" class="w-full h-full object-contain" alt="PAC Logo">
+                </div>
+                <h2 class="text-xl md:text-2xl font-extrabold text-red-800 tracking-tight">LOGIN APLIKASI</h2>
+                <p class="text-red-400 text-[10px] md:text-xs font-bold tracking-widest mt-1.5 uppercase">PDIP PAC
+                    KAWUNGANTEN</p>
+            </div>
+            <div id="loginAlert"
+                class="hidden mb-4 p-3.5 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100 text-center font-bold tracking-wide">
+            </div>
+            <div class="space-y-4 md:space-y-5">
+                <div>
+                    <label
+                        class="block text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Username</label>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <span class="material-icons text-red-300 text-sm">person</span>
+                        </div>
+                        <input type="text" id="username"
+                            class="w-full py-3 pr-3 pl-10 md:py-3.5 md:pr-3.5 md:pl-10 border border-red-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-400 outline-none transition bg-white text-red-700 font-medium text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-bold text-red-400 uppercase tracking-wider mb-1">Password</label>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <span class="material-icons text-red-300 text-sm">lock</span>
+                        </div>
+                        <input type="password" id="password"
+                            class="w-full py-3 pr-3 pl-10 md:py-3.5 md:pr-3.5 md:pl-10 border border-red-100 rounded-xl focus:ring-4 focus:ring-red-50 focus:border-red-400 outline-none transition bg-white text-red-700 font-medium text-sm">
+                    </div>
+                </div>
+                <button onclick="handleLogin()" id="btnLogin"
+                    class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-3.5 md:p-4 rounded-xl font-bold shadow-xl shadow-red-200 transition-all flex justify-center items-center mt-4 text-sm active:scale-95">
+                    Masuk ke Sistem
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden w-full h-full flex flex-col md:flex-row overflow-hidden relative">
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebarBackdrop" onclick="toggleSidebar()"
+            class="hidden fixed inset-0 bg-red-900/40 backdrop-blur-sm z-30 md:hidden"></div>
+
+        <!-- Sidebar -->
+        <div id="sidebar"
+            class="bg-white/95 backdrop-blur-md w-64 flex-shrink-0 flex flex-col transition-all duration-300 fixed md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 border-r border-red-200 h-full shadow-[4px_0_24px_rgba(220,38,38,0.05)]">
+            <div
+                class="p-4 md:p-5 flex items-center justify-between bg-white text-red-700 border-b border-red-100 flex-shrink-0 theme-el">
+                <!-- PERUBAHAN 2: Menambahkan Logo di Sidebar -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-1 rounded-lg border border-red-200 shadow-sm flex items-center justify-center w-8 h-8">
+                        <img id="sidebarLogo" class="w-full h-full object-contain" alt="Logo">
+                    </div>
+                    <span class="font-bold text-xs md:text-sm tracking-wider">PAC KAWUNGANTEN</span>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-red-400 active:text-red-600 transition p-1"><span
+                        class="material-icons">close</span></button>
+            </div>
+            <div
+                class="p-4 text-red-400 text-[10px] md:text-xs font-bold tracking-widest uppercase mt-2 flex-shrink-0 theme-el">
+                Menu Utama</div>
+            <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+                <button onclick="switchMenu('dashboard')" id="btn-dashboard"
+                    class="active-menu flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons">dashboard</span><span class="text-sm">Dashboard</span>
+                </button>
+
+                <!-- PERUBAHAN 3: Sembunyikan Menu Verifikasi (tambah class hidden) -->
+                <button onclick="switchMenu('verifikasi')" id="btn-verifikasi"
+                    class="hidden flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons text-amber-500">fact_check</span>
+                    <span class="text-sm flex-1 text-left">Verifikasi Data</span>
+                    <span id="badgeIncomplete"
+                        class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shadow-sm">0</span>
+                </button>
+
+                <button onclick="switchMenu('dataAnggota')" id="btn-dataAnggota"
+                    class="flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons">folder_shared</span><span class="text-sm">Data Anggota</span>
+                </button>
+
+                <!-- MENU STRUKTUR ORGANISASI -->
+                <button onclick="switchMenu('strukturOrganisasi')" id="btn-strukturOrganisasi"
+                    class="flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons text-red-600">account_tree</span><span class="text-sm">Struktur
+                        Organisasi</span>
+                </button>
+
+                <!-- MENU KAS ORGANISASI -->
+                <button onclick="switchMenu('kasOrganisasi')" id="btn-kasOrganisasi"
+                    class="flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons text-rose-600">payments</span><span class="text-sm">Kas
+                        Organisasi</span>
+                </button>
+
+                <button onclick="switchMenu('laporan')" id="btn-laporan"
+                    class="flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons">print</span><span class="text-sm">Ekspor Laporan</span>
+                </button>
+
+                <!-- MENU MANAJEMEN AKUN LOGIN -->
+                <button onclick="switchMenu('akunManager')" id="btn-akunManager"
+                    class="hidden flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons text-red-600">manage_accounts</span><span class="text-sm">Manajemen
+                        Akun</span>
+                </button>
+
+                <!-- Tombol Menu Log Aktivitas -->
+                <button onclick="switchMenu('logAktivitas')" id="btn-logAktivitas"
+                    class="hidden flex items-center space-x-3 w-full p-3 rounded-xl transition font-medium hover:bg-red-50 hover:text-red-700 text-red-600">
+                    <span class="material-icons text-slate-500">history</span><span class="text-sm">Log Aktivitas</span>
+                </button>
+
+                <!-- Tombol Refresh Data -->
+                <button id="btnRefresh" onclick="refreshAllData()"
+                    class="flex items-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded-lg text-sm transition-all duration-200 shadow-sm disabled:opacity-50 mt-4 w-full justify-center theme-el">
+                    <svg id="refreshIcon" class="w-4 h-4 transition-transform duration-500" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
+                    <span class="hidden sm:inline">Refresh Server Data</span>
+                </button>
+            </nav>
+            <div
+                class="p-4 border-t border-red-100 bg-white text-red-600 flex items-center justify-between flex-shrink-0 theme-el">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center border border-red-200 theme-el">
+                        <span class="material-icons text-red-500 text-sm">person</span>
+                    </div>
+                    <div>
+                        <div id="userDisplay" class="font-bold text-xs text-red-700 uppercase theme-el">Guest</div>
+                        <div id="roleDisplay" class="text-[10px] text-red-500 font-semibold tracking-widest theme-el">
+                            Viewer</div>
+                    </div>
+                </div>
+                <button onclick="logout()"
+                    class="text-red-400 hover:text-red-700 transition p-2 rounded-lg hover:bg-red-50 theme-el"><span
+                        class="material-icons">power_settings_new</span></button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden bg-white h-full theme-el">
+            <header
+                class="bg-white/90 backdrop-blur-lg shadow-[0_4px_20px_rgba(220,38,38,0.03)] p-3.5 md:p-4 flex items-center justify-between border-b border-red-200 flex-shrink-0 theme-el sticky top-0 z-20">
+                <div class="flex items-center">
+                    <button onclick="toggleSidebar()"
+                        class="md:hidden text-red-600 mr-2.5 transition p-1 rounded-lg active:bg-red-50 theme-el"><span
+                            class="material-icons text-2xl block">menu</span></button>
+                    <h1 id="pageTitle" class="text-base md:text-lg font-bold text-red-700 theme-el">DASHBOARD STATISTIK
+                    </h1>
+                </div>
+                <div class="flex items-center">
+                    <div
+                        class="flex items-center space-x-1.5 md:space-x-2 text-[11px] md:text-xs text-red-600 font-semibold bg-red-50 px-2.5 md:px-3 py-1.5 rounded-full border border-red-100 theme-el">
+                        <span class="material-icons text-xs md:text-sm text-red-500 theme-el">event</span>
+                        <span id="currentDate" class="theme-el">-</span>
+                    </div>
+                    <button onclick="showInstallGuide()"
+                        class="ml-2 hidden sm:block p-1.5 bg-rose-50 text-rose-600 rounded-full border border-rose-100 hover:bg-rose-100 transition shadow-sm theme-el"
+                        title="Panduan Install Aplikasi ke HP">
+                        <span class="material-icons text-sm block">install_mobile</span>
+                    </button>
+                    <button onclick="toggleTheme()"
+                        class="ml-2 p-1.5 bg-red-50 text-red-600 rounded-full border border-red-100 hover:bg-red-100 transition shadow-sm theme-el"
+                        title="Ganti Tema">
+                        <span class="material-icons text-sm block" id="themeIcon">dark_mode</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-3.5 sm:p-5 md:p-6 bg-slate-50/80" id="contentArea">
+                <!-- Menu Dashboard -->
+                <div id="menu-dashboard" class="space-y-5 md:space-y-6 max-w-6xl mx-auto">
+
+                    <!-- Welcome Banner -->
+                    <div class="relative bg-gradient-to-r from-red-600 via-red-700 to-red-800 rounded-[20px] p-5 sm:p-6 text-white overflow-hidden">
+                        <div class="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/4"></div>
+                        <div class="absolute bottom-0 left-1/2 w-32 h-32 bg-white/5 rounded-full translate-y-1/2"></div>
+                        <div class="relative z-10">
+                            <h2 class="text-lg sm:text-xl font-black tracking-tight">Selamat Datang 👋</h2>
+                            <p class="text-white/70 text-xs sm:text-sm font-medium mt-1">Panel Kontrol Database Anggota PAC Kawunganten</p>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Stat Cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border-t-4 border-t-red-600 border-x border-b border-slate-100 shadow-[0_4px_16px_rgba(220,38,38,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                            <div class="absolute -right-2 -top-2 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity"><span class="material-icons text-6xl text-red-600">groups</span></div>
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="material-icons text-white bg-red-600 p-1.5 rounded-lg text-base shadow-sm shadow-red-200">groups</span>
+                                <span class="text-[9px] font-black text-red-700 tracking-widest uppercase">Total</span>
+                            </div>
+                            <span id="card-total" class="text-2xl md:text-3xl font-black text-slate-800 block">0</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Anggota</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border-t-4 border-t-red-600 border-x border-b border-slate-100 shadow-[0_4px_16px_rgba(220,38,38,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                            <div class="absolute -right-2 -top-2 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity"><span class="material-icons text-6xl text-red-600">account_balance</span></div>
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="material-icons text-white bg-red-600 p-1.5 rounded-lg text-base shadow-sm shadow-red-200">account_balance</span>
+                                <span class="text-[9px] font-black text-red-700 tracking-widest uppercase">PAC</span>
+                            </div>
+                            <span id="card-pac" class="text-2xl md:text-3xl font-black text-slate-800 block">0</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Pengurus</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border-t-4 border-t-red-600 border-x border-b border-slate-100 shadow-[0_4px_16px_rgba(220,38,38,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                            <div class="absolute -right-2 -top-2 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity"><span class="material-icons text-6xl text-red-600">store</span></div>
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="material-icons text-white bg-red-600 p-1.5 rounded-lg text-base shadow-sm shadow-red-200">store</span>
+                                <span class="text-[9px] font-black text-red-700 tracking-widest uppercase">Ranting</span>
+                            </div>
+                            <span id="card-ranting" class="text-2xl md:text-3xl font-black text-slate-800 block">0</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Pengurus</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border-t-4 border-t-red-600 border-x border-b border-slate-100 shadow-[0_4px_16px_rgba(220,38,38,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                            <div class="absolute -right-2 -top-2 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity"><span class="material-icons text-6xl text-red-600">holiday_village</span></div>
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="material-icons text-white bg-red-600 p-1.5 rounded-lg text-base shadow-sm shadow-red-200">holiday_village</span>
+                                <span class="text-[9px] font-black text-red-700 tracking-widest uppercase truncate max-w-full">Anak Ranting</span>
+                            </div>
+                            <span id="card-anakRanting" class="text-2xl md:text-3xl font-black text-slate-800 block">0</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Pengurus</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border-t-4 border-t-red-600 border-x border-b border-slate-100 shadow-[0_4px_16px_rgba(220,38,38,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
+                            <div class="absolute -right-2 -top-2 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity"><span class="material-icons text-6xl text-red-600">security</span></div>
+                            <div class="flex items-center gap-2 mb-2.5">
+                                <span class="material-icons text-white bg-red-600 p-1.5 rounded-lg text-base shadow-sm shadow-red-200">security</span>
+                                <span class="text-[9px] font-black text-red-700 tracking-widest uppercase">Satgas</span>
+                            </div>
+                            <span id="card-satgas" class="text-2xl md:text-3xl font-black text-slate-800 block">0</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Anggota</span>
+                        </div>
+                    </div>
+
+                    <div id="duplicateWarningBox"
+                        class="hidden bg-amber-50 border-2 border-amber-200 p-4 sm:p-5 rounded-2xl shadow-sm">
+                        <div class="flex items-start space-x-3">
+                            <span
+                                class="material-icons text-amber-600 bg-amber-100 p-1.5 rounded-xl text-lg animate-bounce">gpp_maybe</span>
+                            <div class="flex-1">
+                                <h3 class="text-xs md:text-sm font-extrabold text-amber-800 uppercase tracking-wide">
+                                    Terdeteksi Duplikasi Data Anggota!
+                                </h3>
+                                <p class="text-[11px] text-amber-600 font-medium mt-0.5">
+                                    Ditemukan beberapa Nomor NIK yang terdaftar lebih dari satu kali di dalam sistem.
+                                    Mohon segera periksa atau hapus salah satunya jika terjadi kesalahan input.
+                                </p>
+                                <div class="mt-3 overflow-x-auto rounded-2xl border border-amber-200">
+                                    <table class="w-full text-left text-xs text-amber-900 bg-white">
+                                        <thead
+                                            class="bg-amber-100/50 text-[10px] font-bold uppercase tracking-wider text-amber-800 border-b border-amber-200">
+                                            <tr>
+                                                <th class="p-2.5 pl-4">NIK</th>
+                                                <th class="p-2.5">Nama Anggota</th>
+                                                <th class="p-2.5">Wilayah (Desa)</th>
+                                                <th class="p-2.5 text-center">Jumlah Duplikat</th>
+                                                <th class="p-2.5 text-center pr-4">Aksi Cepat</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="duplicateTableBody" class="divide-y divide-amber-100"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MONITORING KUOTA KEPENGURUSAN -->
+                    <div class="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
+                            <div>
+                                <h3 class="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800">
+                                    <span class="material-icons text-red-600 bg-red-50 p-2 rounded-xl text-xl">people_alt</span>
+                                    Monitoring Kuota
+                                </h3>
+                                <p class="text-[11px] text-slate-400 font-medium mt-1 ml-[44px]">Pantau kelengkapan formasi pengurus berdasarkan wilayah.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                            <div class="bg-gradient-to-br from-red-50/80 to-rose-50/80 rounded-2xl p-4 border border-red-100/60 theme-el flex flex-col justify-between">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="material-icons text-red-600 bg-white shadow-sm p-2 rounded-xl border border-red-100 text-lg">analytics</span>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kesiapan PAC</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100">
+                                        <div id="kuotaTotalBar" class="bg-gradient-to-r from-red-500 to-red-600 h-2.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                    <span id="kuotaTotalPercent" class="text-2xl font-black text-red-700 leading-none whitespace-nowrap">0%</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-red-50/80 to-rose-50/80 rounded-2xl p-4 border border-red-100/60 theme-el flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-red-600 bg-white shadow-sm p-2 rounded-xl border border-red-100 text-lg">account_balance</span>
+                                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pengurus PAC</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-slate-400 bg-white px-2.5 py-1 rounded-lg border border-slate-100">Target: 11</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100">
+                                        <div id="kuotaPacBar" class="bg-gradient-to-r from-red-500 to-red-600 h-2.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span id="kuotaPacPercent" class="text-xl font-black text-red-700 leading-none">0%</span>
+                                        <span id="kuotaPacCount" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">0 / 11</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-red-50/80 to-rose-50/80 rounded-2xl p-4 border border-red-100/60 theme-el flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-icons text-red-600 bg-white shadow-sm p-2 rounded-xl border border-red-100 text-lg">security</span>
+                                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Satgas PAC</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-slate-400 bg-white px-2.5 py-1 rounded-lg border border-slate-100">Target: 5</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100">
+                                        <div id="kuotaSatgasBar" class="bg-gradient-to-r from-red-500 to-red-600 h-2.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span id="kuotaSatgasPercent" class="text-xl font-black text-red-700 leading-none">0%</span>
+                                        <span id="kuotaSatgasCount" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">0 / 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 theme-el">Pilih Desa untuk melihat kuota ranting</label>
+                            <div class="relative w-full md:w-1/2 mt-1">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                                    <span class="material-icons text-red-500 text-lg">location_on</span>
+                                </div>
+                                <select id="kuotaDesaSelect" onchange="renderKuotaWilayah()" class="w-full p-3.5 pl-10 pr-10 border-2 border-red-500 rounded-xl bg-red-50/30 outline-none focus:ring-4 focus:ring-red-100 focus:border-red-600 transition font-black text-red-800 text-sm appearance-none shadow-sm shadow-red-100 cursor-pointer theme-el hover:bg-red-50">
+                                    <option value="">-- PILIH DESA --</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <span class="material-icons text-red-500">expand_more</span>
+                                </div>
+                            </div>
+                            
+                            <div id="kuotaWilayahContainer" class="mt-4 hidden space-y-4">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Kelengkapan Data -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 theme-el">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm md:text-base font-black text-slate-800 flex items-center gap-2.5 tracking-tight theme-el">
+                                <span class="material-icons text-red-500 bg-red-50 p-2 rounded-xl text-xl theme-el">donut_large</span>
+                                Progress Data
+                            </h3>
+                            <span id="percentBadge"
+                                class="text-xs font-bold px-3 py-1 bg-red-50 text-red-600 rounded-full border border-red-100">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mb-5 overflow-hidden border border-slate-200/60 theme-el">
+                            <div class="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-1000 ease-out"
+                                id="completionBar" style="width: 0%"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-emerald-50/60 border border-emerald-100 p-3.5 rounded-xl flex items-center gap-3 theme-el">
+                                <span class="material-icons text-emerald-500 bg-white p-2 rounded-xl shadow-sm text-lg border border-emerald-100">verified</span>
+                                <div>
+                                    <p class="text-[9px] md:text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Data Lengkap</p>
+                                    <p id="textComplete" class="text-lg md:text-xl font-black text-slate-800 leading-none mt-0.5 theme-el">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50/60 border border-amber-100 p-3.5 rounded-xl flex items-center gap-3 theme-el">
+                                <span class="material-icons text-amber-500 bg-white p-2 rounded-xl shadow-sm text-lg border border-amber-100">gpp_maybe</span>
+                                <div>
+                                    <p class="text-[9px] md:text-[10px] font-bold text-amber-600 uppercase tracking-wider">Perlu Dilengkapi</p>
+                                    <p id="textIncomplete" class="text-lg md:text-xl font-black text-slate-800 leading-none mt-0.5 theme-el">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-[0_1px_8px_rgba(0,0,0,0.03)] flex flex-col theme-el">
+                                <h3 class="text-xs font-bold text-slate-600 flex items-center gap-2 uppercase tracking-wider mb-4 pb-2.5 border-b border-slate-100 theme-el">
+                                    <span class="material-icons text-rose-400 text-base">pie_chart</span>
+                                    Komposisi Gender
+                                </h3>
+                                <div class="chart-container">
+                                    <canvas id="genderChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-[0_1px_8px_rgba(0,0,0,0.03)] flex flex-col theme-el">
+                                <h3 class="text-xs font-bold text-slate-600 flex items-center gap-2 uppercase tracking-wider mb-4 pb-2.5 border-b border-slate-100 theme-el">
+                                    <span class="material-icons text-red-400 text-base">hourglass_empty</span>
+                                    Kelompok Usia
+                                </h3>
+                                <div class="chart-container">
+                                    <canvas id="ageChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-[0_1px_8px_rgba(0,0,0,0.03)] md:col-span-2 lg:col-span-1 flex flex-col theme-el">
+                                <h3 class="text-xs font-bold text-slate-600 flex items-center gap-2 uppercase tracking-wider mb-4 pb-2.5 border-b border-slate-100 theme-el">
+                                    <span class="material-icons text-red-500 text-base">bar_chart</span>
+                                    5 Desa Terbanyak
+                                </h3>
+                                <div class="chart-container">
+                                    <canvas id="desaChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ULANG TAHUN BULAN INI -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 theme-el">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 theme-el">
+                            <h3 class="text-sm md:text-base font-black text-slate-800 flex items-center gap-2.5 tracking-tight theme-el">
+                                <span class="material-icons text-pink-500 bg-pink-50 p-2 rounded-xl text-xl theme-el">cake</span>
+                                Ulang Tahun
+                            </h3>
+                            <span class="text-[10px] bg-pink-50 text-pink-600 px-3 py-1 rounded-full font-bold border border-pink-100"
+                                id="birthdayCountBadge">0 Anggota</span>
+                        </div>
+                        <div id="birthdayWidgetContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Section Tab: Verifikasi Data -->
+                <div id="menu-verifikasi" class="hidden space-y-4 max-w-6xl mx-auto">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 theme-el">
+                        <div
+                            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-red-50 pb-4 theme-el">
+                            <div>
+                                <h2
+                                    class="text-sm md:text-base font-bold text-red-700 flex items-center gap-2 uppercase tracking-wide theme-el">
+                                    <span
+                                        class="material-icons text-amber-500 bg-amber-50 p-1.5 rounded-lg border border-amber-200 theme-el">warning</span>
+                                    Verifikasi & Perbaikan Data
+                                </h2>
+                                <p class="text-xs text-red-400 mt-1">Daftar anggota dengan status <span
+                                        class="text-red-600 font-bold">Belum Lengkap</span>.</p>
+                            </div>
+                            <button onclick="loadVerifikasiData()"
+                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-md active:scale-95">
+                                <span class="material-icons text-sm">refresh</span> Muat Ulang Data
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-red-100 theme-el">
+                            <table class="w-full text-left text-xs sm:text-sm text-red-800 theme-el">
+                                <thead
+                                    class="bg-red-50 text-[10px] sm:text-xs uppercase text-red-600 border-b border-red-100 font-bold tracking-wider theme-el">
+                                    <tr>
+                                        <th class="p-3 sm:p-4">No</th>
+                                        <th class="p-3 sm:p-4">Nama Anggota</th>
+                                        <th class="p-3 sm:p-4">Wilayah</th>
+                                        <th class="p-3 sm:p-4">Status</th>
+                                        <th class="p-3 sm:p-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyVerifikasi" class="divide-y divide-red-50 bg-white theme-el">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Data Anggota -->
+                <div id="menu-dataAnggota" class="hidden space-y-4 max-w-6xl mx-auto">
+                    <div
+                        class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm space-y-3 md:space-y-4 border border-red-100 theme-el">
+                        <h3
+                            class="text-xs md:text-sm font-bold text-red-700 flex items-center uppercase tracking-wider border-b border-red-50 pb-2 theme-el">
+                            <span
+                                class="material-icons text-sm mr-2 text-red-600 bg-red-100 p-1 rounded-lg theme-el">filter_alt</span>
+                            Filter Pencarian
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
+                            <input type="text" id="filterNama" placeholder="Tulis Nama/NIK..." oninput="debounceFilter()"
+                                class="p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900 theme-el">
+                            <select id="filterBagian" onchange="applyFilters()"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Bagian -</option>
+                                <option value="PAC">PAC</option>
+                                <option value="RANTING">RANTING</option>
+                                <option value="ANAK RANTING">ANAK RANTING</option>
+                                <option value="SATGAS">SATGAS</option>
+                            </select>
+                            <select id="filterJabatan" onchange="applyFilters()"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Jabatan -</option>
+                                <option value="KETUA">KETUA</option>
+                                <option value="SEKRETARIS">SEKRETARIS</option>
+                                <option value="BENDAHARA">BENDAHARA</option>
+                                <option value="ANGGOTA">ANGGOTA</option>
+                            </select>
+                            <select id="filterKecamatan" onchange="applyFilters()"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Kecamatan -</option>
+                            </select>
+
+                            <select id="filterDesa" onchange="onFilterDesaChange(); applyFilters()"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Desa -</option>
+                            </select>
+
+                            <select id="filterDusun" onchange="applyFilters()"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Dusun -</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end space-x-2.5 pt-1">
+                            <button onclick="resetFilters()"
+                                class="px-4 py-2 border border-red-200 rounded-xl text-red-600 text-xs font-bold hover:bg-red-50 transition theme-el">Reset</button>
+                            <button onclick="applyFilters()"
+                                class="px-5 py-2 bg-red-700 text-white text-xs font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center space-x-1 theme-el"><span
+                                    class="material-icons text-sm">search</span><span>Cari Data</span></button>
+                        </div>
+                    </div>
+
+                    <!-- ACTION PANEL INPUT DATA -->
+                    <div id="actionPanel" class="hidden mt-2 mb-2 flex justify-center">
+                        <button onclick="openInputModal()"
+                            class="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-3 md:py-3.5 rounded-2xl sm:rounded-xl shadow-md hover:shadow-lg font-bold flex items-center justify-center space-x-2 transform active:scale-95 transition-all duration-300 text-sm">
+                            <span class="material-icons">add_circle</span><span>INPUT DATA BARU</span>
+                        </button>
+                    </div>
+
+                    <div id="listAnggotaContainer" class="space-y-4"></div>
+                </div>
+
+                <!-- SEKSI STRUKTUR ORGANISASI -->
+                <div id="menu-strukturOrganisasi" class="hidden space-y-5 max-w-6xl mx-auto">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm space-y-4 border border-red-100 theme-el">
+                        <h3
+                            class="text-xs md:text-sm font-bold text-red-700 flex items-center uppercase tracking-wider border-b border-red-50 pb-2 theme-el">
+                            <span
+                                class="material-icons text-sm mr-2 text-red-600 bg-red-100 p-1 rounded-lg theme-el">filter_alt</span>
+                            Filter Struktur Organisasi
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Bagian
+                                    Kepengurusan</label>
+                                <select id="structBagian" onchange="onStructBagianChange()"
+                                    class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full theme-el">
+                                    <option value="PAC">PAC (Kecamatan)</option>
+                                    <option value="RANTING">Ranting (Desa)</option>
+                                    <option value="ANAK RANTING">Anak Ranting (Dusun)</option>
+                                    <option value="SATGAS">Satgas</option>
+                                </select>
+                            </div>
+                            <div id="structDesaCol" class="hidden">
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Pilih
+                                    Desa</label>
+                                <select id="structDesa" onchange="onStructDesaChange()"
+                                    class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full theme-el">
+                                    <option value="">- Pilih Desa -</option>
+                                </select>
+                            </div>
+                            <div id="structDusunCol" class="hidden">
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Pilih
+                                    Dusun</label>
+                                <select id="structDusun" onchange="renderStrukturOrganisasi()"
+                                    class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs w-full theme-el">
+                                    <option value="">- Pilih Dusun -</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Container Tree Org Chart -->
+                    <div id="orgChartCanvas"
+                        class="p-4 sm:p-8 bg-slate-50 border border-slate-200 rounded-3xl min-h-[450px] flex flex-col items-center justify-start relative overflow-hidden theme-el">
+                        <!-- Konten Diagram Struktur Organisasi akan diisi via Javascript -->
+                    </div>
+                </div>
+
+                <!-- MENU: MANAJEMEN AKUN LOGIN (Halaman Terproteksi Editor) -->
+                <div id="menu-akunManager" class="hidden space-y-5 max-w-6xl mx-auto">
+                    <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-red-100 theme-el">
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-red-50 pb-4 mb-4">
+                            <div>
+                                <h2
+                                    class="text-sm md:text-base font-bold text-red-700 flex items-center gap-2 uppercase tracking-wide theme-el">
+                                    <span
+                                        class="material-icons text-red-600 bg-red-50 p-1.5 rounded-lg border border-red-200 theme-el">manage_accounts</span>
+                                    Manajemen Hak Akses Login
+                                </h2>
+                                <p class="text-xs text-red-400 mt-1">Daftar kredensial pengguna yang dapat masuk ke
+                                    dalam sistem.</p>
+                            </div>
+                            <button onclick="openUserModal()"
+                                class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                                <span class="material-icons text-sm">add_circle</span> Tambah Akun Baru
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-red-100 theme-el">
+                            <table class="w-full text-left text-xs sm:text-sm text-red-800 theme-el">
+                                <thead
+                                    class="bg-red-50 text-[10px] sm:text-xs uppercase text-red-600 border-b border-red-100 font-bold tracking-wider theme-el">
+                                    <tr>
+                                        <th class="p-3 sm:p-4">No</th>
+                                        <th class="p-3 sm:p-4">Username</th>
+                                        <th class="p-3 sm:p-4">Password</th>
+                                        <th class="p-3 sm:p-4">Level Role</th>
+                                        <th class="p-3 sm:p-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyAkun" class="divide-y divide-red-50 bg-white theme-el">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-6 text-red-400">Memuat data akun login...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU: KAS ORGANISASI (Buku Kas Pintar) -->
+                <div id="menu-kasOrganisasi" class="hidden space-y-6 max-w-6xl mx-auto">
+                    <!-- Kartu Summary Keuangan Kas -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div
+                            class="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-3xl shadow-lg shadow-emerald-500/20 text-white flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -right-3 -top-3 opacity-20"><span
+                                    class="material-icons text-7xl">account_balance_wallet</span></div>
+                            <span class="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL
+                                PEMASUKAN</span>
+                            <span id="kas-masuk" class="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                        </div>
+                        <div
+                            class="bg-gradient-to-br from-rose-500 to-red-600 p-5 rounded-3xl shadow-lg shadow-red-500/20 text-white flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -right-3 -top-3 opacity-20"><span
+                                    class="material-icons text-7xl">shopping_cart</span></div>
+                            <span class="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL
+                                PENGELUARAN</span>
+                            <span id="kas-keluar" class="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                        </div>
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 to-blue-600 p-5 rounded-3xl shadow-lg shadow-blue-500/20 text-white flex flex-col justify-between relative overflow-hidden">
+                            <div class="absolute -right-3 -top-3 opacity-20"><span
+                                    class="material-icons text-7xl">savings</span></div>
+                            <span class="font-bold text-[10px] tracking-widest uppercase opacity-80">SALDO AKTIF
+                                KAS</span>
+                            <span id="kas-saldo" class="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter & Penambahan Transaksi Kas -->
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm space-y-4 theme-el">
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-red-50 pb-3 theme-el">
+                            <h3
+                                class="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 theme-el">
+                                <span
+                                    class="material-icons text-red-600 bg-red-100 p-1 rounded-lg theme-el">filter_alt</span>
+                                Filter Transaksi Kas
+                            </h3>
+                            <button id="btnTambahKas" onclick="openKasModal()"
+                                class="hidden bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all duration-200">
+                                <span class="material-icons text-sm">add_circle</span> CATAT TRANSAKSI
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+                            <input type="text" id="filterKasKeterangan" placeholder="Cari keterangan..."
+                                class="p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900 theme-el">
+
+                            <select id="filterKasTipe"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Semua Tipe -</option>
+                                <option value="PEMASUKAN">PEMASUKAN</option>
+                                <option value="PENGELUARAN">PENGELUARAN</option>
+                            </select>
+
+                            <select id="filterKasKategori"
+                                class="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                                <option value="">- Semua Kategori -</option>
+                                <option value="Iuran Anggota">Iuran Anggota</option>
+                                <option value="Sumbangan">Sumbangan</option>
+                                <option value="Kegiatan Sosial">Kegiatan Sosial</option>
+                                <option value="Operasional PAC">Operasional PAC</option>
+                                <option value="Atribut Partai">Atribut / Alat Peraga</option>
+                                <option value="Lain-lain">Lain-lain</option>
+                            </select>
+
+                            <div class="flex gap-2">
+                                <button onclick="resetKasFilters()"
+                                    class="flex-1 py-2.5 border border-red-200 rounded-xl text-red-600 font-bold hover:bg-red-50 transition theme-el">Reset</button>
+                                <button onclick="applyKasFilters()"
+                                    class="flex-1 py-2.5 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center gap-1 theme-el">
+                                    <span class="material-icons text-sm">search</span> Cari
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Grafik Pengeluaran Kas per Kategori -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div
+                            class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-gray-200 flex flex-col md:col-span-1 theme-el">
+                            <h3
+                                class="text-xs md:text-sm font-bold text-slate-800 flex items-center uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 theme-el">
+                                <span
+                                    class="material-icons mr-2 text-rose-500 bg-rose-50 p-1 rounded-lg text-sm theme-el">pie_chart</span>
+                                Kategori Pengeluaran
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="kasPieChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Daftar Riwayat Buku Kas -->
+                        <div
+                            class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-gray-200 flex flex-col md:col-span-2 theme-el">
+                            <h3
+                                class="text-xs md:text-sm font-bold text-slate-800 flex items-center uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 theme-el">
+                                <span
+                                    class="material-icons mr-2 text-red-600 bg-red-100 p-1 rounded-lg text-sm theme-el">view_list</span>
+                                Arus Mutasi Transaksi Kas
+                            </h3>
+                            <div
+                                class="overflow-x-auto rounded-2xl border border-red-100 max-h-[350px] overflow-y-auto theme-el">
+                                <table class="w-full text-left text-xs sm:text-sm text-red-800 theme-el">
+                                    <thead
+                                        class="bg-red-50 text-[10px] sm:text-xs uppercase text-red-600 border-b border-red-100 font-bold tracking-wider sticky top-0 z-10 theme-el">
+                                        <tr>
+                                            <th class="p-3">Tanggal</th>
+                                            <th class="p-3">Tipe</th>
+                                            <th class="p-3">Kategori</th>
+                                            <th class="p-3">Keterangan</th>
+                                            <th class="p-3">Nominal</th>
+                                            <th class="p-3 text-center" id="thAksiKas">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBodyKas" class="divide-y divide-red-50 bg-white theme-el">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-6 text-red-400">Memuat catatan
+                                                keuangan...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Laporan -->
+                <div id="menu-laporan" class="hidden max-w-6xl mx-auto">
+                    <div
+                        class="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-red-100 max-w-2xl mx-auto text-center theme-el">
+                        <div
+                            class="mx-auto w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mb-3.5 border border-red-200 theme-el">
+                            <span
+                                class="material-icons text-red-600 text-2xl md:text-3xl theme-el">assignment_turned_in</span>
+                        </div>
+                        <h2 class="text-lg md:text-xl font-extrabold text-red-800 mb-1.5 theme-el">Ekspor Laporan Data
+                        </h2>
+                        <p class="text-red-400 text-xs md:text-sm mb-5 pb-5 border-b border-red-50 theme-el">Pilih
+                            filter dan format file dokumen yang Anda butuhkan untuk diunduh ke perangkat Anda.</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 mb-6 text-left">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center theme-el">Pilih Format Unduhan</label>
+                                <select id="lapFormat" onchange="onLapExportOptionsChange()"
+                                    class="w-full p-3.5 border-2 border-red-200 rounded-2xl bg-white outline-none text-xs md:text-sm font-bold text-red-700 focus:border-red-500 text-center cursor-pointer transition shadow-sm hover:shadow-md theme-el">
+                                    <option value="EXCEL">Spreadsheet Excel (.xlsx)</option>
+                                    <option value="PDF">Dokumen PDF (.pdf)</option>
+                                    <option value="CSV">Data Mentah CSV (.csv)</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2 pt-3 mt-1 border-t border-red-50 theme-el"></div>
+
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Filter
+                                    Bagian</label>
+                                <select id="lapBagian" onchange="onLapExportOptionsChange()"
+                                    class="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 theme-el">
+                                    <option value="">- Semua Bagian -</option>
+                                    <option value="PAC">PAC</option>
+                                    <option value="RANTING">RANTING</option>
+                                    <option value="ANAK RANTING">ANAK RANTING</option>
+                                    <option value="SATGAS">SATGAS</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Filter
+                                    Desa</label>
+                                <select id="lapDesa" onchange="onLapDesaChange()"
+                                    class="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 theme-el">
+                                    <option value="">- Semua Desa -</option>
+                                </select>
+                            </div>
+                            <div id="lapDusunContainer" class="hidden sm:col-span-2">
+                                <label
+                                    class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1 theme-el">Filter
+                                    Dusun (Bisa Pilih Banyak)</label>
+                                <div id="lapDusun" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1 p-3 border border-red-200 rounded-xl bg-white max-h-40 overflow-y-auto">
+                                    <!-- Checkboxes Dusun disuntik ke sini -->
+                                </div>
+                            </div>
+                              <div id="exportColumnsContainer" class="sm:col-span-2 pt-3 mt-1 border-t border-red-50 theme-el">
+                                  <label
+                                      class="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center theme-el">Pilih Kolom Ekspor</label>
+                                  <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_NIK" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>NIK</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_NAMA" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>NAMA</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_JENIS_KELAMIN" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>JENIS KELAMIN</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_TANGGAL_LAHIR" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>TANGGAL LAHIR</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_USIA" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>USIA</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_NOMOR_HP" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>NOMOR HP</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_DESA" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>DESA</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_DUSUN" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>DUSUN</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_BAGIAN" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>BAGIAN</span></label>
+                                      <label class="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer"><input type="checkbox" id="col_JABATAN" checked class="form-checkbox h-4 w-4 text-red-600 rounded"><span>JABATAN</span></label>
+                                  </div>
+                              </div>
+                        </div>
+
+                        <button onclick="exportData()"
+                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 md:py-4 rounded-full font-bold flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-500/30 transition transform active:scale-95 text-sm">
+                            <span class="material-icons">cloud_download</span><span>UNDUH SEKARANG</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Menu Log Aktivitas (Akses Proteksi: Hanya untuk Editor) -->
+                <div id="menu-logAktivitas" class="hidden max-w-6xl mx-auto space-y-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 theme-el">
+                        <div
+                            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-red-50 pb-4 theme-el">
+                            <div>
+                                <h2
+                                    class="text-sm md:text-base font-bold text-red-700 flex items-center gap-2 uppercase tracking-wide theme-el">
+                                    <span
+                                        class="material-icons text-slate-500 bg-slate-50 p-1.5 rounded-lg border border-slate-200 theme-el">history</span>
+                                    Log Aktivitas Sistem
+                                </h2>
+                                <p class="text-xs text-red-400 mt-1">Daftar riwayat aksi terbaru yang dilakukan oleh
+                                    pengguna sistem.</p>
+                            </div>
+                            <button onclick="loadLogAktivitas()"
+                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-md active:scale-95">
+                                <span class="material-icons text-sm">refresh</span> Muat Ulang Log
+                            </button>
+                        </div>
+
+                        <div
+                            class="overflow-x-auto rounded-2xl border border-red-100 max-h-[50vh] overflow-y-auto theme-el">
+                            <table class="w-full text-left text-xs sm:text-sm text-red-800 theme-el">
+                                <thead
+                                    class="bg-red-50 text-[10px] sm:text-xs uppercase text-red-600 border-b border-red-100 font-bold tracking-wider sticky top-0 z-10 theme-el">
+                                    <tr>
+                                        <th class="p-3 sm:p-4">Waktu</th>
+                                        <th class="p-3 sm:p-4">Pengguna</th>
+                                        <th class="p-3 sm:p-4">Aksi / Aktivitas</th>
+                                        <th class="p-3 sm:p-4">Detail</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyLog" class="divide-y divide-red-50 bg-white theme-el">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-6 text-red-400">Memuat log aktivitas...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Input/Edit Form -->
+    <div id="formModal"
+        class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+        <div
+            class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col transform scale-95 transition-all border border-red-200 theme-el">
+            <div
+                class="bg-red-700 p-4 sm:p-5 text-white flex justify-between items-center border-b border-red-800 flex-shrink-0">
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-white text-lg">edit_document</span>
+                    <h3 id="modalFormTitle" class="font-extrabold text-sm sm:text-base tracking-wide">Input Data Anggota
+                        Baru</h3>
+                </div>
+                <button onclick="closeInputModal()"
+                    class="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span
+                        class="material-icons text-sm block">close</span></button>
+            </div>
+            <form id="anggotaForm"
+                class="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5 flex-1 text-xs sm:text-sm text-red-800 bg-white theme-el"
+                onsubmit="submitForm(event)">
+                <input type="hidden" id="editId">
+
+                <div id="mediaUploadSection"
+                    class="p-4 sm:p-5 bg-red-50 border border-red-100 rounded-2xl shadow-sm space-y-3 sm:space-y-4 theme-el">
+                    <div class="bg-white p-3 rounded-xl border border-dashed border-red-300 theme-el">
+                        <label
+                            class="block text-[10px] font-bold text-red-500 mb-2 uppercase tracking-wide theme-el">Unggah
+                            Foto KTP</label>
+                        <input type="file" id="fileKtp" accept="image/*" onchange="previewUpload(this, 'previewNewKtpContainer', 'previewNewKtp')"
+                            class="w-full text-xs text-red-500 file:mr-2 file:py-1.5 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-700 transition cursor-pointer">
+                        <div id="previewNewKtpContainer" class="hidden mt-3 bg-red-50 p-2 rounded-lg border border-red-100 theme-el text-center">
+                            <span class="block text-[10px] text-red-400 font-bold uppercase mb-2">Preview KTP:</span>
+                            <img id="previewNewKtp" src="" class="h-48 sm:h-64 w-full object-contain rounded shadow-sm border border-red-200 cursor-pointer hover:opacity-80 transition" onclick="openImagePreview(this.src)">
+                        </div>
+                        <div id="previewOldKtpContainer"
+                            class="hidden mt-3 bg-red-50 p-2 rounded-lg border border-red-100 theme-el text-center">
+                            <span class="block text-[10px] text-red-400 font-bold uppercase mb-2">Foto KTP Lama:</span>
+                            <img id="previewOldKtp" src=""
+                                class="h-48 sm:h-64 w-full object-contain rounded shadow-sm border border-red-200 cursor-pointer hover:opacity-80 transition" onclick="openImagePreview(this.src)">
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 pt-3 border-t border-red-100 theme-el">
+                        <button type="button" onclick="executeRealKtpScan()" id="btnScanReal"
+                            class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center justify-center space-x-1.5 w-full sm:w-auto shadow-md transition active:scale-95">
+                            <span class="material-icons text-sm">document_scanner</span><span>Scan Data dari KTP</span>
+                        </button>
+                        <span id="scanStatus"
+                            class="text-[11px] text-red-400 font-medium text-center sm:text-left theme-el">Bantu isi
+                            NIK, Nama & TTL otomatis</span>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 bg-red-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-red-100 theme-el">
+                    <!-- PERUBAHAN 1: Hapus atribut "required" pada semua field kecuali formNama -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Nomor
+                            NIK</label>
+                        <input type="text" id="formNik"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Nama
+                            Lengkap</label>
+                        <!-- Form Nama tetap REQUIRED -->
+                        <input type="text" id="formNama" required
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium uppercase text-xs sm:text-sm text-red-900 theme-el">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Tanggal
+                            Lahir</label>
+                        <input type="text" id="formTanggalLahir" placeholder="DD-MM-YYYY" onfocus="(this.type='date')"
+                            onblur="(this.value === '' ? this.type='text' : this.type='date')"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Jenis
+                            Kelamin</label>
+                        <select id="formJenisKelamin"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                            <option value="LAKI-LAKI">LAKI-LAKI</option>
+                            <option value="PEREMPUAN">PEREMPUAN</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Nomor
+                            Handphone (WA)</label>
+                        <input type="text" id="formNomorHp" placeholder="08..."
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Posisi
+                            Bagian</label>
+                        <select id="formBagian"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                            <option value="PAC">PAC</option>
+                            <option value="RANTING">RANTING</option>
+                            <option value="ANAK RANTING">ANAK RANTING</option>
+                            <option value="SATGAS">SATGAS</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Jabatan
+                            Struktural</label>
+                        <select id="formJabatan"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                            <option value="KETUA">KETUA</option>
+                            <option value="SEKRETARIS">SEKRETARIS</option>
+                            <option value="BENDAHARA">BENDAHARA</option>
+                            <option value="ANGGOTA">ANGGOTA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-red-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-red-100 theme-el">
+                    <div>
+                        <label
+                            class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Kecamatan</label>
+                        <select id="formKecamatan" onchange="updateDesaDropdown()"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Desa</label>
+                        <select id="formDesa" onchange="updateDusunDropdown()"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Dusun</label>
+                        <select id="formDusun"
+                            class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs cursor-pointer text-red-900 theme-el">
+                            <option value="">- Pilih -</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 p-4 sm:p-5 rounded-2xl shadow-sm border border-dashed border-red-300 theme-el mt-2">
+                    <label
+                        class="block text-[10px] font-bold text-red-500 mb-2 uppercase tracking-wide theme-el">Unggah
+                        Pass Foto</label>
+                    <input type="file" id="filePassFoto" accept="image/*" onchange="previewUpload(this, 'previewNewPassContainer', 'previewNewPass')"
+                        class="w-full text-xs text-red-500 file:mr-2 file:py-1.5 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-700 transition cursor-pointer">
+                    <div id="previewNewPassContainer" class="hidden mt-3 bg-white p-2 rounded-lg border border-red-100 theme-el text-center">
+                        <span class="block text-[10px] text-red-400 font-bold uppercase mb-2">Preview Pass Foto:</span>
+                        <img id="previewNewPass" src="" class="h-32 w-auto mx-auto object-cover rounded shadow-sm border border-red-200 cursor-pointer hover:opacity-80 transition" onclick="openImagePreview(this.src)">
+                    </div>
+                    <div id="previewOldPassContainer"
+                        class="hidden mt-3 bg-white p-2 rounded-lg border border-red-100 theme-el text-center">
+                        <span class="block text-[10px] text-red-400 font-bold uppercase mb-2">Foto Lama:</span>
+                        <img id="previewOldPass" src=""
+                            class="h-32 w-auto mx-auto object-cover rounded shadow-sm border border-red-200">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-2.5 pt-3 border-t border-red-100 theme-el">
+                    <button type="button" onclick="closeInputModal()"
+                        class="px-5 py-2.5 border border-red-200 rounded-full text-red-500 hover:bg-red-50 font-bold transition text-xs sm:text-sm theme-el">Batal</button>
+                    <button type="submit" id="btnSubmitForm"
+                        class="px-7 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg shadow-red-500/30 transition text-xs sm:text-sm active:scale-95">Simpan
+                        Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal View Detail -->
+    <div id="viewModal"
+        class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-3 sm:p-4 transition-all duration-300">
+        <div
+            class="bg-white rounded-[28px] shadow-[0_25px_60px_rgba(0,0,0,0.3)] w-full max-w-md overflow-hidden my-auto transform scale-95 transition-all duration-300 theme-el">
+
+            <!-- Hero Header with Gradient -->
+            <div class="relative bg-gradient-to-br from-red-600 via-red-700 to-red-900 px-5 pt-10 pb-16 text-center overflow-hidden">
+                <!-- Decorative circles -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                <!-- Close Button -->
+                <button onclick="closeViewModal()" class="absolute top-3 right-3 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white p-1.5 rounded-xl transition-all duration-200 z-10">
+                    <span class="material-icons text-lg block">close</span>
+                </button>
+            </div>
+
+            <!-- Profile Photo (overlapping hero) -->
+            <div class="flex flex-col items-center -mt-14 relative z-10 px-5">
+                <div class="relative w-28 h-28 bg-white rounded-2xl border-4 border-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center justify-center group overflow-hidden theme-el">
+                    <img id="viewPassFoto" src="" alt="Pass Foto" class="w-full h-full object-cover hidden cursor-pointer hover:scale-110 transition-transform duration-300" onclick="openImagePreview(this.src)">
+                    <span id="noPassFoto" class="material-icons text-red-200 text-5xl theme-el">person</span>
+                    <button id="downloadPassFotoBtn"
+                        class="hidden absolute bottom-1 right-1 bg-red-600/90 hover:bg-red-600 backdrop-blur-sm text-white p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 shadow" title="Unduh Pass Foto">
+                        <span class="material-icons text-[13px] block">download</span>
+                    </button>
+                </div>
+                <h4 id="viewNama" class="font-black text-lg sm:text-xl text-slate-800 tracking-tight text-center uppercase mt-3 theme-el">Nama Anggota</h4>
+                <div class="flex flex-wrap items-center justify-center gap-2 mt-2.5">
+                    <span id="viewBadge" class="px-3.5 py-1 bg-red-600 text-white rounded-full text-[10px] font-bold tracking-widest uppercase shadow-sm">BAGIAN</span>
+                    <span id="viewJabatanView" class="px-3.5 py-1 bg-red-50 text-red-700 rounded-full text-[10px] font-bold tracking-widest border border-red-200 uppercase theme-el">JABATAN</span>
+                </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="px-5 pt-5 pb-5 space-y-3 max-h-[55vh] overflow-y-auto theme-el">
+
+                <!-- Info Rows -->
+                <div class="space-y-2">
+                    <!-- ID & NIK -->
+                    <div class="flex gap-2">
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100 theme-el">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-icons text-red-400 text-[13px]">tag</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">ID Sistem</span>
+                            </div>
+                            <p id="viewId" class="font-bold text-sm text-slate-800 theme-el">-</p>
+                        </div>
+                        <div class="flex-[2] bg-slate-50 rounded-xl p-3 border border-slate-100 theme-el">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-icons text-red-400 text-[13px]">fingerprint</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">Nomor NIK</span>
+                            </div>
+                            <p id="viewNik" class="font-bold text-sm text-slate-800 font-mono theme-el">-</p>
+                        </div>
+                    </div>
+
+                    <!-- TTL & Jenis Kelamin -->
+                    <div class="flex gap-2">
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100 theme-el">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-icons text-red-400 text-[13px]">cake</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">TTL (Umur)</span>
+                            </div>
+                            <p id="viewTglUmur" class="font-bold text-sm text-slate-800 theme-el">-</p>
+                        </div>
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100 theme-el">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-icons text-red-400 text-[13px]">wc</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">Jenis Kelamin</span>
+                            </div>
+                            <p id="viewJk" class="font-bold text-sm text-slate-800 theme-el">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Kontak WhatsApp -->
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center justify-between theme-el">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-icons text-green-500 text-[13px]">phone</span>
+                                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">Kontak WhatsApp</span>
+                            </div>
+                            <p id="viewHp" class="font-bold text-sm text-slate-800 theme-el">-</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a id="btnLinkWa" href="#" target="_blank"
+                                class="bg-green-500 hover:bg-green-600 text-white p-2.5 rounded-xl flex items-center shadow-md shadow-green-500/20 transition-all duration-200 hover:scale-105 active:scale-95"
+                                title="Kirim WhatsApp"><span class="material-icons text-base">chat</span></a>
+                            <button id="btnSaveContact"
+                                class="bg-slate-700 hover:bg-slate-800 text-white p-2.5 rounded-xl flex items-center shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hidden"
+                                title="Simpan ke Kontak HP"><span class="material-icons text-base">person_add</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Alamat -->
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 theme-el">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="material-icons text-red-400 text-[13px]">location_on</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider theme-el">Alamat Domisili</span>
+                        </div>
+                        <p id="viewAlamat" class="font-bold text-sm text-slate-800 leading-relaxed theme-el">-</p>
+                    </div>
+                </div>
+
+                <!-- Foto KTP Section -->
+                <div class="pt-2">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="material-icons text-red-400 text-[14px]">credit_card</span>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider theme-el">Foto KTP</span>
+                    </div>
+                    <div class="w-full h-40 sm:h-52 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative group theme-el transition-colors hover:border-red-300">
+                        <img id="viewFotoKtp" src="" alt="Foto KTP" class="w-full h-full object-contain hidden cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openImagePreview(this.src)">
+                        <div id="noFotoKtp" class="flex flex-col items-center gap-1 theme-el">
+                            <span class="material-icons text-slate-300 text-3xl">photo_camera</span>
+                            <span class="text-[10px] text-slate-400 font-semibold">Belum ada foto KTP</span>
+                        </div>
+                        <div class="absolute bottom-2.5 right-2.5 flex space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <button id="linkFotoKtp" onclick="openImagePreview(document.getElementById('viewFotoKtp').src)"
+                                class="hidden bg-black/60 backdrop-blur-sm text-white p-2 rounded-xl hover:bg-red-600 transition-all duration-200 shadow-lg"
+                                title="Lihat Asli">
+                                <span class="material-icons text-sm block">zoom_in</span>
+                            </button>
+                            <button id="downloadFotoKtpBtn"
+                                class="hidden bg-red-600 text-white p-2 rounded-xl hover:bg-red-700 transition-all duration-200 shadow-lg"
+                                title="Unduh KTP">
+                                <span class="material-icons text-sm block">download</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tombol Kartu Anggota Digital -->
+                <button onclick="generateDigitalCard()" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-red-600/25 transition-all duration-300 flex items-center justify-center space-x-2 active:scale-[0.97] text-xs sm:text-sm uppercase tracking-wider hover:shadow-xl">
+                    <span class="material-icons text-base">card_membership</span>
+                    <span>Buat Kartu Anggota Digital</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: KARTU ANGGOTA DIGITAL -->
+    <div id="digitalCardModal" class="modal opacity-0 pointer-events-none fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-md p-3 sm:p-4 transition-opacity" style="z-index: 9998;">
+        <div class="relative w-full max-w-md flex flex-col items-center">
+            <div class="absolute -top-4 right-0 flex space-x-2 z-10">
+                <button onclick="downloadDigitalCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded-full shadow-xl transition" title="Unduh Kartu">
+                    <span class="material-icons text-lg block">download</span>
+                </button>
+                <button onclick="closeDigitalCard()" class="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-full shadow-xl transition" title="Tutup">
+                    <span class="material-icons text-lg block">close</span>
+                </button>
+            </div>
+            <canvas id="digitalCardCanvas" class="rounded-2xl shadow-2xl max-w-full mt-8" style="max-height: 80vh;"></canvas>
+            <p class="text-white/50 text-[10px] font-bold mt-3 uppercase tracking-widest">Tekan tombol hijau untuk mengunduh kartu</p>
+        </div>
+    </div>
+
+    <!-- MODAL: INPUT/EDIT AKUN USER -->
+    <div id="userModal"
+        class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden my-auto transform scale-95 transition-all border border-red-200 theme-el">
+            <div class="bg-blue-700 p-4 text-white flex justify-between items-center border-b border-blue-800">
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-white">person_add</span>
+                    <h3 id="modalUserTitle" class="font-extrabold text-xs sm:text-sm tracking-wide">Input Kredensial
+                        Akun</h3>
+                </div>
+                <button onclick="closeUserModal()"
+                    class="text-blue-100 hover:text-white bg-blue-800 p-1.5 rounded-lg"><span
+                        class="material-icons text-sm block">close</span></button>
+            </div>
+            <form id="userForm" class="p-5 space-y-4 text-xs sm:text-sm text-red-800 bg-white theme-el"
+                onsubmit="submitUserForm(event)">
+                <input type="hidden" id="oldUserKey">
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Username
+                        Akun</label>
+                    <input type="text" id="formUsername" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Password
+                        Akun</label>
+                    <input type="text" id="formPassword" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Level Hak
+                        Akses (Role)</label>
+                    <select id="formRole" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                        <option value="Viewer">Viewer (Hanya Melihat)</option>
+                        <option value="Editor">Editor (Full Akses)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2.5 pt-2 border-t border-red-100 theme-el">
+                    <button type="button" onclick="closeUserModal()"
+                        class="px-4 py-2 border border-red-200 rounded-full font-bold text-xs theme-el">Batal</button>
+                    <button type="submit" id="btnSubmitUser"
+                        class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-md transition text-xs active:scale-95">Simpan
+                        Akun</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: INPUT/EDIT KAS ORGANISASI -->
+    <div id="kasModal"
+        class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden my-auto transform scale-95 transition-all border border-red-200 theme-el">
+            <div class="bg-emerald-700 p-4 text-white flex justify-between items-center border-b border-emerald-800">
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-white">payments</span>
+                    <h3 id="modalKasTitle" class="font-extrabold text-xs sm:text-sm tracking-wide">Catat Keuangan
+                        Organisasi</h3>
+                </div>
+                <button onclick="closeKasModal()"
+                    class="text-emerald-100 hover:text-white bg-emerald-800 p-1.5 rounded-lg"><span
+                        class="material-icons text-sm block">close</span></button>
+            </div>
+            <form id="kasForm" class="p-5 space-y-4 text-xs sm:text-sm text-red-800 bg-white theme-el"
+                onsubmit="submitKasForm(event)">
+                <input type="hidden" id="editKasId">
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Tanggal
+                        Transaksi</label>
+                    <input type="date" id="formKasTanggal" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Tipe Alur
+                        Keuangan</label>
+                    <select id="formKasTipe" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                        <option value="PEMASUKAN">PEMASUKAN (Kas Masuk)</option>
+                        <option value="PENGELUARAN">PENGELUARAN (Kas Keluar)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Nominal
+                        Uang (Rupiah)</label>
+                    <input type="number" id="formKasNominal" required placeholder="Contoh: 50000"
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Kategori
+                        Keuangan</label>
+                    <select id="formKasKategori" required
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                        <option value="Iuran Anggota">Iuran Anggota</option>
+                        <option value="Sumbangan">Sumbangan</option>
+                        <option value="Kegiatan Sosial">Kegiatan Sosial</option>
+                        <option value="Operasional PAC">Operasional PAC</option>
+                        <option value="Atribut Partai">Atribut / Alat Peraga</option>
+                        <option value="Lain-lain">Lain-lain</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide theme-el">Deskripsi
+                        Keterangan</label>
+                    <input type="text" id="formKasKeterangan" required placeholder="Tulis deskripsi ringkas..."
+                        class="mt-1 w-full p-2.5 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-100 focus:border-red-500 outline-none bg-white font-medium text-xs sm:text-sm text-red-900 theme-el">
+                </div>
+                <div class="flex justify-end space-x-2.5 pt-2 border-t border-red-100 theme-el">
+                    <button type="button" onclick="closeKasModal()"
+                        class="px-4 py-2 border border-red-200 rounded-full font-bold text-xs theme-el">Batal</button>
+                    <button type="submit" id="btnSubmitKas"
+                        class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-md transition text-xs active:scale-95">Simpan
+                        Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" onclick="closeImagePreview()" class="modal opacity-0 pointer-events-none fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 transition-opacity cursor-pointer" style="z-index: 9999;">
+        <div class="relative w-full h-full flex justify-center items-center">
+            <button type="button" onclick="closeImagePreview()" class="absolute top-4 right-4 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition shadow-lg z-10 focus:outline-none">
+                <span class="material-icons">close</span>
+            </button>
+            <img id="imagePreviewImg" onclick="event.stopPropagation()" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl cursor-default" src="" alt="Preview">
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal"
+        class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl transform scale-95 transition-transform duration-300 theme-el">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="p-3 bg-red-100 rounded-full">
+                    <span class="material-icons text-red-600 text-2xl block">warning</span>
+                </div>
+                <h3 class="font-bold text-red-800 text-lg theme-el">Konfirmasi</h3>
+            </div>
+            <p id="confirmMessage" class="text-sm text-red-600 mb-6 theme-el">Apakah Anda yakin?</p>
+            <div class="flex space-x-3">
+                <button id="btnConfirmCancel"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold p-3 rounded-xl transition shadow-sm theme-el">Batal</button>
+                <button id="btnConfirmProceed"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-xl shadow-lg hover:shadow-xl transition shadow-red-500/30">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Guide Modal -->
+    <div id="installModal" class="modal opacity-0 pointer-events-none fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm p-6 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 theme-el" id="installModalContent">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 bg-rose-100 rounded-xl">
+                        <span class="material-icons text-rose-600 text-2xl block">install_mobile</span>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-rose-800 text-lg theme-el">Install Aplikasi</h3>
+                        <p class="text-[10px] text-rose-500 font-bold uppercase theme-el">Tambahkan ke Layar HP</p>
+                    </div>
+                </div>
+                <button onclick="closeInstallGuide()" class="text-slate-400 hover:text-rose-500 transition p-1 bg-slate-50 hover:bg-rose-50 rounded-lg theme-el"><span class="material-icons text-xl block">close</span></button>
+            </div>
+            
+            <div class="space-y-4 mb-5 text-sm text-slate-600 font-medium theme-el leading-relaxed">
+                <p>Jadikan aplikasi ini layaknya aplikasi Android/iOS yang terpasang di layar utama HP Anda agar lebih cepat diakses tanpa harus mengetik link.</p>
+                
+                <div class="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100 theme-el">
+                    <p class="font-bold text-xs uppercase text-blue-700 mb-1.5 flex items-center"><span class="material-icons text-sm mr-1">android</span> Android (Chrome)</p>
+                    <ol class="list-decimal pl-4 text-xs space-y-1.5 text-slate-700">
+                        <li>Ketuk ikon <b>Titik Tiga (⋮)</b> di sudut kanan atas browser Chrome.</li>
+                        <li>Pilih menu <b>"Tambahkan ke Layar Utama"</b>.</li>
+                        <li>Ketuk <b>Tambah</b>.</li>
+                    </ol>
+                </div>
+                
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 theme-el">
+                    <p class="font-bold text-xs uppercase text-slate-700 mb-1.5 flex items-center"><span class="material-icons text-sm mr-1">phone_iphone</span> iPhone (Safari)</p>
+                    <ol class="list-decimal pl-4 text-xs space-y-1.5 text-slate-600">
+                        <li>Ketuk ikon <b>Bagikan (Share)</b> <span class="material-icons text-[10px]">ios_share</span> di baris paling bawah.</li>
+                        <li>Gulir ke bawah, pilih <b>"Tambah ke Layar Utama"</b>.</li>
+                        <li>Ketuk <b>Tambah</b> di pojok kanan atas.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <button onclick="closeInstallGuide()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold p-3 rounded-xl transition shadow-sm theme-el">Mengerti & Tutup</button>
+        </div>
+    </div>
+
+    <!-- Script Utama Aplikasi -->
+    <?!= include('JS'); ?>
+</body>
+
+</html>
+
+
+
+

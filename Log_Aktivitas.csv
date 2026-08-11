@@ -1,0 +1,417 @@
+WAKTU,PENGGUNA,AKSI,DETAIL
+2026-07-13 18:17:57,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-13 18:18:41,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-27 20:19:16,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-27 20:36:53,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-27 20:39:02,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TISNO MEGIPRIYANTO (ID: 1133)
+2026-07-27 21:05:44,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-27 21:07:54,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAMINAH (ID: 1064)
+2026-07-28 9:04:43,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 9:06:26,ISNUFR,TAMBAH_KAS,Mencatat transaksi kas: PENGELUARAN - Rp350.000 (Operasional PAC)
+2026-07-28 9:24:20,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 9:33:29,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 9:44:33,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 9:56:27,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 9:58:11,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 11:00:43,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 11:23:15,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: EDI PURWANTO (ID: 1201)
+2026-07-28 11:24:32,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SAKAM (ID: 1202)
+2026-07-28 11:25:49,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NGALIMIN (ID: 1203)
+2026-07-28 11:27:40,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NUR AHMAD HARYANTO (ID: 1204)
+2026-07-28 11:29:02,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUPRIYADI (ID: 1205)
+2026-07-28 11:31:48,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUMTATIAH (ID: 1206)
+2026-07-28 11:33:31,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUMARNI (ID: 1207)
+2026-07-28 11:34:44,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: HERMAN KUSWANTO (ID: 1208)
+2026-07-28 11:41:05,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 11:54:07,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 12:06:33,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 12:50:38,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 17:51:41,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-28 22:16:35,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 12:56:29,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 16:24:42,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 16:26:43,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 16:45:15,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 16:45:42,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: NITA NANDA LESTARI (ID: 1123)
+2026-07-29 19:14:12,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 19:55:20,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUPRIYATI (ID: 1209)
+2026-07-29 20:07:48,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RAGIL FITRIANTO (ID: 1210)
+2026-07-29 20:09:23,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: AN AN BE TANUPEKEBUN OS (ID: 1211)
+2026-07-29 20:10:18,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUPOMO (ID: 1212)
+2026-07-29 20:11:05,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: KAMSO (ID: 1213)
+2026-07-29 20:12:25,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: YASUN (ID: 1214)
+2026-07-29 20:14:39,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUTIMAN (ID: 1215)
+2026-07-29 20:19:13,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TUGIMAN ROSIDIN (ID: 1216)
+2026-07-29 20:20:27,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RESTIANA (ID: 1217)
+2026-07-29 20:21:54,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAIMAN (ID: 1211)
+2026-07-29 20:24:01,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: FAJAR SULISTRIONO (ID: 1023)
+2026-07-29 21:00:18,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TARNO (ID: 1218)
+2026-07-29 21:13:18,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: AGUS SUPRAPTO (ID: 1219)
+2026-07-29 21:21:51,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NURYANTO (ID: 1220)
+2026-07-29 21:25:38,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 21:29:18,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-29 21:41:17,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TASIMAN (ID: 1197)
+2026-07-29 21:43:31,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: KARSIM (ID: 1196)
+2026-07-29 21:50:52,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUMINAH (ID: 1198)
+2026-07-29 21:53:59,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WIDAYANTI (ID: 1199)
+2026-07-29 22:03:22,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUSANTI (ID: 1221)
+2026-07-29 22:04:39,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: KASMIN (ID: 1200)
+2026-07-29 22:06:14,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PONIMAN (ID: 1195)
+2026-07-29 22:06:47,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SURYA PALUPI (ID: 1191)
+2026-07-29 22:08:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: EKO JULIANTO PRASETIYO (ID: 1222)
+2026-07-29 22:10:29,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUSANTI (ID: 1221)
+2026-07-29 22:11:34,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: suripto afrianto (ID: 1223)
+2026-07-29 22:12:44,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: difa anggraeni putri pratama (ID: 1224)
+2026-07-29 22:35:20,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ERIK SADIKUN (ID: 1225)
+2026-07-29 22:50:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WASIKUN (ID: 1226)
+2026-07-29 22:51:15,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: UNTUNG PURNOMO (ID: 1227)
+2026-07-29 22:52:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WAHYU BAGAS YULIANTORO (ID: 1228)
+2026-07-29 22:54:10,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WASIKUN (ID: 1226)
+2026-07-29 22:57:51,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PONIMAN (ID: 1195)
+2026-07-29 23:01:13,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: .- HERI SUSETYO (ID: 1229)
+2026-07-29 23:03:01,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: HERI SUSETYO (ID: 1229)
+2026-07-29 23:03:59,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUALIP (ID: 1230)
+2026-07-29 23:09:21,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SITI IHBATUN KHAERIYAH (ID: 1231)
+2026-07-29 23:11:46,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TUJAN SAFRIANTO (ID: 1232)
+2026-07-29 23:13:21,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: DEDI RIADI (ID: 1233)
+2026-07-29 23:18:19,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: AFRI ELMATIANA (ID: 1234)
+2026-07-29 23:19:18,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: RISNO (ID: 1177)
+2026-07-29 23:19:52,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ERWIN NUGROHO (ID: 1186)
+2026-07-30 0:05:29,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 0:14:37,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 0:15:34,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 0:21:05,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 0:24:40,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 0:25:04,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: MARTINI (ID: 1082)
+2026-07-30 1:01:15,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 1:30:05,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 1:39:34,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUFROIL (ID: 1096)
+2026-07-30 12:06:46,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 15:17:25,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 15:18:37,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: HUMAM AGUS PRIANTO (ID: 1047)
+2026-07-30 17:12:27,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 17:15:04,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUALIP (ID: 1230)
+2026-07-30 17:16:45,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: DEDI RIADI (ID: 1233)
+2026-07-30 17:18:31,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI IHBATUN KHAERIYAH (ID: 1231)
+2026-07-30 17:58:55,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 17:59:40,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: HERI SUSETYO (ID: 1229)
+2026-07-30 18:00:16,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUALIP (ID: 1230)
+2026-07-30 18:00:53,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI IHBATUN KHAERIYAH (ID: 1231)
+2026-07-30 18:01:22,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: DEDI RIADI (ID: 1233)
+2026-07-30 18:04:28,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUJAN SAFRIANTO (ID: 1232)
+2026-07-30 18:22:04,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 18:23:35,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RIYADI (ID: 1235)
+2026-07-30 18:33:10,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 18:34:37,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUPARMAN (ID: 1236)
+2026-07-30 18:41:06,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 18:51:30,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUJAN SAFRIANTO (ID: 1232)
+2026-07-30 18:52:14,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUALIP (ID: 1230)
+2026-07-30 18:52:39,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: HERI SUSETYO (ID: 1229)
+2026-07-30 18:52:59,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUJAN SAFRIANTO (ID: 1232)
+2026-07-30 19:31:30,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUPARYO (ID: 1021)
+2026-07-30 19:32:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ANI SUSANTI (ID: 1026)
+2026-07-30 19:32:45,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ALHADID SAFANGAT (ID: 1020)
+2026-07-30 19:34:52,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: EKA SULASTRI (ID: 1027)
+2026-07-30 19:39:35,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: AL YASIR (ID: 1022)
+2026-07-30 19:40:01,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ALHADID SAFANGAT (ID: 1020)
+2026-07-30 19:41:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: YUNI KRISWANTI (ID: 1025)
+2026-07-30 20:57:34,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 21:02:46,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NURTIFAH (ID: 1237)
+2026-07-30 21:11:57,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: EKO JULIANTO PRASETIYO (ID: 1222)
+2026-07-30 21:13:46,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: EKO SUPARYO (ID: 1238)
+2026-07-30 21:14:55,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RASMAN (ID: 1239)
+2026-07-30 21:16:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: EKO SUPARYO (ID: 1238)
+2026-07-30 21:17:39,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: EKO JULIANTO (ID: 1194)
+2026-07-30 21:21:16,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: suripto afrianto (ID: 1223)
+2026-07-30 21:25:33,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PUJI DARYONO (ID: 1240)
+2026-07-30 21:29:52,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: JAMALI (ID: 1241)
+2026-07-30 21:30:22,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JAMALI (ID: 1241)
+2026-07-30 21:31:48,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SAMINGIN (ID: 1242)
+2026-07-30 21:32:24,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: SUPOMO (ID: 1212)
+2026-07-30 21:32:44,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: KAMSO (ID: 1213)
+2026-07-30 21:35:08,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JAMALI (ID: 1241)
+2026-07-30 21:35:38,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAMINGIN (ID: 1242)
+2026-07-30 21:36:09,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: RAGIL FITRIANTO (ID: 1210)
+2026-07-30 21:40:32,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAIMAN (ID: 1211)
+2026-07-30 21:42:18,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MANISAH (ID: 1243)
+2026-07-30 21:45:35,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SRI RAHAYU (ID: 1244)
+2026-07-30 21:48:45,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUGIYATI (ID: 1245)
+2026-07-30 21:49:15,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUGIYATI (ID: 1245)
+2026-07-30 21:50:08,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-30 22:12:24,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: HERU SUSANTO (ID: 1246)
+2026-07-30 22:14:57,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TUGIMAN ROSIDIN (ID: 1247)
+2026-07-30 22:16:21,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: YASUN (ID: 1248)
+2026-07-30 22:17:17,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUTIMAN (ID: 1249)
+2026-07-30 22:18:28,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RESTIANA (ID: 1250)
+2026-07-30 22:20:40,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUGIMAN ROSIDIN (ID: 1247)
+2026-07-30 22:21:00,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: YASUN (ID: 1214)
+2026-07-30 22:21:05,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: SUTIMAN (ID: 1215)
+2026-07-30 22:21:22,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: TUGIMAN ROSIDIN (ID: 1216)
+2026-07-30 22:21:24,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: RESTIANA (ID: 1217)
+2026-07-30 22:25:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ALHADID SAFANGAT (ID: 1020)
+2026-07-30 22:26:03,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SIWAN HADI SUYITNO (ID: 1024)
+2026-07-30 22:47:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: DIFA ANGGRAENI PUTRI PRATAMA (ID: 1224)
+2026-07-30 22:55:34,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 9:03:31,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 14:35:43,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 14:41:29,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: BAHRUDIN (ID: 1251)
+2026-07-31 14:43:17,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PURWANTO (ID: 1252)
+2026-07-31 15:33:27,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 16:35:12,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 16:36:28,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PUJIONO (ID: 1253)
+2026-07-31 16:55:33,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 19:19:33,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 19:59:50,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TRI BUDIONO (ID: 1254)
+2026-07-31 20:17:23,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 20:51:57,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ANTONIUS SUBAGDO (ID: 1255)
+2026-07-31 20:53:16,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ANTONIUS SUBAGDO (ID: 1256)
+2026-07-31 20:54:23,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SATIMIN (ID: 1257)
+2026-07-31 20:55:15,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: ANTONIUS SUBAGDO (ID: 1256)
+2026-07-31 20:55:54,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: SUPARJAN (ID: 1125)
+2026-07-31 20:57:36,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: IMAM NUR ROHMAN (ID: 1258)
+2026-07-31 21:01:31,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RIYANTO (ID: 1259)
+2026-07-31 21:06:33,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TRI MULASIH (ID: 1260)
+2026-07-31 21:12:33,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TRI YULIYANTI (ID: 1261)
+2026-07-31 21:22:25,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NANANG TRIONO (ID: 1262)
+2026-07-31 21:24:27,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MA'RUFIN (ID: 1263)
+2026-07-31 21:24:48,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MA'RUFIN (ID: 1264)
+2026-07-31 21:26:16,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PUJIONO (ID: 1265)
+2026-07-31 21:27:29,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WARDIYO (ID: 1266)
+2026-07-31 21:31:13,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RIZQI WULANDARI (ID: 1267)
+2026-07-31 21:36:36,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SARYONO (ID: 1268)
+2026-07-31 21:38:41,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: FENDI NURIYANTO (ID: 1269)
+2026-07-31 21:39:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RATNO (ID: 1270)
+2026-07-31 21:41:37,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SARNO (ID: 1271)
+2026-07-31 21:43:34,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SAMINI (ID: 1272)
+2026-07-31 21:48:32,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: MA'RUFIN (ID: 1264)
+2026-07-31 21:51:17,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: NANANG TRIONO (ID: 1262)
+2026-07-31 22:03:02,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SLAMET HIDAYAT (ID: 1273)
+2026-07-31 22:09:28,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: JENI (ID: 1274)
+2026-07-31 22:10:30,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUCI UTAMI (ID: 1119)
+2026-07-31 22:11:02,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JUMADI (ID: 1129)
+2026-07-31 22:16:29,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: JUMIARTO (ID: 1275)
+2026-07-31 22:57:47,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TRI MULASIH (ID: 1260)
+2026-07-31 23:40:29,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-07-31 23:41:47,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: RIYANTO (ID: 1259)
+2026-07-31 23:44:38,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SALIMUN (ID: 1183)
+2026-08-01 0:37:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JENI (ID: 1274)
+2026-08-01 0:55:17,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-01 19:14:18,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-01 19:46:27,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: IWAN (ID: 1276)
+2026-08-01 19:55:44,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MAFTUHIN (ID: 1105)
+2026-08-01 19:56:59,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SODIKUN (ID: 1103)
+2026-08-01 19:58:35,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: IWANUL NGULUM (ID: 1104)
+2026-08-01 19:59:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ANAS LUFI MARZUKI (ID: 1102)
+2026-08-01 20:01:23,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SRI HARTATI (ID: 1106)
+2026-08-01 20:14:43,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TURSINO (ID: 1277)
+2026-08-01 20:17:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ROBET ASISKA DAVIT DANIAGO (ID: 1278)
+2026-08-01 20:20:15,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TASIKIN (ID: 1279)
+2026-08-01 20:20:45,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TASIKIN (ID: 1280)
+2026-08-01 20:21:10,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: TASIKIN (ID: 1280)
+2026-08-01 22:16:59,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-01 23:13:07,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 1:14:08,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 19:15:24,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 19:18:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MISLAM (ID: 1280)
+2026-08-02 19:21:19,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUWARTO (ID: 1281)
+2026-08-02 19:22:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: GUNAWAN (ID: 1282)
+2026-08-02 19:24:16,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TASLAM (ID: 1283)
+2026-08-02 19:25:34,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 19:26:09,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MISLAM (ID: 1280)
+2026-08-02 19:26:33,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUWARTO (ID: 1281)
+2026-08-02 19:27:42,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: GUNAWAN (ID: 1282)
+2026-08-02 19:32:49,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUGIYONO (ID: 1284)
+2026-08-02 19:33:31,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SUTRISMI (ID: 1285)
+2026-08-02 20:23:49,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 21:17:50,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-02 21:34:48,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SLAMET SALIM (ID: 1286)
+2026-08-02 21:35:51,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ISKANDAR (ID: 1287)
+2026-08-02 21:41:42,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: KARSINI (ID: 1288)
+2026-08-02 21:43:40,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: YEKTIYANINGSIH (ID: 1289)
+2026-08-02 21:50:38,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SITI LATIFAH (ID: 1290)
+2026-08-02 21:51:26,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: IRFAN SAGITA (ID: 1291)
+2026-08-02 21:51:55,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: FERI AGUSTIN INDRIANI (ID: 1062)
+2026-08-02 21:53:02,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: AHMAD AJI RIANTO (ID: 1120)
+2026-08-03 9:06:30,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 13:12:43,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 13:21:20,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUGITO (ID: 1098)
+2026-08-03 13:22:01,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MAFTUHIN (ID: 1105)
+2026-08-03 13:22:23,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SRI HARTATI (ID: 1106)
+2026-08-03 13:23:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SODIKUN (ID: 1103)
+2026-08-03 13:26:29,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JASLIM (ID: 1139)
+2026-08-03 13:27:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: CHALIMAH (ID: 1140)
+2026-08-03 13:27:35,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUNGAWAM (ID: 1141)
+2026-08-03 13:29:07,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: NGATOHA (ID: 1137)
+2026-08-03 13:29:40,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: IWAN (ID: 1276)
+2026-08-03 13:29:57,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: YUNIANTI (ID: 1179)
+2026-08-03 13:30:28,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SLAMET AGUS SETYOBUDI (ID: 1178)
+2026-08-03 13:30:58,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: RASITO (ID: 1138)
+2026-08-03 13:31:21,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUTOYO (ID: 1144)
+2026-08-03 13:31:41,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SIRIL AFITANIA (ID: 1173)
+2026-08-03 13:32:38,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PUJI DARYONO (ID: 1240)
+2026-08-03 13:32:57,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: DEDI SETIADI (ID: 1148)
+2026-08-03 13:33:39,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: FRENDI WAHYUNANTO (ID: 1174)
+2026-08-03 13:39:45,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PONIMAN (ID: 1195)
+2026-08-03 13:40:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: EKO JULIANTO PRASETIYO (ID: 1222)
+2026-08-03 13:43:15,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI LATIFAH (ID: 1290)
+2026-08-03 13:43:40,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JAKA NURSEKHA (ID: 1055)
+2026-08-03 13:44:12,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: IRFAN SAGITA (ID: 1291)
+2026-08-03 13:49:49,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 14:16:51,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SYAIFUL ANWAR (ID: 1292)
+2026-08-03 16:18:08,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 16:56:01,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUMLIYATUN (ID: 1293)
+2026-08-03 16:56:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: KASIRUN (ID: 1294)
+2026-08-03 16:59:40,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: KASIRUN (ID: 1294)
+2026-08-03 17:09:33,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PONIJAN (ID: 1295)
+2026-08-03 19:02:34,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 19:03:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PONIJAN (ID: 1295)
+2026-08-03 19:52:16,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-03 19:52:42,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUMLIYATUN (ID: 1293)
+2026-08-03 19:53:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: KASIRUN (ID: 1294)
+2026-08-03 19:54:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: IRFAN SAGITA (ID: 1291)
+2026-08-03 19:57:44,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI LATIFAH (ID: 1290)
+2026-08-03 20:06:18,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ENDI ROHENDI (ID: 1296)
+2026-08-03 20:07:34,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: FAIZAL MAHI NUROHIM (ID: 1297)
+2026-08-03 20:08:19,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ENDI ROHENDI (ID: 1296)
+2026-08-03 20:15:24,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: JARSIHATUN QIROM (ID: 1298)
+2026-08-03 20:37:46,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WASINI (ID: 1299)
+2026-08-03 20:40:56,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MISTAM (ID: 1300)
+2026-08-03 20:43:44,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: EKO SUPARMAN (ID: 1301)
+2026-08-03 20:45:21,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ARIS SUGIYANTO (ID: 1302)
+2026-08-03 20:46:37,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUHAFIDIN (ID: 1303)
+2026-08-03 20:47:12,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MISTAM (ID: 1300)
+2026-08-03 20:47:36,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WASINI (ID: 1299)
+2026-08-03 20:48:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TEGUH SUDRAJAT (ID: 1170)
+2026-08-03 20:50:01,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JARSIHATUN QIROM (ID: 1298)
+2026-08-03 20:55:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: FERI AGUSTIN INDRIANI (ID: 1062)
+2026-08-03 20:55:29,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: AHMAD AJI RIANTO (ID: 1120)
+2026-08-03 21:31:09,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SYAIFUL ANWAR (ID: 1292)
+2026-08-04 8:33:36,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 9:57:44,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 9:59:11,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SODIKIN (ID: 1304)
+2026-08-04 12:16:50,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: USWATUN HASANAH (ID: 1305)
+2026-08-04 13:15:59,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 13:16:58,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: USWATUN HASANAH (ID: 1305)
+2026-08-04 13:18:03,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: USWATUN HASANAH (ID: 1305)
+2026-08-04 13:19:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ROBET ASISKA DAVIT DANIAGO (ID: 1278)
+2026-08-04 13:19:38,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TURSINO (ID: 1277)
+2026-08-04 17:35:23,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WASINI (ID: 1306)
+2026-08-04 18:28:52,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 18:34:28,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 18:39:03,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 19:06:00,dpc,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 20:29:28,dpc,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 22:05:51,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ADMAN (ID: 1307)
+2026-08-04 22:08:35,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: joko supriyanto (ID: 1308)
+2026-08-04 22:10:48,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: joko supriyanto (ID: 1308)
+2026-08-04 22:10:50,dpc,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 22:21:04,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ARIF FULHUDA (ID: 1309)
+2026-08-04 22:31:38,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 22:33:14,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SAIMIN (ID: 1310)
+2026-08-04 22:37:56,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: EDI BUDIYANTO (ID: 1311)
+2026-08-04 22:43:24,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SULDIYONO (ID: 1312)
+2026-08-04 22:46:19,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-04 23:01:21,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: joko supriyanto (ID: 1308)
+2026-08-04 23:08:09,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: GITO (ID: 1145)
+2026-08-04 23:09:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ADINDA MAHARANI (ID: 1147)
+2026-08-04 23:09:32,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ARIF FULHUDA (ID: 1309)
+2026-08-04 23:22:49,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JUMIARTO (ID: 1275)
+2026-08-04 23:23:08,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ROFIQ SAIFUL RIFAI (ID: 1188)
+2026-08-04 23:23:43,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TEGUH RIYANTO (ID: 1187)
+2026-08-04 23:26:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ERIK SADIKUN (ID: 1225)
+2026-08-04 23:28:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WASIKUN (ID: 1226)
+2026-08-04 23:29:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: UNTUNG PURNOMO (ID: 1227)
+2026-08-04 23:30:53,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WAHYU BAGAS YULIANTORO (ID: 1228)
+2026-08-04 23:37:58,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WASIKUN (ID: 1226)
+2026-08-04 23:38:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: UNTUNG PURNOMO (ID: 1227)
+2026-08-06 8:12:05,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 10:14:07,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 10:19:31,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 10:42:13,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUGIYONO (ID: 1284)
+2026-08-06 10:42:38,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUGIYONO (ID: 1284)
+2026-08-06 10:49:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SUTRISMI (ID: 1285)
+2026-08-06 11:50:52,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SANIMAN (ID: 1313)
+2026-08-06 12:18:41,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 15:03:01,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 15:03:29,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: BAHRUDIN (ID: 1251)
+2026-08-06 15:04:17,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PURWANTO (ID: 1252)
+2026-08-06 15:06:02,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: JAMALI (ID: 1241)
+2026-08-06 15:07:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAMINGIN (ID: 1242)
+2026-08-06 15:07:36,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PURWANTO (ID: 1252)
+2026-08-06 16:28:48,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 16:37:02,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ARDI SUPARMAN (ID: 1314)
+2026-08-06 18:37:18,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 18:38:28,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TURYONO (ID: 1315)
+2026-08-06 18:41:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WINDI YATMIKO (ID: 1316)
+2026-08-06 18:43:24,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ADMAN (ID: 1307)
+2026-08-06 18:49:39,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TURYONO (ID: 1315)
+2026-08-06 18:59:59,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SOLIHUN (ID: 1317)
+2026-08-06 19:05:13,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 19:14:44,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: DARYONO (ID: 1318)
+2026-08-06 19:18:57,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: sartinah (ID: 1319)
+2026-08-06 19:25:35,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ERIK SADIKUN (ID: 1225)
+2026-08-06 19:26:06,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WASIKUN (ID: 1226)
+2026-08-06 19:26:48,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: UNTUNG PURNOMO (ID: 1227)
+2026-08-06 19:27:19,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WAHYU BAGAS YULIANTORO (ID: 1228)
+2026-08-06 19:27:55,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TASIKIN (ID: 1279)
+2026-08-06 19:29:16,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TEGUH SUDRAJAT (ID: 1170)
+2026-08-06 21:23:53,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 21:25:09,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TURIMAN (ID: 1320)
+2026-08-06 21:58:05,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: DEDI HARDIAN (ID: 1321)
+2026-08-06 22:00:11,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: SLAMET MADSUPARTO (ID: 1083)
+2026-08-06 22:01:26,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-06 22:13:34,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MANISAH (ID: 1322)
+2026-08-06 22:23:20,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-07 1:28:23,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MANISAH (ID: 1322)
+2026-08-07 1:32:43,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TURYONO (ID: 1315)
+2026-08-07 8:30:06,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-08 9:06:51,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-08 11:30:29,ISNUFR,TAMBAH_KAS,Mencatat transaksi kas: PENGELUARAN - Rp150.000 (Operasional PAC)
+2026-08-08 16:02:17,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-08 16:03:23,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TRIYANTO (ID: 1323)
+2026-08-08 16:08:35,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-08 16:10:15,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SLAMET RIADI (ID: 1168)
+2026-08-08 16:51:50,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-08 16:52:56,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RASIMIN (ID: 1324)
+2026-08-08 16:53:17,ISNUFR,HAPUS_ANGGOTA,Menghapus permanen anggota: EDI (ID: 1193)
+2026-08-08 17:06:04,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ISKANDAR (ID: 1287)
+2026-08-09 21:39:33,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-10 10:17:12,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-10 15:28:02,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-10 21:37:40,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-10 21:48:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: RIYAN SEPTIANA (ID: 1325)
+2026-08-10 21:49:36,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: NURYANDRI (ID: 1326)
+2026-08-10 21:50:30,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SAMIRIN (ID: 1327)
+2026-08-10 21:57:30,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ARIF MUSTAHA (ID: 1328)
+2026-08-10 21:59:17,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SIDIK PURNGMO (ID: 1329)
+2026-08-10 22:12:39,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ANGGIT RIYANTO (ID: 1330)
+2026-08-10 22:22:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: SITI PRIHATIN (ID: 1331)
+2026-08-10 22:23:02,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: WARIS (ID: 1332)
+2026-08-10 22:24:12,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TONI (ID: 1333)
+2026-08-10 22:30:32,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TUGINO (ID: 1334)
+2026-08-10 22:34:45,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TONI (ID: 1333)
+2026-08-10 22:36:21,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: TURIMAN SUMITRO (ID: 1335)
+2026-08-10 22:39:08,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: ERNI (ID: 1336)
+2026-08-10 22:42:25,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI PRIHATIN (ID: 1331)
+2026-08-10 22:45:24,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: PARYANTO (ID: 1337)
+2026-08-10 22:52:06,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: MUHAMMAD ABDUL HANI (ID: 1338)
+2026-08-10 22:53:33,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: YUSUF ANGGER (ID: 1339)
+2026-08-10 22:57:53,ISNUFR,TAMBAH_ANGGOTA,Menambahkan anggota baru: FAJAR AGUNG SUDRAJAT RIZKIANTO (ID: 1340)
+2026-08-10 23:00:47,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-10 23:11:46,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI PRIHATIN (ID: 1331)
+2026-08-10 23:12:04,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUGINO (ID: 1334)
+2026-08-10 23:14:22,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: RIYAN SEPTIANA (ID: 1325)
+2026-08-10 23:14:36,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: NURYANDRI (ID: 1326)
+2026-08-10 23:15:00,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SAMIRIN (ID: 1327)
+2026-08-10 23:15:18,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: SITI PRIHATIN (ID: 1331)
+2026-08-10 23:15:31,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: WARIS (ID: 1332)
+2026-08-10 23:15:44,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TONI (ID: 1333)
+2026-08-10 23:16:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TUGINO (ID: 1334)
+2026-08-10 23:16:29,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: TURIMAN SUMITRO (ID: 1335)
+2026-08-10 23:16:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: ERNI (ID: 1336)
+2026-08-10 23:17:05,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: PARYANTO (ID: 1337)
+2026-08-10 23:17:19,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: MUHAMMAD ABDUL HANI (ID: 1338)
+2026-08-10 23:17:35,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: YUSUF ANGGER (ID: 1339)
+2026-08-10 23:17:50,ISNUFR,UPDATE_ANGGOTA,Mengubah profil data anggota: FAJAR AGUNG SUDRAJAT RIZKIANTO (ID: 1340)
+2026-08-11 8:17:15,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten
+2026-08-11 8:30:40,isnufr,LOGIN,Berhasil masuk ke dalam aplikasi PAC Kawunganten

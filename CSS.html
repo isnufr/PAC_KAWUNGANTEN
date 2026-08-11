@@ -1,0 +1,140 @@
+<style>
+        .active-menu {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white !important;
+            box-shadow: 0 4px 10px -2px rgba(220, 38, 38, 0.4);
+            transform: scale(1.02);
+        }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+
+        html,
+        body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fca5a5;
+            border-radius: 4px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+
+        body.dark-theme {
+            background-color: #0f172a !important;
+            color: #f1f5f9;
+        }
+
+        body.dark-theme .bg-white {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-theme .bg-red-50,
+        body.dark-theme .bg-red-100,
+        body.dark-theme .bg-slate-100,
+        body.dark-theme .bg-gray-50,
+        body.dark-theme .bg-amber-50,
+        body.dark-theme .bg-rose-50,
+        body.dark-theme .bg-pink-50,
+        body.dark-theme .bg-emerald-50,
+        body.dark-theme .bg-indigo-50,
+        body.dark-theme .bg-blue-50,
+        body.dark-theme .bg-purple-50 {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-theme .text-red-700,
+        body.dark-theme .text-red-800,
+        body.dark-theme .text-red-900,
+        body.dark-theme .text-slate-800 {
+            color: #f8fafc !important;
+        }
+
+        body.dark-theme .text-red-600,
+        body.dark-theme .text-red-500 {
+            color: #ef4444 !important;
+        }
+
+        body.dark-theme .border-red-100,
+        body.dark-theme .border-red-200,
+        body.dark-theme .border-gray-200 {
+            border-color: #334155 !important;
+        }
+
+        body.dark-theme header,
+        body.dark-theme #sidebar {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-theme input,
+        body.dark-theme select,
+        body.dark-theme table {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-theme tbody tr:hover {
+            background-color: #334155 !important;
+        }
+
+        body.dark-theme .shadow-sm,
+        body.dark-theme .shadow-md,
+        body.dark-theme .shadow-xl {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        body.dark-theme .chart-container canvas {
+            filter: brightness(0.9) contrast(1.1);
+        }
+
+        body.dark-theme .active-menu {
+            background-color: #ef4444;
+            color: white !important;
+        }
+    </style>

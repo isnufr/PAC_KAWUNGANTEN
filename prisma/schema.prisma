@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  role     String
+}
+
+model Wilayah {
+  id        Int       @id @default(autoincrement())
+  kecamatan String
+  desa      String
+  dusun     String
+  anggota   Anggota[]
+  
+  @@unique([kecamatan, desa, dusun])
+}
+
+model Anggota {
+  id            Int      @id @default(autoincrement())
+  nik           String   @unique
+  nama          String
+  tanggalLahir  String?
+  jenisKelamin  String?
+  umur          Int?
+  nomorHp       String?
+  bagian        String?
+  jabatan       String?
+  
+  // Relasi ke wilayah
+  wilayahId     Int?
+  wilayah       Wilayah? @relation(fields: [wilayahId], references: [id])
+  
+  // Agar kompatibel dengan script lama jika wilayah tidak ter-map ke id
+  kecamatan     String?
+  desa          String?
+  dusun         String?
+
+  fotoKtpUrl    String?
+  passFotoUrl   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model KasOrganisasi {
+  id         Int      @id @default(autoincrement())
+  tanggal    DateTime
+  tipe       String
+  nominal    Int
+  kategori   String?
+  keterangan String?
+  operator   String?
+  createdAt  DateTime @default(now())
+}
+
+model LogAktivitas {
+  id        Int      @id @default(autoincrement())
+  waktu     DateTime @default(now())
+  pengguna  String
+  aksi      String
+  detail    String?
+}
