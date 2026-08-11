@@ -792,7 +792,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
             </div>
         , document.body)}
         {/* PRINTABLE ID CARD (Review Mode) */}
-        {isPrinting && selectedAnggota && (
+        {mounted && isPrinting && selectedAnggota && createPortal(
             <div className="fixed inset-0 bg-slate-900/90 z-[9999] flex flex-col items-center justify-center p-4">
                 <style>{`
                   @media print {
@@ -857,7 +857,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </div>
                 </div>
             </div>
-        )}
+        , document.body)}
 
         {/* MODAL FULL SCREEN IMAGE */}
         {mounted && fullScreenImage && createPortal(
