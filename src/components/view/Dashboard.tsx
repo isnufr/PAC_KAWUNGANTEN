@@ -11,6 +11,8 @@ export default function DashboardView() {
     satgas: 0
   });
   const [gender, setGender] = useState({ pria: 0, wanita: 0 });
+  const [verification, setVerification] = useState({ tidakLengkap: 0, nikGanda: 0 });
+  const [ulangTahun, setUlangTahun] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +40,12 @@ export default function DashboardView() {
             pria: data.data.gender.LAKI_LAKI || 0,
             wanita: data.data.gender.PEREMPUAN || 0
           });
+          if (data.data.verification) {
+            setVerification(data.data.verification);
+          }
+          if (data.data.ulangTahun) {
+            setUlangTahun(data.data.ulangTahun);
+          }
         }
       })
       .catch(console.error)
@@ -70,51 +78,107 @@ export default function DashboardView() {
           <StatCard title="Anggota" subtitle="Satgas" icon="security" value={stats.satgas} isWide />
       </div>
 
-      {/* MONITORING KUOTA KEPENGURUSAN */}
-      <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
-              <div>
-                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800">
-                      <span className="material-icons text-red-600 bg-red-50 p-2 rounded-xl text-xl">people_alt</span>
-                      Monitoring Kuota
+      {/* VERIFICATION WARNINGS */}
+      {(verification.tidakLengkap > 0 || verification.nikGanda > 0) && (
+          <div className="bg-yellow-50 border border-yellow-200 p-4 md:p-5 rounded-2xl flex flex-col sm:flex-row gap-4 sm:items-center justify-between shadow-sm">
+              <div className="flex items-center gap-3">
+                  <span className="material-icons text-yellow-600 bg-yellow-100 p-2 rounded-xl text-xl">warning</span>
+                  <div>
+                      <h3 className="text-sm font-bold text-yellow-800 tracking-tight">Perhatian: Verifikasi Data Diperlukan!</h3>
+                      <p className="text-xs text-yellow-700 mt-0.5">
+                          Terdapat {verification.tidakLengkap > 0 && <strong className="text-red-600">{verification.tidakLengkap} anggota data tidak lengkap</strong>} 
+                          {verification.tidakLengkap > 0 && verification.nikGanda > 0 && ' dan '}
+                          {verification.nikGanda > 0 && <strong className="text-red-600">{verification.nikGanda} anggota dengan NIK ganda</strong>}.
+                      </p>
+                  </div>
+              </div>
+              <button onClick={() => router.push('/?menu=dataAnggota')} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md whitespace-nowrap">
+                  Perbaiki Sekarang
+              </button>
+          </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+          <div className="lg:col-span-2 space-y-5 md:space-y-6">
+              {/* MONITORING KUOTA KEPENGURUSAN */}
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
+                      <div>
+                          <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800">
+                              <span className="material-icons text-red-600 bg-red-50 p-2 rounded-xl text-xl">people_alt</span>
+                              Monitoring Kuota
+                          </h3>
+                          <p className="text-[11px] text-slate-400 font-medium mt-1 ml-[44px]">Pantau kelengkapan formasi pengurus berdasarkan wilayah.</p>
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 relative">
+                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
+                      <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
+                      <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
+                      <QuotaCard title="Satgas PAC" icon="security" target={5} current={stats.satgas} percent={Math.min(100, Math.round((stats.satgas / 5) * 100) || 0)} />
+                  </div>
+              </div>
+
+              {/* STATISTIK GENDER */}
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
+                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-5">
+                      <span className="material-icons text-blue-600 bg-blue-50 p-2 rounded-xl text-xl">wc</span>
+                      Statistik Gender Anggota
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-medium mt-1 ml-[44px]">Pantau kelengkapan formasi pengurus berdasarkan wilayah.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex items-center gap-4">
+                      <div className="bg-blue-600 text-white p-3 rounded-xl shadow-md shadow-blue-200">
+                        <span className="material-icons text-2xl">male</span>
+                      </div>
+                      <div>
+                        <span className="text-2xl font-black text-blue-700">{gender.pria}</span>
+                        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Laki-laki ({priaPercent}%)</p>
+                      </div>
+                    </div>
+                    <div className="bg-pink-50 rounded-2xl p-4 border border-pink-100 flex items-center gap-4">
+                      <div className="bg-pink-600 text-white p-3 rounded-xl shadow-md shadow-pink-200">
+                        <span className="material-icons text-2xl">female</span>
+                      </div>
+                      <div>
+                        <span className="text-2xl font-black text-pink-700">{gender.wanita}</span>
+                        <p className="text-[10px] font-bold text-pink-500 uppercase tracking-wider">Perempuan ({wanitaPercent}%)</p>
+                      </div>
+                    </div>
+                  </div>
               </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 relative">
-              {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
-              <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
-              <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
-              <QuotaCard title="Satgas PAC" icon="security" target={5} current={stats.satgas} percent={Math.min(100, Math.round((stats.satgas / 5) * 100) || 0)} />
-          </div>
-      </div>
-
-      {/* STATISTIK GENDER */}
-      <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
-          <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-5">
-              <span className="material-icons text-blue-600 bg-blue-50 p-2 rounded-xl text-xl">wc</span>
-              Statistik Gender Anggota
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex items-center gap-4">
-              <div className="bg-blue-600 text-white p-3 rounded-xl shadow-md shadow-blue-200">
-                <span className="material-icons text-2xl">male</span>
+          <div className="space-y-5 md:space-y-6">
+              {/* ULANG TAHUN BULAN INI */}
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el h-full flex flex-col">
+                  <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-4">
+                      <span className="material-icons text-orange-600 bg-orange-50 p-2 rounded-xl text-xl">cake</span>
+                      Ulang Tahun Bulan Ini
+                  </h3>
+                  
+                  <div className="flex-1 overflow-y-auto max-h-80 space-y-3 pr-2">
+                      {ulangTahun.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center h-full text-slate-400 opacity-50 py-10">
+                              <span className="material-icons text-4xl mb-2">event_busy</span>
+                              <p className="text-xs font-bold uppercase tracking-wider">Tidak ada yang berulang tahun</p>
+                          </div>
+                      ) : (
+                          ulangTahun.map((u, i) => (
+                              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-orange-50/50 border border-orange-100 hover:bg-orange-50 transition">
+                                  <div className="w-10 h-10 bg-orange-200 text-orange-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0">
+                                      {u.nama.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                      <h4 className="text-xs font-bold text-slate-800 truncate">{u.nama}</h4>
+                                      <p className="text-[10px] text-slate-500 font-medium font-mono mt-0.5">{u.tanggalLahir}</p>
+                                  </div>
+                                  <span className="material-icons text-orange-500 text-sm">celebration</span>
+                              </div>
+                          ))
+                      )}
+                  </div>
               </div>
-              <div>
-                <span className="text-2xl font-black text-blue-700">{gender.pria}</span>
-                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Laki-laki ({priaPercent}%)</p>
-              </div>
-            </div>
-            <div className="bg-pink-50 rounded-2xl p-4 border border-pink-100 flex items-center gap-4">
-              <div className="bg-pink-600 text-white p-3 rounded-xl shadow-md shadow-pink-200">
-                <span className="material-icons text-2xl">female</span>
-              </div>
-              <div>
-                <span className="text-2xl font-black text-pink-700">{gender.wanita}</span>
-                <p className="text-[10px] font-bold text-pink-500 uppercase tracking-wider">Perempuan ({wanitaPercent}%)</p>
-              </div>
-            </div>
           </div>
       </div>
     </div>

@@ -31,6 +31,7 @@ export default function DataAnggotaView() {
   const [desa, setDesa] = useState('');
   const [dusun, setDusun] = useState('');
   const [selectedAnggota, setSelectedAnggota] = useState<any>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   // Wilayah data for filters
   const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
@@ -288,14 +289,21 @@ export default function DataAnggotaView() {
                         <button onClick={() => setSelectedAnggota(null)} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
                     <div className="p-4 sm:p-6 overflow-y-auto space-y-3 flex-1 text-xs sm:text-sm text-slate-800">
-                        <div className="flex justify-center mb-4">
-                            <div className="w-24 h-24 rounded-full bg-slate-200 overflow-hidden border-4 border-white shadow-lg">
-                                {selectedAnggota.passFotoUrl ? (
-                                    <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-3xl">person</span></div>
-                                )}
-                            </div>
+                        <div className="flex justify-between items-center mb-4">
+                             <div className="flex-1"></div>
+                             <div className="w-24 h-24 rounded-full bg-slate-200 overflow-hidden border-4 border-white shadow-lg mx-auto">
+                                 {selectedAnggota.passFotoUrl ? (
+                                     <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
+                                 ) : (
+                                     <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-3xl">person</span></div>
+                                 )}
+                             </div>
+                             <div className="flex-1 flex justify-end">
+                                 <button onClick={() => { setIsPrinting(true); setTimeout(() => window.print(), 300); setTimeout(() => setIsPrinting(false), 2000); }} 
+                                         className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-1 transition">
+                                     <span className="material-icons text-sm">print</span> CETAK KTA
+                                 </button>
+                             </div>
                         </div>
                         <DetailRow label="Nama" value={selectedAnggota.nama} />
                         <DetailRow label="NIK" value={selectedAnggota.nik} />
@@ -358,6 +366,60 @@ export default function DataAnggotaView() {
                             {isSubmitting ? 'Menyimpan...' : <><span className="material-icons text-sm">save</span> SIMPAN DATA ANGGOTA</>}
                         </button>
                     </form>
+                </div>
+            </div>
+        )}
+        {/* PRINTABLE ID CARD (Hidden except on print) */}
+        {isPrinting && selectedAnggota && (
+            <div className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center" id="printable-id-card">
+                <style>{`
+                  @media print {
+                    body * { visibility: hidden; }
+                    #printable-id-card, #printable-id-card * { visibility: visible; }
+                    #printable-id-card { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+                    @page { size: landscape; margin: 0; }
+                  }
+                `}</style>
+                <div className="w-[85.6mm] h-[53.98mm] bg-red-600 rounded-xl shadow-2xl relative overflow-hidden border border-red-800 text-white" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full mix-blend-screen opacity-50 -mr-10 -mt-10"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-700 rounded-full mix-blend-multiply opacity-50 -ml-10 -mb-10"></div>
+
+                    {/* Header */}
+                    <div className="h-10 bg-red-800 w-full flex items-center px-3 relative z-10 border-b-2 border-yellow-500">
+                        <img src="/logo.png" alt="Logo PDIP" className="w-6 h-6 mr-2 object-contain bg-white rounded-full p-0.5" />
+                        <div>
+                            <h1 className="text-[10px] font-black leading-none text-white tracking-widest">KARTU TANDA ANGGOTA</h1>
+                            <h2 className="text-[7px] font-bold text-yellow-400">PDI PERJUANGAN KAWUNGANTEN</h2>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="flex p-2 gap-2 relative z-10 h-[calc(100%-40px)]">
+                        {/* Photo */}
+                        <div className="w-[20mm] h-[25mm] bg-white rounded-md p-0.5 shadow-sm mt-1">
+                            {selectedAnggota.passFotoUrl ? (
+                                <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt="Foto" className="w-full h-full object-cover rounded-sm" />
+                            ) : (
+                                <div className="w-full h-full bg-slate-200 flex items-center justify-center rounded-sm"><span className="material-icons text-slate-400 text-xl">person</span></div>
+                            )}
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 flex flex-col justify-center space-y-0.5 mt-1">
+                            <div className="font-black text-xs uppercase text-yellow-400 drop-shadow-md">{selectedAnggota.nama}</div>
+                            <div className="text-[8px] font-bold text-red-100 tracking-wider font-mono bg-red-900/50 inline-block px-1 rounded-sm w-max mb-1">{selectedAnggota.nik}</div>
+                            
+                            <table className="text-[6px] w-full mt-1">
+                                <tbody>
+                                    <tr><td className="w-12 font-bold text-red-200">Bagian</td><td>: {selectedAnggota.bagian || '-'}</td></tr>
+                                    <tr><td className="font-bold text-red-200">Jabatan</td><td>: {selectedAnggota.jabatan || '-'}</td></tr>
+                                    <tr><td className="font-bold text-red-200">Desa</td><td>: {selectedAnggota.desa || '-'}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         )}
