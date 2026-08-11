@@ -571,7 +571,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                 </div>
                                 <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-[2]">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">wc</span> JENIS KELAMIN</p>
-                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.jenisKelamin?.toUpperCase() === 'LAKI-LAKI' ? 'L' : selectedAnggota.jenisKelamin?.toUpperCase() === 'PEREMPUAN' ? 'P' : selectedAnggota.jenisKelamin || '-'}</p>
+                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.jenisKelamin || '-'}</p>
                                 </div>
                             </div>
 
