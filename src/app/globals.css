@@ -35,35 +35,19 @@
    SMOOTH PAGE TRANSITIONS (GPU Accelerated)
    ============================================ */
 
-@keyframes fadeInUp {
-  from {
+@keyframes softFade {
+  0% {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
+    transform: translateY(6px);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translate3d(20px, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translateY(0);
   }
 }
 
 .page-transition {
-  animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: softFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .fade-in {
