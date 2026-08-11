@@ -311,115 +311,135 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   return (
     <div id="menu-dataAnggota" className="space-y-5 max-w-6xl mx-auto">
         {/* FILTER DATA */}
-        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm space-y-4 theme-el">
-            <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 border-b border-red-50 pb-3">
-                <span className="material-icons text-red-600 bg-red-100 p-1 rounded-lg">filter_alt</span>
-                Filter Data Anggota {filter === 'verifikasi' && <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px] ml-2">MODE VERIFIKASI (TIDAK LENGKAP/GANDA)</span>}
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm theme-el mb-6">
+            <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 mb-4">
+                <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">filter_alt</span>
+                FILTER PENCARIAN
+                {filter === 'verifikasi' && <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px] ml-2">MODE VERIFIKASI</span>}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
-                <input type="text" placeholder="Cari nama / NIK..."
+            
+            <div className="flex flex-col md:flex-row gap-3">
+                <input type="text" placeholder="Tulis Nama/NIK..."
                     value={search} onChange={e => setSearch(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                    className="sm:col-span-2 md:col-span-2 p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
+                    className="flex-1 p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
 
-                <select value={bagian} onChange={e => setBagian(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Bagian -</option>
+                <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                    <option value="">- Bagian -</option>
                     <option value="PAC">PAC</option>
                     <option value="RANTING">RANTING</option>
                     <option value="ANAK RANTING">ANAK RANTING</option>
                     <option value="SATGAS">SATGAS</option>
                 </select>
 
-                <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Jabatan -</option>
+                <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                    <option value="">- Jabatan -</option>
                     <option value="KETUA">KETUA</option>
                     <option value="SEKRETARIS">SEKRETARIS</option>
                     <option value="BENDAHARA">BENDAHARA</option>
                     <option value="ANGGOTA">ANGGOTA</option>
                 </select>
 
-
-
                 {/* Filter Desa */}
-                <select value={desa} onChange={e => setDesa(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Desa -</option>
+                <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                    <option value="">- Desa -</option>
                     {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
 
                 {/* Filter Dusun */}
-                <select value={dusun} onChange={e => setDusun(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!desa}>
-                    <option value="">- Semua Dusun -</option>
+                <select value={dusun} onChange={e => setDusun(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!desa}>
+                    <option value="">- Dusun -</option>
                     {dusunList.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
 
                 <div className="flex gap-2">
-                    <button onClick={handleReset} className="flex-1 py-2.5 border border-red-200 rounded-xl text-red-600 font-bold hover:bg-red-50 transition">Reset</button>
-                    <button onClick={handleSearch} className="flex-1 py-2.5 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center gap-1">
-                        <span className="material-icons text-sm">search</span>Cari
+                    <button onClick={handleReset} className="w-11 h-11 border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
+                        <span className="material-icons text-xl">restart_alt</span>
+                    </button>
+                    <button onClick={handleSearch} className="w-11 h-11 bg-red-700 text-white rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center" title="Cari Data">
+                        <span className="material-icons text-xl">search</span>
                     </button>
                 </div>
             </div>
         </div>
 
         {/* ACTION PANEL INPUT DATA */}
-        <div className="mt-2 mb-2 flex justify-center">
+        <div className="mb-6 flex justify-center md:justify-end">
             <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
-                className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-3 md:py-3.5 rounded-2xl sm:rounded-xl shadow-md hover:shadow-lg font-bold flex items-center justify-center space-x-2 transform active:scale-95 transition-all duration-300 text-sm">
-                <span className="material-icons">add_circle</span><span>INPUT DATA BARU</span>
+                className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all duration-300 text-sm">
+                <span className="material-icons">add_circle</span> INPUT DATA BARU
             </button>
         </div>
 
         {/* LIST DATA */}
         <div className="space-y-4">
-            <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 overflow-x-auto">
+            <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 theme-el">
+                {/* Header (Desa/Dusun title) */}
+                <div className="flex items-center justify-between border-b border-red-50 pb-4 mb-4">
+                    <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2">
+                        <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">location_on</span>
+                        {dusun ? `DUSUN: ${dusun}` : desa ? `DESA: ${desa}` : 'SEMUA WILAYAH'}
+                    </h3>
+                    <span className="bg-red-700 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">{data.length} DATA</span>
+                </div>
+
                 {isLoading ? (
                     <p className="text-center text-slate-500 py-8">Memuat Data Anggota...</p>
                 ) : data.length === 0 ? (
                     <p className="text-center text-slate-500 py-8">Tidak ada data anggota yang ditemukan.</p>
                 ) : (
-                    <>
-                    <p className="text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-wider">Menampilkan {data.length} data anggota</p>
-                    <table className="w-full text-left border-collapse min-w-[800px]">
-                        <thead>
-                            <tr className="border-b-2 border-red-100 text-red-800 text-[10px] md:text-xs uppercase tracking-wider">
-                                <th className="p-3 font-bold text-center">No</th>
-                                <th className="p-3 font-bold">Foto</th>
-                                <th className="p-3 font-bold">NIK / Nama</th>
-                                <th className="p-3 font-bold">Bagian</th>
-                                <th className="p-3 font-bold">Jabatan</th>
-                                <th className="p-3 font-bold">Desa</th>
-                                <th className="p-3 font-bold text-center">Detail</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-xs md:text-sm text-slate-700">
-                            {data.map((item, index) => (
-                                <tr key={item.id} className="border-b border-slate-100 hover:bg-red-50/50 transition duration-150">
-                                    <td className="p-3 font-medium text-center">{index + 1}</td>
-                                    <td className="p-3">
-                                        <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
+                    <div className="flex flex-col gap-3">
+                        {data.map((item, index) => {
+                            const isLengkap = item.fotoKtpUrl && item.passFotoUrl && item.nik;
+                            return (
+                                <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
+                                    <div className="flex items-center gap-4">
+                                        {/* Kolom ID */}
+                                        <div className="w-8 text-center text-[10px] font-bold text-slate-400">#{item.id}</div>
+                                        
+                                        {/* Foto */}
+                                        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
                                             {item.passFotoUrl ? (
                                                 <img src={getDirectImageUrl(item.passFotoUrl) || ''} alt={item.nama} className="w-full h-full object-cover"
-                                                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-sm">person</span></div>'; }} />
+                                                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-xl">person</span></div>'; }} />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-sm">person</span></div>
+                                                <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-400"><span className="material-icons text-xl">person</span></div>
                                             )}
                                         </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="font-bold text-slate-800">{item.nama}</div>
-                                        <div className="text-[10px] text-slate-500 tracking-wider">{item.nik}</div>
-                                    </td>
-                                    <td className="p-3 font-semibold text-red-600">{item.bagian || '-'}</td>
-                                    <td className="p-3 text-slate-600">{item.jabatan || '-'}</td>
-                                    <td className="p-3 text-slate-600 text-xs">{item.desa || '-'}</td>
-                                    <td className="p-3 text-center">
-                                        <button onClick={() => setSelectedAnggota(item)} className="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg transition"><span className="material-icons text-[18px]">visibility</span></button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    </>
+                                        
+                                        {/* Info */}
+                                        <div>
+                                            <div className="flex items-center gap-1.5 mb-1">
+                                                <h4 className="text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
+                                                {isLengkap && <span className="material-icons text-emerald-500 text-[16px]" title="Data Lengkap">verified</span>}
+                                            </div>
+                                            <div className="text-[10px] md:text-xs font-bold tracking-wider flex items-center flex-wrap gap-1.5">
+                                                <span className="text-red-500">{item.bagian || '-'}</span>
+                                                <span className="text-red-200">|</span>
+                                                <span className="text-red-700">{item.jabatan || '-'}</span>
+                                                <span className="text-red-200">|</span>
+                                                <span className="text-red-500">{item.jenisKelamin || '-'}</span>
+                                                <span className="text-red-200">|</span>
+                                                <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 mt-4 sm:mt-0 pl-16 sm:pl-0">
+                                        {item.nomorHp && (
+                                            <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
+                                                <span className="material-icons text-[18px]">chat</span>
+                                            </a>
+                                        )}
+                                        <button onClick={() => setSelectedAnggota(item)} className="w-9 h-9 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition" title="Lihat Detail">
+                                            <span className="material-icons text-[18px]">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
         </div>
