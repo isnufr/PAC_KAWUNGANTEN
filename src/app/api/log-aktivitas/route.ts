@@ -6,21 +6,18 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const wilayah = await prisma.wilayah.findMany({
-      orderBy: [
-        { kecamatan: 'asc' },
-        { desa: 'asc' },
-        { dusun: 'asc' }
-      ]
+    const logs = await prisma.logAktivitas.findMany({
+      orderBy: { waktu: 'desc' },
+      take: 100
     });
 
     return NextResponse.json({
       success: true,
-      data: wilayah
+      data: logs
     });
 
   } catch (error) {
-    console.error('API Wilayah GET Error:', error);
+    console.error('API Log Aktivitas GET Error:', error);
     return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
   }
 }

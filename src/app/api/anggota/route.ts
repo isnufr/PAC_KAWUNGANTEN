@@ -10,7 +10,9 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
     const bagian = searchParams.get('bagian');
     const jabatan = searchParams.get('jabatan');
+    const kecamatan = searchParams.get('kecamatan');
     const desa = searchParams.get('desa');
+    const dusun = searchParams.get('dusun');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     
@@ -26,7 +28,9 @@ export async function GET(req: NextRequest) {
     }
     if (bagian) whereClause.bagian = bagian;
     if (jabatan) whereClause.jabatan = jabatan;
+    if (kecamatan) whereClause.kecamatan = kecamatan;
     if (desa) whereClause.desa = desa;
+    if (dusun) whereClause.dusun = dusun;
 
     const [data, total] = await Promise.all([
       prisma.anggota.findMany({

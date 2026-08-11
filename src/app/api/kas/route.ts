@@ -7,27 +7,27 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const search = searchParams.get('search');
     const tipe = searchParams.get('tipe');
     const kategori = searchParams.get('kategori');
-    const search = searchParams.get('search');
-    
+
     const whereClause: any = {};
 
-    if (tipe) whereClause.tipe = tipe;
-    if (kategori) whereClause.kategori = kategori;
     if (search) {
       whereClause.keterangan = { contains: search };
     }
+    if (tipe) whereClause.tipe = tipe;
+    if (kategori) whereClause.kategori = kategori;
 
     const data = await prisma.kasOrganisasi.findMany({
       where: whereClause,
       orderBy: { tanggal: 'desc' }
     });
 
-    // Kalkulasi summary
-    const totalPemasukan = data.filter(k => k.tipe === 'PEMASUKAN').reduce((acc, curr) => acc + curr.nominal, 0);
-    const totalPengeluaran = data.filter(k => k.tipe === 'PENGELUARAN').reduce((acc, curr) => acc + curr.nominal, 0);
-    const saldoAktif = totalPemasukan - totalPengeluaran;
+    // Calculate summary
+    const allData = await prisma.kasOrganisasi.findMany();
+    const totalPemasukan = allData.filter(d => d.tipe === 'PEMASUKAN').reduce((sum, d) => sum + d.nominal, 0);
+    const totalPengeluaran = allData.filter(d => d.tipe === 'PENGELUARAN').reduce((sum, d) => sum + d.nominal, 0);
 
     return NextResponse.json({
       success: true,
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       summary: {
         totalPemasukan,
         totalPengeluaran,
-        saldoAktif
+        saldoAkhir: totalPemasukan - totalPengeluaran
       }
     });
 
@@ -48,19 +48,26 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
+
     const newKas = await prisma.kasOrganisasi.create({
-      data: body
+      data: {
+        tanggal: new Date(body.tanggal),
+        tipe: body.tipe,
+        nominal: body.nominal,
+        kategori: body.kategori || null,
+        keterangan: body.keterangan || null,
+        operator: body.operator || null
+      }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Transaksi kas berhasil dicatat',
+      message: 'Transaksi berhasil dicatat',
       data: newKas
     }, { status: 201 });
 
   } catch (error) {
     console.error('API Kas POST Error:', error);
-    return NextResponse.json({ error: 'Gagal mencatat transaksi kas' }, { status: 500 });
+    return NextResponse.json({ error: 'Gagal mencatat transaksi' }, { status: 500 });
   }
 }
