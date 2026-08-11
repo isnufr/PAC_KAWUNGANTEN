@@ -32,9 +32,10 @@ export async function POST(request: Request) {
     // Dapatkan ekstensi file dari nama aslinya
     const extension = file.name.split('.').pop() || 'jpg';
 
-    // Format nama file: [TYPE]_[ID]_[NAMA_DEPAN].[ext]
-    // Contoh: KTP_1_Budi.jpg
-    const fileName = `${type.toUpperCase()}_${id}_${namaDepan}.${extension}`;
+    // Format nama file: [TYPE]_[ID]_[NAMA_DEPAN]_[TIMESTAMP].[ext]
+    // Contoh: KTP_1_Budi_1690000000.jpg
+    const timestamp = Date.now();
+    const fileName = `${type.toUpperCase()}_${id}_${namaDepan}_${timestamp}.${extension}`;
     
     // Pastikan folder public/uploads ada
     const uploadDir = join(process.cwd(), 'public', 'uploads');
