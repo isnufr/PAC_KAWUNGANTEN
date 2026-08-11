@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardView() {
+  const router = useRouter();
   const [stats, setStats] = useState({
     total: 0,
     pac: 0,
@@ -8,25 +10,43 @@ export default function DashboardView() {
     anakRanting: 0,
     satgas: 0
   });
+  const [gender, setGender] = useState({ pria: 0, wanita: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/dashboard/stats')
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          router.push('/login');
+          return null;
+        }
+        return res.json();
+      })
       .then(data => {
+        if (!data) return;
         if (data.success) {
           setStats({
-            total: data.data.totalAnggota || 0,
-            pac: data.data.bagian.PAC || 0,
-            ranting: data.data.bagian.RANTING || 0,
-            anakRanting: data.data.bagian.ANAK_RANTING || 0,
-            satgas: data.data.bagian.SATGAS || 0
+            total: data.data.stats.total || 0,
+            pac: data.data.stats.pac || 0,
+            ranting: data.data.stats.ranting || 0,
+            anakRanting: data.data.stats.anakRanting || 0,
+            satgas: data.data.stats.satgas || 0
+          });
+          setGender({
+            pria: data.data.gender.LAKI_LAKI || 0,
+            wanita: data.data.gender.PEREMPUAN || 0
           });
         }
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [router]);
+
+  const totalGender = gender.pria + gender.wanita;
+  const priaPercent = totalGender > 0 ? Math.round((gender.pria / totalGender) * 100) : 0;
+  const wanitaPercent = totalGender > 0 ? Math.round((gender.wanita / totalGender) * 100) : 0;
 
   return (
     <div id="menu-dashboard" className="space-y-5 md:space-y-6 max-w-6xl mx-auto">
@@ -67,6 +87,34 @@ export default function DashboardView() {
               <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
               <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
               <QuotaCard title="Satgas PAC" icon="security" target={5} current={stats.satgas} percent={Math.min(100, Math.round((stats.satgas / 5) * 100) || 0)} />
+          </div>
+      </div>
+
+      {/* STATISTIK GENDER */}
+      <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
+          <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-slate-100 pb-4 mb-5">
+              <span className="material-icons text-blue-600 bg-blue-50 p-2 rounded-xl text-xl">wc</span>
+              Statistik Gender Anggota
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex items-center gap-4">
+              <div className="bg-blue-600 text-white p-3 rounded-xl shadow-md shadow-blue-200">
+                <span className="material-icons text-2xl">male</span>
+              </div>
+              <div>
+                <span className="text-2xl font-black text-blue-700">{gender.pria}</span>
+                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Laki-laki ({priaPercent}%)</p>
+              </div>
+            </div>
+            <div className="bg-pink-50 rounded-2xl p-4 border border-pink-100 flex items-center gap-4">
+              <div className="bg-pink-600 text-white p-3 rounded-xl shadow-md shadow-pink-200">
+                <span className="material-icons text-2xl">female</span>
+              </div>
+              <div>
+                <span className="text-2xl font-black text-pink-700">{gender.wanita}</span>
+                <p className="text-[10px] font-bold text-pink-500 uppercase tracking-wider">Perempuan ({wanitaPercent}%)</p>
+              </div>
+            </div>
           </div>
       </div>
     </div>

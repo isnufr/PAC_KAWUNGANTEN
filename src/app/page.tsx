@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
@@ -12,6 +12,15 @@ import LaporanView from '@/components/view/Laporan';
 import ManajemenAkunView from '@/components/view/ManajemenAkun';
 import LogAktivitasView from '@/components/view/LogAktivitas';
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('beranda');
@@ -19,10 +28,17 @@ export default function Dashboard() {
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/login');
+  }, [router]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
+    if (!token || isTokenExpired(token)) {
+      logout();
     } else {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -32,7 +48,18 @@ export default function Dashboard() {
       } catch (e) {}
       setIsReady(true);
     }
-  }, [router]);
+  }, [logout]);
+
+  // Cek token expiry setiap 60 detik
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      if (!token || isTokenExpired(token)) {
+        logout();
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [logout]);
 
   if (!isReady) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat...</div>;
 
@@ -67,4 +94,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

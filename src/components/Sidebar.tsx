@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +9,16 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }: SidebarProps) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Hapus cookie auth_token
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/login');
+  };
+
   return (
     <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}>
       <div className="flex items-center justify-center h-20 border-b border-gray-100">
@@ -36,7 +46,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
         </button>
 
         {/* ADMIN SECTION */}
-        {(userRole === 'Super Admin' || userRole === 'Admin') && (
+        {(userRole === 'Super Admin' || userRole === 'Admin' || userRole === 'Editor') && (
           <>
             <div className="pt-4 pb-2 px-4">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Keuangan</p>
@@ -47,8 +57,8 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
           </>
         )}
 
-        {/* SUPER ADMIN SECTION */}
-        {userRole === 'Super Admin' && (
+        {/* SUPER ADMIN / EDITOR SECTION */}
+        {(userRole === 'Super Admin' || userRole === 'Editor') && (
           <>
             <div className="pt-4 pb-2 px-4">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sistem</p>
@@ -67,9 +77,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
       {/* FOOTER SIDEBAR */}
       <div className="p-4 border-t border-gray-100">
         <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                onClick={() => {
-                  // handle logout
-                }}>
+                onClick={handleLogout}>
           <span className="material-icons mr-2">logout</span> Keluar
         </button>
       </div>

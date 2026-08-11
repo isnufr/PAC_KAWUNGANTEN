@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -35,10 +36,11 @@ export async function POST(req: NextRequest) {
       { expiresIn: '24h' }
     );
 
-    // Set token di HTTP-Only Cookie
+    // Set token di HTTP-Only Cookie DAN di response body
     const response = NextResponse.json({
       success: true,
       message: 'Login berhasil',
+      token: token,
       user: {
         username: user.username,
         role: user.role
