@@ -362,78 +362,148 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         </div>
 
         {/* LIST DATA */}
-        <div className="space-y-4">
-            <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 theme-el">
-                {/* Header (Desa/Dusun title) */}
-                <div className="flex items-center justify-between border-b border-red-50 pb-4 mb-4">
-                    <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2">
-                        <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">location_on</span>
-                        {desa && dusun ? `${desa} - ${dusun}` : desa ? `${desa}` : 'SEMUA WILAYAH'}
+        {filter === 'verifikasi' ? (
+            <div className="space-y-4">
+                {/* Custom Header for Verifikasi */}
+                <div className="bg-white p-5 rounded-3xl border border-red-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 theme-el">
+                  <div>
+                    <h3 className="text-sm md:text-base font-black text-red-700 flex items-center gap-2 uppercase tracking-wide">
+                      <span className="material-icons text-yellow-600 bg-yellow-100 p-1.5 rounded-lg text-lg">warning</span>
+                      VERIFIKASI & PERBAIKAN DATA
                     </h3>
-                    <span className="bg-red-700 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">{data.length} DATA</span>
+                    <p className="text-xs text-red-400 mt-1">Daftar anggota dengan status <span className="font-bold text-red-700">Belum Lengkap</span>.</p>
+                  </div>
+                  <button onClick={() => fetchData()} className="bg-red-700 hover:bg-red-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 active:scale-95">
+                    <span className="material-icons text-sm">refresh</span> Muat Ulang Data
+                  </button>
                 </div>
-
-                {isLoading ? (
-                    <LoadingSpinner />
-                ) : data.length === 0 ? (
-                    <p className="text-center text-slate-500 py-8">Tidak ada data anggota yang ditemukan.</p>
-                ) : (
-                    <div className="flex flex-col gap-3">
-                        {data.map((item: any, index: number) => {
-                            const isLengkap = item.fotoKtpUrl && item.passFotoUrl && item.nik;
-                            return (
-                                <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
-                                    <div className="flex items-center gap-4">
-
-                                        
-                                        {/* Foto */}
-                                        <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
-                                            {item.passFotoUrl ? (
-                                                <img src={getDirectImageUrl(item.passFotoUrl) || ''} alt={item.nama} className="w-full h-full object-cover"
-                                                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-xl">person</span></div>'; }} />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-400"><span className="material-icons text-xl">person</span></div>
-                                            )}
-                                        </div>
-                                        
-                                        {/* Info */}
-                                        <div>
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <h4 className="text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
-                                                {isLengkap && <span className="material-icons text-emerald-500 text-[16px]" title="Data Lengkap">verified</span>}
-                                            </div>
-                                            <div className="text-[10px] md:text-xs font-bold tracking-wider flex items-center flex-wrap gap-1.5">
-                                                <span className="text-red-500">{item.bagian || '-'}</span>
-                                                <span className="text-red-200">|</span>
-                                                <span className="text-red-700">{item.jabatan || '-'}</span>
-                                                <span className="text-red-200">|</span>
-                                                <span className="text-red-500">{item.jenisKelamin === 'Laki-Laki' ? 'L' : item.jenisKelamin === 'Perempuan' ? 'P' : item.jenisKelamin || '-'}</span>
-                                                <span className="text-red-200">|</span>
-                                                <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 mt-4 sm:mt-0 pl-16 sm:pl-0">
-                                        {item.nomorHp && (
-                                            <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                                                  <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
-                                                </svg>
-                                            </a>
-                                        )}
-                                        <button onClick={() => setSelectedAnggota(item)} className="w-9 h-9 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition" title="Lihat Detail">
-                                            <span className="material-icons text-[18px]">visibility</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                
+                {/* Table View for Verifikasi */}
+                <div className="bg-white rounded-3xl shadow-sm border border-red-100 overflow-hidden theme-el">
+                  {isLoading ? (
+                      <div className="p-8"><LoadingSpinner /></div>
+                  ) : data.length === 0 ? (
+                      <p className="text-center text-slate-500 py-8 font-bold">Tidak ada data anggota yang perlu diverifikasi.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs sm:text-sm text-red-800">
+                            <thead className="bg-red-50 text-[10px] sm:text-xs uppercase text-red-700 border-b border-red-100 font-extrabold tracking-wider">
+                                <tr>
+                                    <th className="p-4 sm:p-5">No</th>
+                                    <th className="p-4 sm:p-5 min-w-[150px]">Nama Anggota</th>
+                                    <th className="p-4 sm:p-5 min-w-[200px]">Wilayah</th>
+                                    <th className="p-4 sm:p-5 text-center">Status</th>
+                                    <th className="p-4 sm:p-5 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-red-50">
+                                {data.map((item: any, index: number) => (
+                                    <tr key={item.id} className="hover:bg-red-50/50 transition duration-200">
+                                        <td className="p-4 sm:p-5 font-bold text-red-400">{index + 1}</td>
+                                        <td className="p-4 sm:p-5 font-black text-slate-800 tracking-tight">{item.nama}</td>
+                                        <td className="p-4 sm:p-5 font-bold text-red-600 uppercase text-xs">
+                                            {item.kecamatan || 'KAWUNGANTEN'} / {item.desa || '-'}
+                                        </td>
+                                        <td className="p-4 sm:p-5 text-center">
+                                            <span className="inline-flex items-center justify-center gap-1 bg-red-100 text-red-600 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                                <span className="material-icons text-[12px]">error_outline</span> BELUM LENGKAP
+                                            </span>
+                                        </td>
+                                        <td className="p-4 sm:p-5 text-center">
+                                            <button onClick={() => { 
+                                                // Trigger same edit logic as standard view
+                                                setSelectedAnggota(item); 
+                                                setTimeout(() => {
+                                                    setEditId(item.id);
+                                                    setFormData({
+                                                        nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
+                                                    });
+                                                    setFileKtp(null); setFilePassFoto(null); setFormError(''); setFormSuccess(''); setIsModalOpen(true); setSelectedAnggota(null);
+                                                }, 0);
+                                            }} className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition shadow-md shadow-amber-200 flex items-center justify-center gap-1.5 mx-auto active:scale-95 whitespace-nowrap">
+                                                <span className="material-icons text-[14px]">edit_square</span> Perbaiki
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                )}
+                  )}
+                </div>
             </div>
-        </div>
+        ) : (
+            <div className="space-y-4">
+                <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 theme-el">
+                    {/* Header (Desa/Dusun title) */}
+                    <div className="flex items-center justify-between border-b border-red-50 pb-4 mb-4">
+                        <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">location_on</span>
+                            {desa && dusun ? `${desa} - ${dusun}` : desa ? `${desa}` : 'SEMUA WILAYAH'}
+                        </h3>
+                        <span className="bg-red-700 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">{data.length} DATA</span>
+                    </div>
+
+                    {isLoading ? (
+                        <LoadingSpinner />
+                    ) : data.length === 0 ? (
+                        <p className="text-center text-slate-500 py-8 font-bold">Tidak ada data anggota yang ditemukan.</p>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {data.map((item: any, index: number) => {
+                                const isLengkap = item.fotoKtpUrl && item.passFotoUrl && item.nik;
+                                return (
+                                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
+                                        <div className="flex items-center gap-4">
+                                            {/* Foto */}
+                                            <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
+                                                {item.passFotoUrl ? (
+                                                    <img src={getDirectImageUrl(item.passFotoUrl) || ''} alt={item.nama} className="w-full h-full object-cover"
+                                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-xl">person</span></div>'; }} />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-400"><span className="material-icons text-xl">person</span></div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Info */}
+                                            <div>
+                                                <div className="flex items-center gap-1.5 mb-1">
+                                                    <h4 className="text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
+                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[16px]" title="Data Lengkap">verified</span>}
+                                                </div>
+                                                <div className="text-[10px] md:text-xs font-bold tracking-wider flex items-center flex-wrap gap-1.5">
+                                                    <span className="text-red-500">{item.bagian || '-'}</span>
+                                                    <span className="text-red-200">|</span>
+                                                    <span className="text-red-700">{item.jabatan || '-'}</span>
+                                                    <span className="text-red-200">|</span>
+                                                    <span className="text-red-500">{item.jenisKelamin === 'Laki-Laki' ? 'L' : item.jenisKelamin === 'Perempuan' ? 'P' : item.jenisKelamin || '-'}</span>
+                                                    <span className="text-red-200">|</span>
+                                                    <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center gap-2 mt-4 sm:mt-0 pl-16 sm:pl-0">
+                                            {item.nomorHp && (
+                                                <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                                      <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                                                    </svg>
+                                                </a>
+                                            )}
+                                            <button onClick={() => setSelectedAnggota(item)} className="w-9 h-9 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition" title="Lihat Detail">
+                                                <span className="material-icons text-[18px]">visibility</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )}
 
         {/* MODAL DETAIL ANGGOTA */}
         {selectedAnggota && (
