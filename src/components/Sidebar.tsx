@@ -22,7 +22,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
   return (
     <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}>
       <div className="flex items-center justify-center h-20 border-b border-gray-100">
-         <div className="relative w-12 h-12 mr-3 animate-blob">
+         <div className="relative w-12 h-12 mr-3">
             <div className="absolute inset-0 bg-red-100 rounded-full blur-md"></div>
             <img src="/logo.png" alt="Logo PAC" className="relative z-10 w-full h-full object-contain drop-shadow-md" />
          </div>

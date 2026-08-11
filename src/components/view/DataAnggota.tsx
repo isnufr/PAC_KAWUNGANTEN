@@ -48,6 +48,51 @@ export default function DataAnggotaView() {
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // File Upload & OCR State
+  const [fileKtp, setFileKtp] = useState<File | null>(null);
+  const [filePassFoto, setFilePassFoto] = useState<File | null>(null);
+  const [ocrStatus, setOcrStatus] = useState('');
+
+  const uploadFile = async (file: File, type: string, id: number, nama: string) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('type', type);
+    fd.append('id', id.toString());
+    fd.append('nama', nama);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    return res.json();
+  };
+
+  const handleKtpChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFileKtp(file);
+      setOcrStatus('Memindai KTP dengan AI...');
+      try {
+        const Tesseract = (await import('tesseract.js')).default;
+        const { data: { text } } = await Tesseract.recognize(file, 'ind');
+        setOcrStatus('Selesai memindai.');
+        
+        // Ekstrak NIK (16 digit)
+        const nikMatch = text.match(/\b\d{16}\b/);
+        if (nikMatch) handleFormChange('nik', nikMatch[0]);
+        
+        // Ekstrak Nama
+        const lines = text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].toLowerCase().includes('nama')) {
+            const namaRaw = lines[i].replace(/nama/i, '').replace(/[:;-]/g, '').trim();
+            if (namaRaw) handleFormChange('nama', namaRaw);
+            break;
+          }
+        }
+      } catch (err) {
+        setOcrStatus('Gagal memindai teks.');
+        console.error(err);
+      }
+    }
+  };
+
   // Load wilayah data
   useEffect(() => {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
@@ -145,8 +190,32 @@ export default function DataAnggotaView() {
       const json = await res.json();
 
       if (res.ok && json.success) {
-        setFormSuccess('Anggota berhasil ditambahkan!');
+        const newId = json.data.id;
+        
+        if (fileKtp || filePassFoto) {
+            setFormSuccess('Menyimpan foto...');
+            let uploadSuccess = true;
+            if (fileKtp) {
+                const ktpRes = await uploadFile(fileKtp, 'KTP', newId, formData.nama);
+                if (!ktpRes.success) uploadSuccess = false;
+            }
+            if (filePassFoto) {
+                const passRes = await uploadFile(filePassFoto, 'PASSFOTO', newId, formData.nama);
+                if (!passRes.success) uploadSuccess = false;
+            }
+            if (uploadSuccess) {
+                setFormSuccess('Data & Foto berhasil ditambahkan!');
+            } else {
+                setFormSuccess('Data ditambahkan, namun sebagian foto gagal diunggah.');
+            }
+        } else {
+            setFormSuccess('Anggota berhasil ditambahkan!');
+        }
+
         setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' });
+        setFileKtp(null);
+        setFilePassFoto(null);
+        setOcrStatus('');
         fetchData();
         setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
       } else {
@@ -357,8 +426,19 @@ export default function DataAnggotaView() {
                             <FormInput label="Kecamatan" value={formData.kecamatan} onChange={v => handleFormChange('kecamatan', v)} placeholder="Nama kecamatan" />
                             <FormInput label="Desa" value={formData.desa} onChange={v => handleFormChange('desa', v)} placeholder="Nama desa" />
                             <FormInput label="Dusun" value={formData.dusun} onChange={v => handleFormChange('dusun', v)} placeholder="Nama dusun" />
-                            <div className="sm:col-span-2"><FormInput label="Link Pass Foto (Google Drive)" value={formData.passFotoUrl} onChange={v => handleFormChange('passFotoUrl', v)} placeholder="https://drive.google.com/..." /></div>
-                            <div className="sm:col-span-2"><FormInput label="Link Foto KTP (Google Drive)" value={formData.fotoKtpUrl} onChange={v => handleFormChange('fotoKtpUrl', v)} placeholder="https://drive.google.com/..." /></div>
+                            
+                            {/* Upload KTP with OCR */}
+                            <div className="sm:col-span-2 bg-red-50 p-4 rounded-xl border border-red-100 flex flex-col gap-2">
+                                <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide">Upload & Scan KTP</label>
+                                <input type="file" accept="image/*" onChange={handleKtpChange} className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 transition" />
+                                {ocrStatus && <span className="text-[10px] font-bold text-red-600 mt-1">{ocrStatus}</span>}
+                            </div>
+
+                            {/* Upload Pass Foto */}
+                            <div className="sm:col-span-2 bg-red-50 p-4 rounded-xl border border-red-100 flex flex-col gap-2">
+                                <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide">Upload Pass Foto</label>
+                                <input type="file" accept="image/*" onChange={(e) => { if(e.target.files) setFilePassFoto(e.target.files[0]) }} className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 transition" />
+                            </div>
                         </div>
 
                         <button type="submit" disabled={isSubmitting}
