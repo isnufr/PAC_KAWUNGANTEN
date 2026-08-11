@@ -77,7 +77,7 @@ function DashboardContent() {
     setIsSidebarOpen(false);
   }, []);
 
-  if (!isReady) return <LoadingSpinner fullScreen />;
+  if (!isReady) return <LoadingSpinner fullScreen text="sedang menghubungkan ke Kandang Banteng..." />;
 
   return (
     <div className="bg-[#fafafa] text-slate-800 h-screen flex overflow-hidden">

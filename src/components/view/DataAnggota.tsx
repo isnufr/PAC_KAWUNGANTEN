@@ -622,7 +622,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                 <span className="material-icons text-base">delete</span> HAPUS
                             </button>
                         </div>
-                        <button onClick={() => { setIsPrinting(true); setTimeout(() => window.print(), 300); setTimeout(() => setIsPrinting(false), 2000); }} 
+                        <button onClick={() => setIsPrinting(true)} 
                                 className="w-full mt-2 bg-red-600 hover:bg-red-700 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 flex justify-center items-center gap-2 transition transform active:scale-95">
                             <span className="material-icons text-base">badge</span> BUAT KARTU ANGGOTA DIGITAL
                         </button>
@@ -791,18 +791,31 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                 </div>
             </div>
         , document.body)}
-        {/* PRINTABLE ID CARD (Hidden except on print) */}
+        {/* PRINTABLE ID CARD (Review Mode) */}
         {isPrinting && selectedAnggota && (
-            <div className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center" id="printable-id-card">
+            <div className="fixed inset-0 bg-slate-900/90 z-[9999] flex flex-col items-center justify-center p-4">
                 <style>{`
                   @media print {
                     body * { visibility: hidden; }
                     #printable-id-card, #printable-id-card * { visibility: visible; }
-                    #printable-id-card { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+                    #printable-id-card { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: none; box-shadow: none; transform: none; }
+                    .no-print { display: none !important; }
                     @page { size: landscape; margin: 0; }
                   }
                 `}</style>
-                <div className="w-[85.6mm] h-[53.98mm] bg-red-600 rounded-xl shadow-2xl relative overflow-hidden border border-red-800 text-white" style={{ fontFamily: 'Arial, sans-serif' }}>
+                
+                {/* Print Controls (Hidden when actually printing) */}
+                <div className="no-print w-full max-w-sm flex justify-between items-center mb-6 bg-white/10 p-3 rounded-2xl backdrop-blur-md border border-white/20">
+                    <button onClick={() => setIsPrinting(false)} className="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-xl font-bold flex items-center gap-2 transition text-sm">
+                        <span className="material-icons text-sm">close</span> Tutup
+                    </button>
+                    <button onClick={() => window.print()} className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-600/40 transition text-sm">
+                        <span className="material-icons text-sm">print</span> Cetak
+                    </button>
+                </div>
+
+                {/* The Card */}
+                <div id="printable-id-card" className="w-[85.6mm] h-[53.98mm] bg-red-600 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden border border-red-800 text-white transform transition-transform hover:scale-105" style={{ fontFamily: 'Arial, sans-serif' }}>
                     {/* Background Pattern */}
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full mix-blend-screen opacity-50 -mr-10 -mt-10"></div>
@@ -848,15 +861,11 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
 
         {/* MODAL FULL SCREEN IMAGE */}
         {mounted && fullScreenImage && createPortal(
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 cursor-zoom-out" onClick={() => setFullScreenImage(null)}>
                 <button onClick={() => setFullScreenImage(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 p-2 rounded-full backdrop-blur-md">
                     <span className="material-icons text-2xl block">close</span>
                 </button>
-                <img src={fullScreenImage} alt="Fullscreen" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" />
-                <a href={fullScreenImage} target="_blank" rel="noreferrer" download className="absolute bottom-8 bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-full font-bold flex items-center justify-center space-x-2 shadow-xl shadow-red-600/40 transition transform hover:scale-105 active:scale-95 text-sm border-2 border-red-500/50">
-                    <span className="material-icons text-xl">download</span>
-                    <span>UNDUH FOTO UTUH</span>
-                </a>
+                <img src={fullScreenImage} alt="Fullscreen" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
             </div>
         , document.body)}
     </div>

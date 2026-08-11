@@ -8,15 +8,20 @@ interface LoadingSpinnerProps {
 export default function LoadingSpinner({ text = 'MEMUAT DATA...', fullScreen = false }: LoadingSpinnerProps) {
   const spinnerContent = (
     <div className="flex flex-col items-center justify-center p-8 space-y-6 animate-in fade-in duration-500">
+      {fullScreen && (
+        <div className="w-24 h-24 sm:w-32 sm:h-32 mb-4 drop-shadow-xl animate-pulse">
+          <img src="/logo.png" alt="Logo PAC" className="w-full h-full object-contain" />
+        </div>
+      )}
       <div className="relative">
         {/* Background track */}
-        <div className="w-16 h-16 border-[4px] border-red-100 rounded-full"></div>
+        <div className="w-12 h-12 sm:w-16 sm:h-16 border-[4px] border-red-100 rounded-full"></div>
         {/* Spinning red segment */}
-        <div className="w-16 h-16 border-[4px] border-transparent border-t-red-600 border-r-red-600 rounded-full animate-spin absolute top-0 left-0"></div>
+        <div className="w-12 h-12 sm:w-16 sm:h-16 border-[4px] border-transparent border-t-red-600 border-r-red-600 rounded-full animate-spin absolute top-0 left-0"></div>
         {/* Subtle inner glow */}
         <div className="absolute inset-2 bg-red-600/5 rounded-full blur-sm"></div>
       </div>
-      <p className="text-xs md:text-sm font-black tracking-[0.2em] text-red-600 uppercase" style={{ textShadow: '0 2px 4px rgba(220,38,38,0.1)' }}>
+      <p className="text-[10px] sm:text-xs md:text-sm font-black tracking-[0.2em] text-red-600 uppercase text-center max-w-[80vw]" style={{ textShadow: '0 2px 4px rgba(220,38,38,0.1)' }}>
         {text}
       </p>
     </div>

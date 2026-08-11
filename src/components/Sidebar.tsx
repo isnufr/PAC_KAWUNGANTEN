@@ -71,11 +71,14 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, o
         {/* Header with close button on mobile */}
         <div className="flex items-center justify-between h-20 border-b border-gray-100 px-4">
           <div className="flex items-center">
-            <div className="relative w-12 h-12 mr-3">
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12 mr-3 flex-shrink-0">
               <div className="absolute inset-0 bg-red-100 rounded-full blur-md"></div>
               <img src="/logo.png" alt="Logo PAC" className="relative z-10 w-full h-full object-contain drop-shadow-md" />
             </div>
-            <h1 className="text-xl font-bold text-red-700 tracking-tight">PAC KWT</h1>
+            <div className="flex flex-col justify-center">
+              <h1 className="text-[10px] sm:text-xs font-black text-red-700 tracking-tight uppercase leading-none mb-0.5">Pimpinan Anak Cabang</h1>
+              <h2 className="text-sm sm:text-base font-black text-slate-800 tracking-widest uppercase leading-none">Kawunganten</h2>
+            </div>
           </div>
           {/* Close button — mobile only */}
           <button
