@@ -793,7 +793,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </form>
                 </div>
             </div>
-        )}
+        , document.body)}
         {/* PRINTABLE ID CARD (Hidden except on print) */}
         {isPrinting && selectedAnggota && (
             <div className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center" id="printable-id-card">
@@ -847,7 +847,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </div>
                 </div>
             </div>
-        , document.body)}
+        )}
 
         {/* MODAL FULL SCREEN IMAGE */}
         {mounted && fullScreenImage && createPortal(
