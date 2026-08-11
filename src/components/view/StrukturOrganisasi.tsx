@@ -26,7 +26,7 @@ export default function StrukturOrganisasiView() {
   useEffect(() => {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
       if (json.success) {
-        const desas = [...new Set(json.data.map((w: any) => w.desa))].sort() as string[];
+        const desas = Array.from(new Set(json.data.map((w: any) => w.desa))).sort() as string[];
         setDesaList(desas);
       }
     }).catch(console.error);

@@ -53,7 +53,7 @@ export default function DataAnggotaView() {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
       if (json.success) {
         setWilayahList(json.data);
-        const kecs = [...new Set(json.data.map((w: WilayahItem) => w.kecamatan))].sort() as string[];
+        const kecs = Array.from(new Set(json.data.map((w: WilayahItem) => w.kecamatan))).sort() as string[];
         setKecamatanList(kecs);
       }
     }).catch(console.error);
@@ -62,7 +62,7 @@ export default function DataAnggotaView() {
   // Update desa list when kecamatan changes
   useEffect(() => {
     if (kecamatan) {
-      const desas = [...new Set(wilayahList.filter(w => w.kecamatan === kecamatan).map(w => w.desa))].sort() as string[];
+      const desas = Array.from(new Set(wilayahList.filter(w => w.kecamatan === kecamatan).map(w => w.desa))).sort() as string[];
       setDesaList(desas);
     } else {
       setDesaList([]);
@@ -74,7 +74,7 @@ export default function DataAnggotaView() {
   // Update dusun list when desa changes
   useEffect(() => {
     if (desa) {
-      const dusuns = [...new Set(wilayahList.filter(w => w.kecamatan === kecamatan && w.desa === desa).map(w => w.dusun).filter(Boolean))].sort() as string[];
+      const dusuns = Array.from(new Set(wilayahList.filter(w => w.kecamatan === kecamatan && w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
       setDusunList(dusuns);
     } else {
       setDusunList([]);
