@@ -400,8 +400,12 @@ export default function DashboardView() {
                       ) : (
                           ulangTahun.map((u: any, i: number) => (
                               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-red-50/50 border border-red-100 hover:bg-red-50 transition">
-                                  <div className="w-10 h-10 bg-red-200 text-red-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0">
-                                      {u.nama.charAt(0).toUpperCase()}
+                                  <div className="w-10 h-10 bg-red-200 text-red-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0 overflow-hidden relative">
+                                      {u.passFotoUrl ? (
+                                        <img src={u.passFotoUrl} alt={u.nama} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = u.nama.charAt(0).toUpperCase(); }} />
+                                      ) : (
+                                        u.nama.charAt(0).toUpperCase()
+                                      )}
                                   </div>
                                   <div className="flex-1 min-w-0">
                                       <h4 className="text-xs font-bold text-slate-800 truncate">{u.nama}</h4>

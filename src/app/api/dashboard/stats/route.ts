@@ -43,7 +43,7 @@ export async function GET() {
     // Ulang Tahun Bulan Ini
     // Format is assumed DD/MM/YYYY or YYYY-MM-DD
     const allAnggota = await prisma.anggota.findMany({
-      select: { id: true, nama: true, tanggalLahir: true }
+      select: { id: true, nama: true, tanggalLahir: true, passFotoUrl: true }
     });
     
     const currentMonth = new Date().getMonth() + 1;
@@ -79,7 +79,7 @@ export async function GET() {
         return m === currentMonth;
       }
       return false;
-    }).map(a => ({ id: a.id, nama: a.nama, tanggalLahir: a.tanggalLahir }));
+    }).map(a => ({ id: a.id, nama: a.nama, tanggalLahir: a.tanggalLahir, passFotoUrl: a.passFotoUrl }));
 
     // KUOTA KEPENGURUSAN
     const wilayahList = await prisma.wilayah.findMany();
