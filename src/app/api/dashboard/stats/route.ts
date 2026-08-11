@@ -47,11 +47,35 @@ export async function GET() {
     });
     
     const currentMonth = new Date().getMonth() + 1;
+    // Kelompok Usia
+    let genZ = 0; // 13-28 (1996 - 2011)
+    let milenial = 0; // 29-43 (1981 - 1995)
+    let genX = 0; // 44-59 (1965 - 1980)
+    let babyBoomer = 0; // >59 (< 1965)
+    
+    const currentYear = new Date().getFullYear();
+
     const ulangTahunList = allAnggota.filter(a => {
       if (!a.tanggalLahir) return false;
+      
       const parts = a.tanggalLahir.includes('/') ? a.tanggalLahir.split('/') : a.tanggalLahir.split('-');
-      if (parts.length >= 2) {
-        const m = parseInt(parts[1], 10);
+      if (parts.length >= 3) {
+        // Assume format could be DD-MM-YYYY or YYYY-MM-DD
+        let y = parseInt(parts[2], 10);
+        let m = parseInt(parts[1], 10);
+        if (parts[0].length === 4) {
+           y = parseInt(parts[0], 10);
+        }
+        
+        // Age calculation
+        if (y) {
+           const age = currentYear - y;
+           if (age >= 13 && age <= 28) genZ++;
+           else if (age >= 29 && age <= 43) milenial++;
+           else if (age >= 44 && age <= 59) genX++;
+           else if (age > 59) babyBoomer++;
+        }
+
         return m === currentMonth;
       }
       return false;
@@ -59,6 +83,18 @@ export async function GET() {
 
     // KUOTA KEPENGURUSAN
     const wilayahList = await prisma.wilayah.findMany();
+
+    // Top 5 Desa
+    const allDesaCounts = await prisma.anggota.groupBy({
+      by: ['desa'],
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 5
+    });
+    const topDesa = allDesaCounts.filter(d => d.desa && d.desa.trim() !== '').map(d => ({
+      desa: d.desa,
+      count: d._count.id
+    }));
     
     // Ranting by Desa
     const rantingCounts = await prisma.anggota.groupBy({
@@ -92,6 +128,13 @@ export async function GET() {
           tidakLengkap: dataTidakLengkapCount,
           nikGanda: nikGandaCount
         },
+        usia: {
+          genZ,
+          milenial,
+          genX,
+          babyBoomer
+        },
+        topDesa,
         ulangTahun: ulangTahunList,
         kuota: {
           wilayah: wilayahList,

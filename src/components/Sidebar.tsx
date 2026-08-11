@@ -30,9 +30,9 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
       </div>
       
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {/* BERANDA */}
+        {/* DASHBOARD */}
         <button onClick={() => setActiveMenu('beranda')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'beranda' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-          <span className="material-icons mr-3 text-lg">dashboard</span> Beranda
+          <span className="material-icons mr-3 text-lg">dashboard</span> Dashboard
         </button>
         
         {/* DATA ANGGOTA */}
