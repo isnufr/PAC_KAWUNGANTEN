@@ -3,24 +3,28 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function PUT(req: NextRequest, { params }: { params: { nik: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const nik = params.nik;
+    const id = parseInt(params.id);
     const body = await req.json();
     
+    if (isNaN(id)) {
+        return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
+    }
+
     // Validasi NIK unik jika ada perubahan NIK
-    if (body.nik && body.nik !== nik) {
+    if (body.nik) {
         const existing = await prisma.anggota.findUnique({
             where: { nik: body.nik }
         });
         
-        if (existing) {
-            return NextResponse.json({ error: 'NIK baru sudah terdaftar di sistem' }, { status: 400 });
+        if (existing && existing.id !== id) {
+            return NextResponse.json({ error: 'NIK baru sudah terdaftar pada anggota lain di sistem' }, { status: 400 });
         }
     }
 
     const updatedAnggota = await prisma.anggota.update({
-      where: { nik },
+      where: { id },
       data: body
     });
 
@@ -36,12 +40,16 @@ export async function PUT(req: NextRequest, { params }: { params: { nik: string 
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { nik: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-      const nik = params.nik;
+      const id = parseInt(params.id);
+
+      if (isNaN(id)) {
+          return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
+      }
       
       await prisma.anggota.delete({
-        where: { nik }
+        where: { id }
       });
   
       return NextResponse.json({

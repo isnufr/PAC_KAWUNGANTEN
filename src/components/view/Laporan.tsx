@@ -3,11 +3,23 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+interface WilayahItem {
+  id: number;
+  kecamatan: string;
+  desa: string;
+  dusun: string;
+}
+
 export default function LaporanView() {
   const [format, setFormat] = useState('EXCEL');
   const [bagian, setBagian] = useState('');
   const [desa, setDesa] = useState('');
+  
+  const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
   const [desaList, setDesaList] = useState<string[]>([]);
+  const [dusunList, setDusunList] = useState<string[]>([]);
+  const [selectedDusuns, setSelectedDusuns] = useState<string[]>([]);
+  
   const [isExporting, setIsExporting] = useState(false);
 
   const [cols, setCols] = useState({
@@ -15,22 +27,41 @@ export default function LaporanView() {
     nama: true,
     jenisKelamin: true,
     tanggalLahir: true,
-    umur: true,
+    usia: true,
     nomorHp: true,
-    bagian: true,
-    jabatan: true,
     desa: true,
-    dusun: true
+    dusun: true,
+    bagian: true,
+    jabatan: true
   });
 
   useEffect(() => {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
       if (json.success) {
+        setWilayahList(json.data);
         const desas = Array.from(new Set(json.data.map((w: any) => w.desa))).sort() as string[];
         setDesaList(desas);
       }
     }).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (desa) {
+      const dusuns = Array.from(new Set(wilayahList.filter(w => w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
+      setDusunList(dusuns);
+    } else {
+      setDusunList([]);
+    }
+    setSelectedDusuns([]); // reset when desa changes
+  }, [desa, wilayahList]);
+
+  const toggleCol = (k: keyof typeof cols) => {
+    setCols(p => ({ ...p, [k]: !p[k] }));
+  };
+
+  const toggleDusun = (d: string) => {
+    setSelectedDusuns(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -44,51 +75,241 @@ export default function LaporanView() {
       const json = await res.json();
       if (!json.success || !json.data.length) {
         alert('Tidak ada data anggota untuk filter tersebut.');
+        setIsExporting(false);
         return;
       }
 
-      const rawData = json.data;
+      let rawData = json.data;
       
-      // Filter columns
-      const exportData = rawData.map((d: any, index: number) => {
-        const row: any = { No: index + 1 };
-        if (cols.nik) row['NIK'] = d.nik;
-        if (cols.nama) row['Nama Lengkap'] = d.nama;
-        if (cols.jenisKelamin) row['Jenis Kelamin'] = d.jenisKelamin;
-        if (cols.tanggalLahir) row['Tanggal Lahir'] = d.tanggalLahir;
-        if (cols.umur) row['Usia'] = d.umur;
-        if (cols.nomorHp) row['Nomor HP'] = d.nomorHp;
-        if (cols.bagian) row['Bagian'] = d.bagian;
-        if (cols.jabatan) row['Jabatan'] = d.jabatan;
-        if (cols.desa) row['Desa'] = d.desa;
-        if (cols.dusun) row['Dusun'] = d.dusun;
-        return row;
+      // Filter Dusun if selected
+      if (selectedDusuns.length > 0) {
+          rawData = rawData.filter((d: any) => selectedDusuns.includes(d.dusun));
+      }
+
+      if (rawData.length === 0) {
+        alert('Tidak ada data untuk kombinasi filter tersebut.');
+        setIsExporting(false);
+        return;
+      }
+
+      // Sorting by Jabatan
+      const urutanJabatan: Record<string, number> = { "KETUA": 1, "SEKRETARIS": 2, "BENDAHARA": 3, "ANGGOTA": 4 };
+      rawData.sort((a: any, b: any) => {
+          const jA = urutanJabatan[String(a.jabatan).toUpperCase()] || 5;
+          const jB = urutanJabatan[String(b.jabatan).toUpperCase()] || 5;
+          return jA - jB;
       });
 
-      const fileName = `Laporan_Anggota_PAC_KAWUNGANTEN_${bagian || 'Semua'}_${desa || 'Semua'}`;
+      const countL = rawData.filter((d: any) => String(d.jenisKelamin).toUpperCase() === 'LAKI-LAKI').length;
+      const countP = rawData.filter((d: any) => String(d.jenisKelamin).toUpperCase() === 'PEREMPUAN').length;
 
-      if (format === 'EXCEL' || format === 'CSV') {
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Anggota');
-        XLSX.writeFile(workbook, `${fileName}.${format.toLowerCase()}`);
-      } else if (format === 'PDF') {
-        const doc = new jsPDF(cols.dusun ? 'landscape' : 'portrait');
-        doc.text(`Laporan Data Anggota PAC KAWUNGANTEN`, 14, 15);
-        doc.setFontSize(10);
-        doc.text(`Filter Bagian: ${bagian || 'Semua'} | Desa: ${desa || 'Semua'}`, 14, 22);
-        
-        const headers = Object.keys(exportData[0]);
-        const body = exportData.map((row: any) => headers.map(h => row[h] || '-'));
-        
-        autoTable(doc, {
-          head: [headers],
-          body: body,
-          startY: 28,
-          styles: { fontSize: 8 },
-          headStyles: { fillColor: [220, 38, 38] } // Red theme
+      let filterArr = [];
+      if (bagian) filterArr.push("BAGIAN: " + bagian);
+      if (desa) filterArr.push("DESA: " + desa);
+      if (selectedDusuns.length > 0) filterArr.push("DUSUN: " + selectedDusuns.join(", "));
+
+      const filterLeftText = "DATA " + (filterArr.length > 0 ? filterArr.join(" | ") : "KESELURUHAN ANGGOTA");
+      const summaryRightText = `Jumlah Data : ${rawData.length} | Laki-Laki : ${countL} | Perempuan : ${countP}`;
+      const fileName = `Laporan_Data_${bagian || 'Total'}_${new Date().getTime()}`;
+
+      // Build Headers
+      const headers = ["NO"];
+      if (cols.nik) headers.push("NIK");
+      if (cols.nama) headers.push("NAMA");
+      if (cols.jenisKelamin) headers.push("L/P");
+      if (cols.tanggalLahir) headers.push("TGL LAHIR");
+      if (cols.usia) headers.push("UMUR");
+      if (cols.nomorHp) headers.push("NOMOR HP");
+      if (cols.desa) headers.push("DESA");
+      if (cols.dusun) headers.push("DUSUN");
+      if (cols.bagian) headers.push("BAGIAN");
+      if (cols.jabatan) headers.push("JABATAN");
+
+      // Common rows
+      const commonDataRows = rawData.map((d: any, idx: number) => {
+          let row: any[] = [idx + 1];
+          if (cols.nik) row.push(d.nik ? "'" + d.nik : '-');
+          if (cols.nama) row.push(d.nama || '-');
+          if (cols.jenisKelamin) {
+              let jk = '-';
+              if (String(d.jenisKelamin).toUpperCase() === 'LAKI-LAKI') jk = 'L';
+              else if (String(d.jenisKelamin).toUpperCase() === 'PEREMPUAN') jk = 'P';
+              row.push(jk);
+          }
+          if (cols.tanggalLahir) row.push(d.tanggalLahir || '-');
+          if (cols.usia) row.push(d.umur || '-');
+          if (cols.nomorHp) row.push(d.nomorHp || '-');
+          if (cols.desa) row.push(d.desa || '-');
+          if (cols.dusun) row.push(d.dusun || '-');
+          if (cols.bagian) row.push(d.bagian || '-');
+          if (cols.jabatan) row.push(d.jabatan || '-');
+          return row;
+      });
+
+      if (format === 'CSV') {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += '"PDI PERJUANGAN"\r\n';
+        csvContent += '"PAC KAWUNGANTEN"\r\n';
+        csvContent += '"PERIODE 2026 - 2031"\r\n\r\n';
+        const emptyCols = headers.slice(1).map(() => '""').join(",");
+        csvContent += `"${filterLeftText}",${emptyCols.length > 3 ? emptyCols.substring(3) : ''},"${summaryRightText}"\r\n\r\n`;
+        commonDataRows.forEach((row: any[]) => {
+            let csvRow = row.map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+            csvContent += csvRow + "\r\n";
         });
-        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", fileName + ".csv");
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      }
+      else if (format === 'EXCEL') {
+        if (bagian === 'RANTING') {
+            const excelData: any[][] = [
+                ["STRUKTUR, KOMPOSISI DAN PERSONALIA"],
+                ["PENGURUS RANTING PDI PERJUANGAN"],
+                ["DESA " + (desa || ".............").toUpperCase() + " KECAMATAN KAWUNGANTEN"],
+                ["KABUPATEN CILACAP"],
+                [],
+                [],
+                ["NO", "JABATAN", "NAMA SESUAI KTP", "NIK", "TGL LAHIR", "L/P", "NO. HP"]
+            ];
+            const posRanting = ["KETUA", "Wakil Ketua", "Wakil Ketua", "Wakil Ketua", "Wakil Ketua", "Wakil Ketua", "Wakil Ketua", "SEKRETARIS", "BENDAHARA"];
+            rawData.forEach((d: any) => d._used = false);
+            
+            const getPerson = (jab: string) => {
+                let searchJab = String(jab).toUpperCase();
+                if (searchJab === "WAKIL KETUA") searchJab = "ANGGOTA";
+                let p = rawData.find((d: any) => String(d.jabatan).toUpperCase() === searchJab && !d._used);
+                if (!p && searchJab.startsWith("WAKIL")) p = rawData.find((d: any) => String(d.jabatan).toUpperCase().includes("WAKIL") && !d._used);
+                if (p) p._used = true;
+                return p;
+            };
+
+            posRanting.forEach((pos, idx) => {
+                let p = getPerson(pos);
+                if (p) {
+                    let jk = '-';
+                    if (String(p.jenisKelamin).toUpperCase() === 'LAKI-LAKI') jk = 'L';
+                    else if (String(p.jenisKelamin).toUpperCase() === 'PEREMPUAN') jk = 'P';
+                    let hpVal = p.nomorHp || '-';
+                    excelData.push([ idx + 1, pos, p.nama || '-', p.nik ? "'" + p.nik : '-', p.tanggalLahir || '-', jk, hpVal ]);
+                } else {
+                    excelData.push([idx + 1, pos, "", "", "", "", ""]);
+                }
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }
+            ];
+            ws['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 12 }, { wch: 5 }, { wch: 15 }];
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan Ranting");
+            XLSX.writeFile(wb, fileName + ".xlsx");
+            
+        } else if (bagian === 'ANAK RANTING') {
+            const excelData: any[][] = [
+                ["ANAK RANTING PDI PERJUANGAN DESA " + (desa || ".............").toUpperCase()],
+                [],
+                []
+            ];
+            const dusunToExport = selectedDusuns.length > 0 ? selectedDusuns : [...Array.from(new Set(rawData.map((d: any) => d.dusun).filter(Boolean)))].sort() as string[];
+            const posAnak = ["KETUA", "WAKIL KETUA", "WAKIL KETUA", "SEKRETARIS", "BENDAHARA"];
+            const merges: any[] = [ { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } } ];
+
+            dusunToExport.forEach(dsn => {
+                merges.push({ s: { r: excelData.length, c: 0 }, e: { r: excelData.length, c: 6 } });
+                excelData.push(["DATA ANAK RANTING PDI PERJUANGAN (" + dsn.toUpperCase() + ")"]);
+                excelData.push([]);
+                excelData.push(["NO", "NAMA SESUAI KTP", "JABATAN", "NIK ", "TGL LAHIR", "L/P", "NO. HP"]);
+
+                const dusunData = rawData.filter((d: any) => d.dusun === dsn);
+                dusunData.forEach((d: any) => d._used = false);
+
+                const getPerson = (jab: string) => {
+                    let searchJab = jab;
+                    if (jab === "WAKIL KETUA") searchJab = "ANGGOTA";
+                    let p = dusunData.find((d: any) => String(d.jabatan).toUpperCase() === searchJab && !d._used);
+                    if (!p && searchJab.startsWith("WAKIL")) p = dusunData.find((d: any) => String(d.jabatan).toUpperCase().includes("WAKIL") && !d._used);
+                    if (p) p._used = true;
+                    return p;
+                };
+
+                posAnak.forEach((pos, idx) => {
+                    let p = getPerson(pos);
+                    if (p) {
+                        let jk = '-';
+                        if (String(p.jenisKelamin).toUpperCase() === 'LAKI-LAKI') jk = 'L';
+                        else if (String(p.jenisKelamin).toUpperCase() === 'PEREMPUAN') jk = 'P';
+                        let hpVal = p.nomorHp || '-';
+                        excelData.push([ idx + 1, p.nama || '-', pos, p.nik ? "'" + p.nik : '-', p.tanggalLahir || '-', jk, hpVal ]);
+                    } else {
+                        excelData.push([idx + 1, "", pos, "", "", "", ""]);
+                    }
+                });
+                excelData.push([]); excelData.push([]); excelData.push([]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            ws['!merges'] = merges;
+            ws['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 5 }, { wch: 15 }];
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan Anak Ranting");
+            XLSX.writeFile(wb, fileName + ".xlsx");
+
+        } else {
+            const excelData: any[][] = [
+                ["PDI PERJUANGAN"],
+                ["PAC KAWUNGANTEN"],
+                ["PERIODE 2026 - 2031"],
+                [],
+            ];
+            const filterRow = [filterLeftText];
+            for (let i = 1; i < headers.length - 1; i++) filterRow.push("");
+            filterRow.push(summaryRightText);
+            excelData.push(filterRow);
+            excelData.push(headers);
+            commonDataRows.forEach((row: any[]) => excelData.push(row));
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            const totalCols = headers.length;
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } }
+            ];
+            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 5) + 2 }));
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+            XLSX.writeFile(wb, fileName + ".xlsx");
+        }
+      } else if (format === 'PDF') {
+        const doc = new jsPDF('landscape');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        doc.text("PDI PERJUANGAN", pageWidth / 2, 12, { align: "center" });
+        doc.text("PAC KAWUNGANTEN", pageWidth / 2, 18, { align: "center" });
+        doc.text("PERIODE 2026 - 2031", pageWidth / 2, 24, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.text(filterLeftText, 14, 32);
+        doc.text(summaryRightText, pageWidth - 14, 32, { align: "right" });
+
+        autoTable(doc, {
+            startY: 36,
+            head: [headers],
+            body: commonDataRows,
+            headStyles: { fillColor: [220, 38, 38] },
+            styles: { fontSize: 8, cellPadding: 2 }
+        });
+
         doc.save(`${fileName}.pdf`);
       }
     } catch (e) {
@@ -99,9 +320,8 @@ export default function LaporanView() {
     }
   };
 
-  const toggleCol = (k: keyof typeof cols) => {
-    setCols(p => ({ ...p, [k]: !p[k] }));
-  };
+  const hideKolomEkspor = format === 'EXCEL' && (bagian === 'RANTING' || bagian === 'ANAK RANTING');
+  const showDusunFilter = bagian === 'ANAK RANTING' && desa;
 
   return (
     <div id="menu-laporan" className="max-w-6xl mx-auto">
@@ -143,17 +363,33 @@ export default function LaporanView() {
                     </select>
                 </div>
 
-                <div className="sm:col-span-2 pt-3 mt-1 border-t border-red-50">
-                    <label className="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center">Pilih Kolom Ekspor</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                        {Object.entries(cols).map(([k, v]) => (
-                            <label key={k} className="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer">
-                                <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded" />
-                                <span className="uppercase">{k.replace(/([A-Z])/g, ' $1').trim()}</span>
-                            </label>
-                        ))}
+                {showDusunFilter && (
+                    <div className="sm:col-span-2 mt-2">
+                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-2">Filter Dusun (Bisa Pilih Banyak)</label>
+                        <div className="grid grid-cols-2 gap-2 bg-red-50 p-3 rounded-xl border border-red-100">
+                            {dusunList.map(dsn => (
+                                <label key={dsn} className="flex items-center space-x-2 text-xs font-semibold text-red-800 cursor-pointer">
+                                    <input type="checkbox" checked={selectedDusuns.includes(dsn)} onChange={() => toggleDusun(dsn)} className="form-checkbox h-4 w-4 text-red-600 rounded border-red-300 focus:ring-red-500" />
+                                    <span>{dsn}</span>
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {!hideKolomEkspor && (
+                    <div className="sm:col-span-2 pt-3 mt-1 border-t border-red-50 transition-all duration-300">
+                        <label className="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center">Pilih Kolom Ekspor</label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                            {Object.entries(cols).map(([k, v]) => (
+                                <label key={k} className="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer">
+                                    <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-red-300 focus:ring-red-500" />
+                                    <span className="uppercase">{k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <button onClick={handleExport} disabled={isExporting}

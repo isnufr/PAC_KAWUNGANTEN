@@ -31,7 +31,9 @@ export default function DataAnggotaView() {
   const [desa, setDesa] = useState('');
   const [dusun, setDusun] = useState('');
   const [selectedAnggota, setSelectedAnggota] = useState<any>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
 
   // Wilayah data for filters
   const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
@@ -185,6 +187,48 @@ export default function DataAnggotaView() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleEdit = () => {
+      setEditId(selectedAnggota.id);
+      setFormData({
+          nik: selectedAnggota.nik || '',
+          nama: selectedAnggota.nama || '',
+          tanggalLahir: selectedAnggota.tanggalLahir || '',
+          jenisKelamin: selectedAnggota.jenisKelamin || '',
+          umur: selectedAnggota.umur?.toString() || '',
+          nomorHp: selectedAnggota.nomorHp || '',
+          bagian: selectedAnggota.bagian || '',
+          jabatan: selectedAnggota.jabatan || '',
+          kecamatan: selectedAnggota.kecamatan || '',
+          desa: selectedAnggota.desa || '',
+          dusun: selectedAnggota.dusun || '',
+          fotoKtpUrl: selectedAnggota.fotoKtpUrl || '',
+          passFotoUrl: selectedAnggota.passFotoUrl || ''
+      });
+      setFileKtp(null);
+      setFilePassFoto(null);
+      setFormError('');
+      setFormSuccess('');
+      setIsModalOpen(true);
+      setSelectedAnggota(null);
+  };
+
+  const handleDelete = async () => {
+      if (!window.confirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?")) return;
+      try {
+          const res = await fetch(`/api/anggota/${selectedAnggota.id}`, { method: 'DELETE' });
+          const json = await res.json();
+          if (res.ok && json.success) {
+              alert("Data berhasil dihapus!");
+              setSelectedAnggota(null);
+              fetchData();
+          } else {
+              alert(json.error || "Gagal menghapus data");
+          }
+      } catch (e) {
+          alert("Terjadi kesalahan koneksi");
+      }
+  };
+
   const handleSubmitAnggota = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
@@ -213,44 +257,48 @@ export default function DataAnggotaView() {
         passFotoUrl: formData.passFotoUrl || null,
       };
 
-      const res = await fetch('/api/anggota', {
-        method: 'POST',
+      const method = editId ? 'PUT' : 'POST';
+      const url = editId ? `/api/anggota/${editId}` : '/api/anggota';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const json = await res.json();
 
       if (res.ok && json.success) {
-        const newId = json.data.id;
+        const targetId = editId || json.data.id;
         
         if (fileKtp || filePassFoto) {
             setFormSuccess('Menyimpan foto...');
             let uploadSuccess = true;
             if (fileKtp) {
-                const ktpRes = await uploadFile(fileKtp, 'KTP', newId, formData.nama);
+                const ktpRes = await uploadFile(fileKtp, 'KTP', targetId, formData.nama);
                 if (!ktpRes.success) uploadSuccess = false;
             }
             if (filePassFoto) {
-                const passRes = await uploadFile(filePassFoto, 'PASSFOTO', newId, formData.nama);
+                const passRes = await uploadFile(filePassFoto, 'PASSFOTO', targetId, formData.nama);
                 if (!passRes.success) uploadSuccess = false;
             }
             if (uploadSuccess) {
-                setFormSuccess('Data & Foto berhasil ditambahkan!');
+                setFormSuccess('Data & Foto berhasil disimpan!');
             } else {
-                setFormSuccess('Data ditambahkan, namun sebagian foto gagal diunggah.');
+                setFormSuccess('Data disimpan, namun sebagian foto gagal diunggah.');
             }
         } else {
-            setFormSuccess('Anggota berhasil ditambahkan!');
+            setFormSuccess(editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!');
         }
 
         setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' });
         setFileKtp(null);
         setFilePassFoto(null);
         setOcrStatus('');
+        setEditId(null);
         fetchData();
         setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
       } else {
-        setFormError(json.error || 'Gagal menambahkan anggota');
+        setFormError(json.error || 'Gagal menyimpan data anggota');
       }
     } catch (err) {
       setFormError('Terjadi kesalahan koneksi');
@@ -284,11 +332,9 @@ export default function DataAnggotaView() {
                 <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
                     <option value="">- Semua Jabatan -</option>
                     <option value="KETUA">KETUA</option>
-                    <option value="WAKIL KETUA">WAKIL KETUA</option>
                     <option value="SEKRETARIS">SEKRETARIS</option>
                     <option value="BENDAHARA">BENDAHARA</option>
                     <option value="ANGGOTA">ANGGOTA</option>
-                    <option value="KOMANDAN">KOMANDAN</option>
                 </select>
 
 
@@ -393,9 +439,14 @@ export default function DataAnggotaView() {
                     <div className="relative z-10 flex-1 overflow-y-auto p-5 sm:p-6 mt-12 scrollbar-hide">
                         {/* Avatar */}
                         <div className="flex justify-center mb-4">
-                             <div className="w-28 h-28 rounded-2xl bg-slate-200 overflow-hidden border-[6px] border-white shadow-xl">
+                             <div className="w-28 h-28 rounded-2xl bg-slate-200 overflow-hidden border-[6px] border-white shadow-xl group relative cursor-pointer" onClick={() => selectedAnggota.passFotoUrl && setFullScreenImage(getDirectImageUrl(selectedAnggota.passFotoUrl))}>
                                  {selectedAnggota.passFotoUrl ? (
-                                     <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
+                                     <>
+                                        <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                            <span className="material-icons text-white text-3xl drop-shadow-md">zoom_in</span>
+                                        </div>
+                                     </>
                                  ) : (
                                      <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-4xl">person</span></div>
                                  )}
@@ -467,15 +518,10 @@ export default function DataAnggotaView() {
                             {selectedAnggota.fotoKtpUrl && (
                                 <div className="mt-2">
                                     <p className="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-1"><span className="material-icons text-[10px]">credit_card</span> FOTO KTP</p>
-                                    <div className="relative group rounded-2xl border-2 border-dashed border-red-200 overflow-hidden bg-white p-1">
+                                    <div className="relative group rounded-2xl border-2 border-dashed border-red-200 overflow-hidden bg-white p-1 cursor-pointer" onClick={() => setFullScreenImage(getDirectImageUrl(selectedAnggota.fotoKtpUrl) || null)}>
                                         <img src={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} alt="Foto KTP" className="w-full rounded-xl object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
-                                            <a href={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} target="_blank" rel="noreferrer" className="w-10 h-10 bg-slate-700/80 hover:bg-slate-700 text-white rounded-full flex items-center justify-center transform hover:scale-110 transition">
-                                                <span className="material-icons text-lg">zoom_in</span>
-                                            </a>
-                                            <a href={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} download className="w-10 h-10 bg-red-600/90 hover:bg-red-600 text-white rounded-full flex items-center justify-center transform hover:scale-110 transition">
-                                                <span className="material-icons text-lg">download</span>
-                                            </a>
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                            <span className="material-icons text-white text-4xl drop-shadow-md">zoom_in</span>
                                         </div>
                                     </div>
                                 </div>
@@ -483,8 +529,16 @@ export default function DataAnggotaView() {
                         </div>
                         
                         {/* CTA Button */}
+                        <div className="flex gap-2">
+                            <button onClick={handleEdit} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-yellow-500/30 flex justify-center items-center gap-2 transition transform active:scale-95">
+                                <span className="material-icons text-base">edit</span> EDIT
+                            </button>
+                            <button onClick={handleDelete} className="flex-1 bg-slate-800 hover:bg-slate-900 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-slate-800/30 flex justify-center items-center gap-2 transition transform active:scale-95">
+                                <span className="material-icons text-base">delete</span> HAPUS
+                            </button>
+                        </div>
                         <button onClick={() => { setIsPrinting(true); setTimeout(() => window.print(), 300); setTimeout(() => setIsPrinting(false), 2000); }} 
-                                className="w-full bg-red-600 hover:bg-red-700 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 flex justify-center items-center gap-2 transition transform active:scale-95">
+                                className="w-full mt-2 bg-red-600 hover:bg-red-700 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 flex justify-center items-center gap-2 transition transform active:scale-95">
                             <span className="material-icons text-base">badge</span> BUAT KARTU ANGGOTA DIGITAL
                         </button>
                     </div>
@@ -499,9 +553,9 @@ export default function DataAnggotaView() {
                     <div className="bg-red-700 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
                         <div className="flex items-center space-x-2">
                             <span className="material-icons text-white text-lg">edit_document</span>
-                            <h3 className="font-extrabold text-sm sm:text-base tracking-wide">Input Data Anggota Baru</h3>
+                            <h3 className="font-extrabold text-sm sm:text-base tracking-wide">{editId ? 'Edit Data Anggota' : 'Input Data Anggota Baru'}</h3>
                         </div>
-                        <button onClick={() => setIsModalOpen(false)} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
+                        <button onClick={() => { setIsModalOpen(false); setEditId(null); setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' }); }} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
                     <form onSubmit={handleSubmitAnggota} className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm text-slate-800 bg-red-50/30">
                         {formError && <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center font-bold text-xs">{formError}</div>}
@@ -575,11 +629,9 @@ export default function DataAnggotaView() {
                                     <select value={formData.jabatan} onChange={e => handleFormChange('jabatan', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
                                         <option value="">- Pilih -</option>
                                         <option value="KETUA">KETUA</option>
-                                        <option value="WAKIL KETUA">WAKIL KETUA</option>
                                         <option value="SEKRETARIS">SEKRETARIS</option>
                                         <option value="BENDAHARA">BENDAHARA</option>
                                         <option value="ANGGOTA">ANGGOTA</option>
-                                        <option value="KOMANDAN">KOMANDAN</option>
                                     </select>
                                 </div>
                             </div>
@@ -686,6 +738,20 @@ export default function DataAnggotaView() {
                         </div>
                     </div>
                 </div>
+            </div>
+        )}
+
+        {/* MODAL FULL SCREEN IMAGE */}
+        {fullScreenImage && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+                <button onClick={() => setFullScreenImage(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 p-2 rounded-full backdrop-blur-md">
+                    <span className="material-icons text-2xl block">close</span>
+                </button>
+                <img src={fullScreenImage} alt="Fullscreen" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+                <a href={fullScreenImage} target="_blank" rel="noreferrer" download className="absolute bottom-8 bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-full font-bold flex items-center justify-center space-x-2 shadow-xl shadow-red-600/40 transition transform hover:scale-105 active:scale-95 text-sm border-2 border-red-500/50">
+                    <span className="material-icons text-xl">download</span>
+                    <span>UNDUH FOTO UTUH</span>
+                </a>
             </div>
         )}
     </div>
