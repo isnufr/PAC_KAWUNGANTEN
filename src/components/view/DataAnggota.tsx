@@ -632,7 +632,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </div>
                 </div>
             </div>
-        ), document.body)}
+        , document.body)}
 
         {/* MODAL INPUT DATA BARU */}
         {mounted && isModalOpen && createPortal(

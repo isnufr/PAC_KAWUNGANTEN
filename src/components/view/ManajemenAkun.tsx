@@ -192,7 +192,7 @@ export default function ManajemenAkunView() {
                     </form>
                 </div>
             </div>
-        ), document.body)}
+        , document.body)}
     </div>
   );
 }

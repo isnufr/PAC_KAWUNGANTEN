@@ -259,7 +259,7 @@ export default function KasOrganisasiView() {
                     </form>
                 </div>
             </div>
-        ), document.body)}
+        , document.body)}
     </div>
   );
 }
