@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const desa = searchParams.get('desa');
     const dusun = searchParams.get('dusun');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = parseInt(searchParams.get('limit') || '20');
     
     const skip = (page - 1) * limit;
 
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     const [data, total] = await Promise.all([
       prisma.anggota.findMany({
         where: whereClause,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { id: 'asc' },
         skip,
         take: limit
       }),
