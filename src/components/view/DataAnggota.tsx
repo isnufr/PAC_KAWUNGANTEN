@@ -300,11 +300,11 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   return (
     <div id="menu-dataAnggota" className="space-y-5 max-w-6xl mx-auto">
         {/* FILTER DATA */}
+        {filter !== 'verifikasi' && (
         <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm theme-el mb-6">
             <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 mb-4">
                 <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">filter_alt</span>
                 FILTER PENCARIAN
-                {filter === 'verifikasi' && <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px] ml-2">MODE VERIFIKASI</span>}
             </h3>
             
             <div className="flex flex-col md:flex-row gap-3">
@@ -351,6 +351,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                 </div>
             </div>
         </div>
+        )}
 
         {/* ACTION PANEL INPUT DATA */}
         <div className="mb-6 flex justify-center md:justify-end">

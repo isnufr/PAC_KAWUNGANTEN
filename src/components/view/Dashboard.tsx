@@ -169,26 +169,6 @@ export default function DashboardView() {
           <StatCard title="Anggota" subtitle="Satgas" icon="security" value={stats.satgas} isWide />
       </div>
 
-      {/* VERIFICATION WARNINGS */}
-      {(verification.tidakLengkap > 0 || verification.nikGanda > 0) && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 md:p-5 rounded-2xl flex flex-col sm:flex-row gap-4 sm:items-center justify-between shadow-sm">
-              <div className="flex items-center gap-3">
-                  <span className="material-icons text-yellow-600 bg-yellow-100 p-2 rounded-xl text-xl">warning</span>
-                  <div>
-                      <h3 className="text-sm font-bold text-yellow-800 tracking-tight">Perhatian: Verifikasi Data Diperlukan!</h3>
-                      <p className="text-xs text-yellow-700 mt-0.5">
-                          Terdapat {verification.tidakLengkap > 0 && <strong className="text-red-600">{verification.tidakLengkap} anggota data tidak lengkap</strong>} 
-                          {verification.tidakLengkap > 0 && verification.nikGanda > 0 && ' dan '}
-                          {verification.nikGanda > 0 && <strong className="text-red-600">{verification.nikGanda} anggota dengan NIK ganda</strong>}.
-                      </p>
-                  </div>
-              </div>
-              <button onClick={() => router.push('/?menu=verifikasi_data')} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md whitespace-nowrap">
-                  Perbaiki Sekarang
-              </button>
-          </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
           
           {/* VISUALISASI DATA BARU */}
