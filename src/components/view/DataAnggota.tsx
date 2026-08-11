@@ -455,31 +455,33 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         <div className="flex flex-col gap-3">
                             {data.map((item: any, index: number) => {
                                 const isLengkap = item.fotoKtpUrl && item.passFotoUrl && item.nik;
+                                const jk = item.jenisKelamin ? item.jenisKelamin.toUpperCase() : '';
+                                const jkShort = jk === 'LAKI-LAKI' ? 'L' : jk === 'PEREMPUAN' ? 'P' : item.jenisKelamin || '-';
                                 return (
-                                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
-                                        <div className="flex items-center gap-4">
+                                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
+                                        <div className="flex items-center gap-3">
                                             {/* Foto */}
-                                            <div className="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
                                                 {item.passFotoUrl ? (
                                                     <img src={getDirectImageUrl(item.passFotoUrl) || ''} alt={item.nama} className="w-full h-full object-cover"
                                                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-xl">person</span></div>'; }} />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-400"><span className="material-icons text-xl">person</span></div>
+                                                    <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-400"><span className="material-icons text-lg">person</span></div>
                                                 )}
                                             </div>
                                             
                                             {/* Info */}
                                             <div>
-                                                <div className="flex items-center gap-1.5 mb-1">
-                                                    <h4 className="text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
-                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[16px]" title="Data Lengkap">verified</span>}
+                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                    <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
+                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[14px]" title="Data Lengkap">verified</span>}
                                                 </div>
-                                                <div className="text-[10px] md:text-xs font-bold tracking-wider flex items-center flex-wrap gap-1.5">
+                                                <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1">
                                                     <span className="text-red-500">{item.bagian || '-'}</span>
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-700">{item.jabatan || '-'}</span>
                                                     <span className="text-red-200">|</span>
-                                                    <span className="text-red-500">{item.jenisKelamin === 'Laki-Laki' ? 'L' : item.jenisKelamin === 'Perempuan' ? 'P' : item.jenisKelamin || '-'}</span>
+                                                    <span className="text-red-500">{jkShort}</span>
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
                                                 </div>
@@ -521,7 +523,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </button>
 
                     {/* Content Scrollable */}
-                    <div className="relative z-10 flex-1 overflow-y-auto p-5 sm:p-6 mt-12 scrollbar-hide">
+                    <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-5 mt-10 scrollbar-hide">
                         {/* Avatar */}
                         <div className="flex justify-center mb-4">
                              <div className="w-28 h-28 rounded-2xl bg-slate-200 overflow-hidden border-[6px] border-white shadow-xl group relative cursor-pointer" onClick={() => selectedAnggota.passFotoUrl && setFullScreenImage(getDirectImageUrl(selectedAnggota.passFotoUrl))}>
@@ -539,8 +541,8 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         </div>
 
                         {/* Name & Badges */}
-                        <div className="text-center mb-6">
-                            <h3 className="font-black text-xl text-slate-800 tracking-tight mb-2">{selectedAnggota.nama}</h3>
+                        <div className="text-center mb-5">
+                            <h3 className="font-black text-lg text-slate-800 tracking-tight mb-2">{selectedAnggota.nama}</h3>
                             <div className="flex justify-center gap-2">
                                 <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
                                 <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
@@ -548,33 +550,33 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         </div>
 
                         {/* Details Grid */}
-                        <div className="space-y-3 mb-6">
+                        <div className="space-y-2 mb-5">
                             {/* Card 1: ID & NIK */}
-                            <div className="flex gap-3">
-                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-1">
+                            <div className="flex gap-2">
+                                <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-1">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">tag</span> ID SISTEM</p>
                                     <p className="font-black text-slate-700 text-sm">{selectedAnggota.id}</p>
                                 </div>
-                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-1">
+                                <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-1">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">badge</span> NOMOR NIK</p>
                                     <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nik}</p>
                                 </div>
                             </div>
 
                             {/* Card 2: TTL & Jenis Kelamin */}
-                            <div className="flex gap-3">
-                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-[3]">
+                            <div className="flex gap-2">
+                                <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-[3]">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">cake</span> TTL (UMUR)</p>
                                     <p className="font-bold text-slate-700 text-xs">{selectedAnggota.tanggalLahir || '-'} {selectedAnggota.umur ? `(${selectedAnggota.umur} Tahun)` : ''}</p>
                                 </div>
-                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-[2]">
+                                <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-[2]">
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">wc</span> JENIS KELAMIN</p>
-                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.jenisKelamin || '-'}</p>
+                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.jenisKelamin?.toUpperCase() === 'LAKI-LAKI' ? 'L' : selectedAnggota.jenisKelamin?.toUpperCase() === 'PEREMPUAN' ? 'P' : selectedAnggota.jenisKelamin || '-'}</p>
                                 </div>
                             </div>
 
                             {/* Card 3: WhatsApp */}
-                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
+                            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
                                 <div>
                                     <p className="text-[8px] font-bold text-green-500 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">phone</span> KONTAK WHATSAPP</p>
                                     <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nomorHp || '-'}</p>
@@ -590,7 +592,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                             </div>
 
                             {/* Card 4: Alamat */}
-                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
                                 <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">location_on</span> ALAMAT DOMISILI</p>
                                 <p className="font-bold text-slate-700 text-xs leading-relaxed">
                                     {selectedAnggota.dusun ? `Dsn. ${selectedAnggota.dusun}, ` : ''}
