@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Doughnut, Pie, Bar } from 'react-chartjs-2';
 
@@ -7,71 +9,52 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 export default function DashboardView() {
   const router = useRouter();
-  const [stats, setStats] = useState({
-    total: 0,
-    pac: 0,
-    ranting: 0,
-    anakRanting: 0,
-    satgas: 0
-  });
-  const [gender, setGender] = useState({ pria: 0, wanita: 0 });
-  const [verification, setVerification] = useState({ tidakLengkap: 0, nikGanda: 0 });
-  const [usia, setUsia] = useState({ genZ: 0, milenial: 0, genX: 0, babyBoomer: 0 });
-  const [topDesa, setTopDesa] = useState<any[]>([]);
-  const [ulangTahun, setUlangTahun] = useState<any[]>([]);
-  const [kuota, setKuota] = useState<{ wilayah: any[]; rantingCounts: any[]; anakRantingCounts: any[] }>({ wilayah: [], rantingCounts: [], anakRantingCounts: [] });
   const [selectedDesa, setSelectedDesa] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  
+  const { data: dashboardData, isLoading, isError } = useQuery({
+    queryKey: ['dashboardStats'],
+    queryFn: async () => {
+      const res = await fetch('/api/dashboard/stats');
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        router.push('/login');
+        throw new Error('Unauthorized');
+      }
+      const json = await res.json();
+      
+      if (json.success && json.data?.kuota?.wilayah) {
+        const uniqueDesas = Array.from(new Set(json.data.kuota.wilayah.map((w: any) => w.desa))).sort();
+        if (uniqueDesas.length > 0 && !selectedDesa) {
+          setSelectedDesa(uniqueDesas[0] as string);
+        }
+      }
+      return json.success ? json.data : null;
+    }
+  });
 
-  useEffect(() => {
-    fetch('/api/dashboard/stats')
-      .then(res => {
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          router.push('/login');
-          return null;
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (!data) return;
-        if (data.success) {
-          setStats({
-            total: data.data.stats.total || 0,
-            pac: data.data.stats.pac || 0,
-            ranting: data.data.stats.ranting || 0,
-            anakRanting: data.data.stats.anakRanting || 0,
-            satgas: data.data.stats.satgas || 0
-          });
-          setGender({
-            pria: data.data.gender.LAKI_LAKI || 0,
-            wanita: data.data.gender.PEREMPUAN || 0
-          });
-          if (data.data.verification) {
-            setVerification(data.data.verification);
-          }
-          if (data.data.usia) {
-            setUsia(data.data.usia);
-          }
-          if (data.data.topDesa) {
-            setTopDesa(data.data.topDesa);
-          }
-          if (data.data.ulangTahun) {
-            setUlangTahun(data.data.ulangTahun);
-          }
-          if (data.data.kuota) {
-            setKuota(data.data.kuota);
-            const uniqueDesas = Array.from(new Set(data.data.kuota.wilayah.map((w: any) => w.desa))).sort();
-            if (uniqueDesas.length > 0) {
-              setSelectedDesa(uniqueDesas[0] as string);
-            }
-          }
-        }
-      })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, [router]);
+  const stats = {
+    total: dashboardData?.stats?.total || 0,
+    pac: dashboardData?.stats?.pac || 0,
+    ranting: dashboardData?.stats?.ranting || 0,
+    anakRanting: dashboardData?.stats?.anakRanting || 0,
+    satgas: dashboardData?.stats?.satgas || 0
+  };
+
+  const gender = {
+    pria: dashboardData?.gender?.LAKI_LAKI || 0,
+    wanita: dashboardData?.gender?.PEREMPUAN || 0
+  };
+
+  const verification = dashboardData?.verification || { tidakLengkap: 0, nikGanda: 0 };
+  const usia = dashboardData?.usia || { genZ: 0, milenial: 0, genX: 0, babyBoomer: 0 };
+  const topDesa = dashboardData?.topDesa || [];
+  const ulangTahun = dashboardData?.ulangTahun || [];
+  const kuota = dashboardData?.kuota || { wilayah: [], rantingCounts: [], anakRantingCounts: [] };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   const totalGender = gender.pria + gender.wanita;
   const priaPercent = totalGender > 0 ? Math.round((gender.pria / totalGender) * 100) : 0;
@@ -105,10 +88,10 @@ export default function DashboardView() {
   };
 
   const topDesaChartData = {
-    labels: topDesa.map(d => d.desa),
+    labels: topDesa.map((d: any) => d.desa),
     datasets: [{
       label: 'Jumlah Anggota',
-      data: topDesa.map(d => d.count),
+      data: topDesa.map((d: any) => d.count),
       backgroundColor: '#dc2626',
       borderRadius: 4
     }]
@@ -140,9 +123,9 @@ export default function DashboardView() {
   const targetRantingPerDesa = 9;
   const targetAnakRantingPerDusun = 5;
 
-  const uniqueDesas = Array.from(new Set(kuota.wilayah.map(w => w.desa))).sort() as string[];
+  const uniqueDesas = Array.from(new Set(kuota.wilayah.map((w: any) => w.desa))).sort() as string[];
   const numDesa = uniqueDesas.length;
-  const numDusun = kuota.wilayah.filter(w => w.dusun && w.dusun.trim() !== '').length;
+  const numDusun = kuota.wilayah.filter((w: any) => w.dusun && w.dusun.trim() !== '').length;
   
   const totalTarget = targetPac + targetSatgas + (numDesa * targetRantingPerDesa) + (numDusun * targetAnakRantingPerDusun);
 
@@ -150,19 +133,19 @@ export default function DashboardView() {
   const achievedSatgas = Math.min(stats.satgas, targetSatgas);
   
   let achievedRanting = 0;
-  kuota.rantingCounts.forEach(r => { achievedRanting += Math.min(r._count.id, targetRantingPerDesa); });
+  kuota.rantingCounts.forEach((r: any) => { achievedRanting += Math.min(r._count.id, targetRantingPerDesa); });
   
   let achievedAnakRanting = 0;
-  kuota.anakRantingCounts.forEach(a => { achievedAnakRanting += Math.min(a._count.id, targetAnakRantingPerDusun); });
+  kuota.anakRantingCounts.forEach((a: any) => { achievedAnakRanting += Math.min(a._count.id, targetAnakRantingPerDusun); });
 
   const totalAchieved = achievedPac + achievedSatgas + achievedRanting + achievedAnakRanting;
   const kesiapanPacPercent = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
 
   // Data for selected desa
-  const currentRantingCount = kuota.rantingCounts.find(r => r.desa === selectedDesa)?._count.id || 0;
+  const currentRantingCount = kuota.rantingCounts.find((r: any) => r.desa === selectedDesa)?._count.id || 0;
   const currentRantingPercent = Math.min(100, Math.round((currentRantingCount / targetRantingPerDesa) * 100));
 
-  const dusunsInSelectedDesa = Array.from(new Set(kuota.wilayah.filter(w => w.desa === selectedDesa && w.dusun).map(w => w.dusun))).sort() as string[];
+  const dusunsInSelectedDesa = Array.from(new Set(kuota.wilayah.filter((w: any) => w.desa === selectedDesa && w.dusun).map((w: any) => w.dusun))).sort() as string[];
 
   return (
     <div id="menu-dashboard" className="space-y-5 md:space-y-6 max-w-6xl mx-auto">
@@ -370,7 +353,7 @@ export default function DashboardView() {
                       <h4 className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-3">Anak Ranting Menurut Dusun (Target: {targetAnakRantingPerDusun}/Dusun)</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {dusunsInSelectedDesa.map(dusunName => {
-                              const arCount = kuota.anakRantingCounts.find(a => a.desa === selectedDesa && a.dusun === dusunName)?._count.id || 0;
+                              const arCount = kuota.anakRantingCounts.find((a: any) => a.desa === selectedDesa && a.dusun === dusunName)?._count.id || 0;
                               const arPercent = Math.min(100, Math.round((arCount / targetAnakRantingPerDusun) * 100));
                               return (
                                   <div key={dusunName} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
@@ -435,7 +418,7 @@ export default function DashboardView() {
                               <p className="text-xs font-bold uppercase tracking-wider">Tidak ada yang berulang tahun</p>
                           </div>
                       ) : (
-                          ulangTahun.map((u, i) => (
+                          ulangTahun.map((u: any, i: number) => (
                               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-orange-50/50 border border-orange-100 hover:bg-orange-50 transition">
                                   <div className="w-10 h-10 bg-orange-200 text-orange-700 font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0">
                                       {u.nama.charAt(0).toUpperCase()}

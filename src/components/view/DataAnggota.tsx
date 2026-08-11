@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -21,9 +23,8 @@ interface WilayahItem {
 }
 
 export default function DataAnggotaView({ filter }: { filter?: string }) {
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [bagian, setBagian] = useState('');
   const [jabatan, setJabatan] = useState('');
@@ -35,10 +36,25 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   const [isPrinting, setIsPrinting] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
 
-  // Wilayah data for filters
-  const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
-  const [desaList, setDesaList] = useState<string[]>([]);
-  const [dusunList, setDusunList] = useState<string[]>([]);
+  const { data: wilayahListResponse = [] } = useQuery({
+    queryKey: ['wilayah'],
+    queryFn: async () => {
+      const r = await fetch('/api/wilayah');
+      const json = await r.json();
+      return json.success ? json.data : [];
+    }
+  });
+  
+  const wilayahList: WilayahItem[] = wilayahListResponse;
+  
+  const desaList = useMemo(() => {
+    return Array.from(new Set(wilayahList.map((w) => w.desa))).sort() as string[];
+  }, [wilayahList]);
+  
+  const dusunList = useMemo(() => {
+    if (desa) return Array.from(new Set(wilayahList.filter((w) => w.desa === desa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
+    return [];
+  }, [desa, wilayahList]);
 
   // Form state for input baru
   const [formData, setFormData] = useState({
@@ -126,37 +142,10 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
     }
   };
 
-  // Load wilayah data
-  useEffect(() => {
-    fetch('/api/wilayah').then(r => r.json()).then(json => {
-      if (json.success) {
-        setWilayahList(json.data);
-        const desas = Array.from(new Set(json.data.map((w: WilayahItem) => w.desa))).sort() as string[];
-        setDesaList(desas);
-      }
-    }).catch(console.error);
-  }, []);
-
-
-
-  // Update dusun list when desa changes
-  useEffect(() => {
-    if (desa) {
-      const dusuns = Array.from(new Set(wilayahList.filter(w => w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
-      setDusunList(dusuns);
-    } else {
-      setDusunList([]);
-    }
-    setDusun('');
-  }, [desa, wilayahList]);
-
-  useEffect(() => {
-    fetchData();
-  }, [bagian, jabatan, kecamatan, desa, dusun]);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
+  // Fetch Data Anggota using React Query
+  const { data = [], isLoading, refetch: fetchData } = useQuery({
+    queryKey: ['anggota', search, bagian, jabatan, kecamatan, desa, dusun, filter],
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (bagian) params.append('bagian', bagian);
@@ -165,23 +154,16 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
       if (desa) params.append('desa', desa);
       if (dusun) params.append('dusun', dusun);
       if (filter) params.append('filter', filter);
-
+      
       const res = await fetch(`/api/anggota?${params.toString()}`);
       const json = await res.json();
-      if (json.success) {
-        setData(json.data);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
+      return json.success ? json.data : [];
     }
-  };
+  });
 
   const handleSearch = () => { fetchData(); };
   const handleReset = () => {
     setSearch(''); setBagian(''); setJabatan(''); setKecamatan(''); setDesa(''); setDusun('');
-    setTimeout(fetchData, 100);
   };
 
   const handleFormChange = (field: string, value: string) => {
@@ -213,21 +195,28 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
       setSelectedAnggota(null);
   };
 
-  const handleDelete = async () => {
-      if (!window.confirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?")) return;
-      try {
-          const res = await fetch(`/api/anggota/${selectedAnggota.id}`, { method: 'DELETE' });
-          const json = await res.json();
-          if (res.ok && json.success) {
-              alert("Data berhasil dihapus!");
-              setSelectedAnggota(null);
-              fetchData();
-          } else {
-              alert(json.error || "Gagal menghapus data");
-          }
-      } catch (e) {
-          alert("Terjadi kesalahan koneksi");
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/anggota/${id}`, { method: 'DELETE' });
+      return res.json();
+    },
+    onSuccess: (json) => {
+      if (json.success) {
+        alert("Data berhasil dihapus!");
+        setSelectedAnggota(null);
+        queryClient.invalidateQueries({ queryKey: ['anggota'] });
+      } else {
+        alert(json.error || "Gagal menghapus data");
       }
+    },
+    onError: () => {
+      alert("Terjadi kesalahan koneksi");
+    }
+  });
+
+  const handleDelete = () => {
+      if (!window.confirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?")) return;
+      deleteMutation.mutate(selectedAnggota.id);
   };
 
   const handleSubmitAnggota = async (e: React.FormEvent) => {
@@ -296,7 +285,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         setFilePassFoto(null);
         setOcrStatus('');
         setEditId(null);
-        fetchData();
+        queryClient.invalidateQueries({ queryKey: ['anggota'] });
         setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
       } else {
         setFormError(json.error || 'Gagal menyimpan data anggota');
@@ -384,12 +373,12 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                 </div>
 
                 {isLoading ? (
-                    <p className="text-center text-slate-500 py-8">Memuat Data Anggota...</p>
+                    <LoadingSpinner />
                 ) : data.length === 0 ? (
                     <p className="text-center text-slate-500 py-8">Tidak ada data anggota yang ditemukan.</p>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        {data.map((item, index) => {
+                        {data.map((item: any, index: number) => {
                             const isLengkap = item.fotoKtpUrl && item.passFotoUrl && item.nik;
                             return (
                                 <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">

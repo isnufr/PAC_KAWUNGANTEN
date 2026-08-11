@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -14,14 +15,8 @@ export default function LaporanView() {
   const [format, setFormat] = useState('EXCEL');
   const [bagian, setBagian] = useState('');
   const [desa, setDesa] = useState('');
-  
-  const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
-  const [desaList, setDesaList] = useState<string[]>([]);
-  const [dusunList, setDusunList] = useState<string[]>([]);
   const [selectedDusuns, setSelectedDusuns] = useState<string[]>([]);
-  
   const [isExporting, setIsExporting] = useState(false);
-
   const [cols, setCols] = useState({
     nik: true,
     nama: true,
@@ -34,26 +29,28 @@ export default function LaporanView() {
     bagian: true,
     jabatan: true
   });
-
-  useEffect(() => {
-    fetch('/api/wilayah').then(r => r.json()).then(json => {
-      if (json.success) {
-        setWilayahList(json.data);
-        const desas = Array.from(new Set(json.data.map((w: any) => w.desa))).sort() as string[];
-        setDesaList(desas);
-      }
-    }).catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (desa) {
-      const dusuns = Array.from(new Set(wilayahList.filter(w => w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
-      setDusunList(dusuns);
-    } else {
-      setDusunList([]);
+  
+  const { data: wilayahListResponse = [] } = useQuery({
+    queryKey: ['wilayah'],
+    queryFn: async () => {
+      const r = await fetch('/api/wilayah');
+      const json = await r.json();
+      return json.success ? json.data : [];
     }
-    setSelectedDusuns([]); // reset when desa changes
+  });
+
+  const wilayahList: WilayahItem[] = wilayahListResponse;
+  
+  const desaList = useMemo(() => {
+    return Array.from(new Set(wilayahList.map((w) => w.desa))).sort() as string[];
+  }, [wilayahList]);
+  
+  const dusunList = useMemo(() => {
+    if (desa) return Array.from(new Set(wilayahList.filter((w) => w.desa === desa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
+    return [];
   }, [desa, wilayahList]);
+
+  // We should clear selectedDusuns when desa changes. We can do this in the select onChange.
 
   const toggleCol = (k: keyof typeof cols) => {
     setCols(p => ({ ...p, [k]: !p[k] }));
@@ -347,7 +344,7 @@ export default function LaporanView() {
                 <div>
                     <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Filter Bagian</label>
                     <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800">
-                        <option value="">- Semua Bagian -</option>
+                        <option value="">- Bagian -</option>
                         <option value="PAC">PAC</option>
                         <option value="RANTING">RANTING</option>
                         <option value="ANAK RANTING">ANAK RANTING</option>
@@ -357,8 +354,8 @@ export default function LaporanView() {
 
                 <div>
                     <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Filter Desa</label>
-                    <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800">
-                        <option value="">- Semua Desa -</option>
+                    <select value={desa} onChange={e => { setDesa(e.target.value); setSelectedDusuns([]); }} className="p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 w-full text-xs">
+                        <option value="">- Desa -</option>
                         {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
                 </div>

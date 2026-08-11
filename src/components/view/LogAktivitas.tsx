@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function LogAktivitasView() {
-  const [logs, setLogs] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => { fetchLogs(); }, []);
-
-  const fetchLogs = async () => {
-    setIsLoading(true);
-    try {
+  const { data: logs = [], isLoading, refetch: fetchLogs } = useQuery({
+    queryKey: ['logAktivitas'],
+    queryFn: async () => {
       const res = await fetch('/api/log-aktivitas');
       const json = await res.json();
-      if (json.success) setLogs(json.data);
-    } catch (e) { console.error(e); }
-    finally { setIsLoading(false); }
-  };
+      return json.success ? json.data : [];
+    }
+  });
 
   return (
     <div id="menu-logAktivitas" className="max-w-6xl mx-auto space-y-4">
@@ -27,7 +23,7 @@ export default function LogAktivitasView() {
                     </h2>
                     <p className="text-xs text-red-400 mt-1">Daftar riwayat aksi terbaru yang dilakukan oleh pengguna sistem.</p>
                 </div>
-                <button onClick={fetchLogs} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-md active:scale-95">
+                <button onClick={() => fetchLogs()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-md active:scale-95">
                     <span className="material-icons text-sm">refresh</span> Muat Ulang Log
                 </button>
             </div>
@@ -44,10 +40,10 @@ export default function LogAktivitasView() {
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
                         {isLoading ? (
-                            <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Memuat log aktivitas...</td></tr>
+                            <tr><td colSpan={4} className="p-0"><LoadingSpinner /></td></tr>
                         ) : logs.length === 0 ? (
                             <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Belum ada log aktivitas.</td></tr>
-                        ) : logs.map((log) => (
+                        ) : logs.map((log: any) => (
                             <tr key={log.id} className="hover:bg-red-50/30 transition">
                                 <td className="p-3 sm:p-4 text-slate-500 whitespace-nowrap">{new Date(log.waktu).toLocaleString('id-ID')}</td>
                                 <td className="p-3 sm:p-4 font-bold">{log.pengguna}</td>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function ManajemenAkunView() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
 
@@ -12,17 +13,14 @@ export default function ManajemenAkunView() {
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => { fetchUsers(); }, []);
-
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
       const res = await fetch('/api/users');
       const json = await res.json();
-      if (json.success) setUsers(json.data);
-    } catch (e) { console.error(e); }
-    finally { setIsLoading(false); }
-  };
+      return json.success ? json.data : [];
+    }
+  });
 
   const openAddModal = () => {
     setEditUser(null);
@@ -65,20 +63,26 @@ export default function ManajemenAkunView() {
       const json = await res.json();
       if (res.ok && json.success) {
         setFormSuccess(editUser ? 'Akun berhasil diperbarui!' : 'Akun berhasil ditambahkan!');
-        fetchUsers();
+        queryClient.invalidateQueries({ queryKey: ['users'] });
         setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
       } else { setFormError(json.error || 'Gagal menyimpan akun'); }
     } catch (err) { setFormError('Terjadi kesalahan koneksi'); }
     finally { setIsSubmitting(false); }
   };
 
-  const handleDelete = async (id: number, username: string) => {
-    if (!confirm(`Yakin ingin menghapus akun "${username}"?`)) return;
-    try {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
-      const json = await res.json();
-      if (json.success) fetchUsers();
-    } catch (e) { console.error(e); }
+      return res.json();
+    },
+    onSuccess: (json) => {
+      if (json.success) queryClient.invalidateQueries({ queryKey: ['users'] });
+    }
+  });
+
+  const handleDelete = (id: number, username: string) => {
+    if (!confirm(`Yakin ingin menghapus akun "${username}"?`)) return;
+    deleteMutation.mutate(id);
   };
 
   const roleColor = (role: string) => {
@@ -118,10 +122,10 @@ export default function ManajemenAkunView() {
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
                         {isLoading ? (
-                            <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Memuat data akun login...</td></tr>
+                            <tr><td colSpan={4} className="p-0"><LoadingSpinner /></td></tr>
                         ) : users.length === 0 ? (
                             <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Tidak ada akun ditemukan.</td></tr>
-                        ) : users.map((user, index) => (
+                        ) : users.map((user: any, index: number) => (
                             <tr key={user.id} className="hover:bg-red-50/30 transition">
                                 <td className="p-3 sm:p-4 font-medium">{index + 1}</td>
                                 <td className="p-3 sm:p-4 font-bold">{user.username}</td>

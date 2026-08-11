@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function KasOrganisasiView() {
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [saldo, setSaldo] = useState({ pemasukan: 0, pengeluaran: 0, aktif: 0 });
   const [search, setSearch] = useState('');
   const [tipe, setTipe] = useState('');
   const [kategori, setKategori] = useState('');
@@ -15,11 +15,9 @@ export default function KasOrganisasiView() {
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => { fetchData(); }, [tipe, kategori]);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
+  const { data: kasData, isLoading, refetch: fetchData } = useQuery({
+    queryKey: ['kas', search, tipe, kategori],
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (tipe) params.append('tipe', tipe);
@@ -27,19 +25,19 @@ export default function KasOrganisasiView() {
 
       const res = await fetch(`/api/kas?${params.toString()}`);
       const json = await res.json();
-      if (json.success) {
-        setData(json.data);
-        setSaldo({
-          pemasukan: json.summary?.totalPemasukan || 0,
-          pengeluaran: json.summary?.totalPengeluaran || 0,
-          aktif: json.summary?.saldoAkhir || 0
-        });
-      }
-    } catch (e) { console.error(e); } finally { setIsLoading(false); }
+      return json.success ? json : { data: [], summary: { totalPemasukan: 0, totalPengeluaran: 0, saldoAkhir: 0 } };
+    }
+  });
+
+  const data = kasData?.data || [];
+  const saldo = {
+    pemasukan: kasData?.summary?.totalPemasukan || 0,
+    pengeluaran: kasData?.summary?.totalPengeluaran || 0,
+    aktif: kasData?.summary?.saldoAkhir || 0
   };
 
   const handleSearch = () => { fetchData(); };
-  const handleReset = () => { setSearch(''); setTipe(''); setKategori(''); setTimeout(fetchData, 100); };
+  const handleReset = () => { setSearch(''); setTipe(''); setKategori(''); };
 
   const handleSubmitKas = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,20 +62,26 @@ export default function KasOrganisasiView() {
       if (res.ok && json.success) {
         setFormSuccess('Transaksi berhasil dicatat!');
         setFormData({ tanggal: '', tipe: 'PEMASUKAN', nominal: '', kategori: '', keterangan: '' });
-        fetchData();
+        queryClient.invalidateQueries({ queryKey: ['kas'] });
         setTimeout(() => { setIsModalOpen(false); setFormSuccess(''); }, 1500);
       } else { setFormError(json.error || 'Gagal mencatat transaksi'); }
     } catch (err) { setFormError('Terjadi kesalahan koneksi'); }
     finally { setIsSubmitting(false); }
   };
 
-  const handleDeleteKas = async (id: number) => {
-    if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
-    try {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
       const res = await fetch(`/api/kas/${id}`, { method: 'DELETE' });
-      const json = await res.json();
-      if (json.success) fetchData();
-    } catch (e) { console.error(e); }
+      return res.json();
+    },
+    onSuccess: (json) => {
+      if (json.success) queryClient.invalidateQueries({ queryKey: ['kas'] });
+    }
+  });
+
+  const handleDeleteKas = (id: number) => {
+    if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
+    deleteMutation.mutate(id);
   };
 
   return (
@@ -117,12 +121,12 @@ export default function KasOrganisasiView() {
                     onKeyDown={e => e.key === 'Enter' && handleSearch()}
                     className="p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
                 <select value={tipe} onChange={e => setTipe(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Tipe -</option>
+                    <option value="">- Tipe Transaksi -</option>
                     <option value="PEMASUKAN">PEMASUKAN</option>
                     <option value="PENGELUARAN">PENGELUARAN</option>
                 </select>
                 <select value={kategori} onChange={e => setKategori(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Kategori -</option>
+                    <option value="">- Kategori -</option>
                     <option value="Iuran Anggota">Iuran Anggota</option>
                     <option value="Sumbangan">Sumbangan</option>
                     <option value="Kegiatan Sosial">Kegiatan Sosial</option>
@@ -160,10 +164,10 @@ export default function KasOrganisasiView() {
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
                         {isLoading ? (
-                            <tr><td colSpan={7} className="text-center py-6 text-red-400 font-bold">Memuat catatan keuangan...</td></tr>
+                            <tr><td colSpan={7} className="p-0"><LoadingSpinner /></td></tr>
                         ) : data.length === 0 ? (
                             <tr><td colSpan={7} className="text-center py-6 text-red-400 font-bold">Tidak ada transaksi ditemukan.</td></tr>
-                        ) : data.map((item) => (
+                        ) : data.map((item: any) => (
                             <tr key={item.id} className="hover:bg-red-50/30 transition">
                                 <td className="p-3">{new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
                                 <td className="p-3 font-bold text-[10px] md:text-xs">

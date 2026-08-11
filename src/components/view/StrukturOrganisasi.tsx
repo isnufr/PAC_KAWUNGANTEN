@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '../LoadingSpinner';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -19,29 +21,25 @@ export default function StrukturOrganisasiView() {
   const [bagian, setBagian] = useState('PAC');
   const [desa, setDesa] = useState('');
   const [dusun, setDusun] = useState('');
-  const [desaList, setDesaList] = useState<string[]>([]);
-  const [wilayahList, setWilayahList] = useState<any[]>([]);
-  const [data, setData] = useState<AnggotaItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: wilayahListResponse = [] } = useQuery({
+    queryKey: ['wilayah'],
+    queryFn: async () => {
+      const r = await fetch('/api/wilayah');
+      const json = await r.json();
+      return json.success ? json.data : [];
+    }
+  });
 
-  // Load desa list
-  useEffect(() => {
-    fetch('/api/wilayah').then(r => r.json()).then(json => {
-      if (json.success) {
-        setWilayahList(json.data);
-        const desas = Array.from(new Set(json.data.map((w: any) => w.desa))).sort() as string[];
-        setDesaList(desas);
-      }
-    }).catch(console.error);
-  }, []);
+  const wilayahList: any[] = wilayahListResponse;
+  const desaList = useMemo(() => Array.from(new Set(wilayahList.map((w: any) => w.desa))).sort() as string[], [wilayahList]);
+  const dusunList = useMemo(() => {
+    if (desa) return Array.from(new Set(wilayahList.filter((w: any) => w.desa === desa).map((w: any) => w.dusun).filter(Boolean))).sort() as string[];
+    return [];
+  }, [desa, wilayahList]);
 
-  useEffect(() => {
-    fetchData();
-  }, [bagian, desa, dusun]);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ['struktur', bagian, desa, dusun],
+    queryFn: async () => {
       const params = new URLSearchParams();
       params.append('bagian', bagian);
       if (desa) params.append('desa', desa);
@@ -50,23 +48,17 @@ export default function StrukturOrganisasiView() {
 
       const res = await fetch(`/api/anggota?${params.toString()}`);
       const json = await res.json();
-      if (json.success) {
-        setData(json.data);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
+      return json.success ? json.data : [];
     }
-  };
+  });
 
   // Group by jabatan for org chart
-  const ketua = data.filter(d => d.jabatan === 'KETUA');
-  const wakilKetua = data.filter(d => d.jabatan === 'WAKIL KETUA');
-  const sekretaris = data.filter(d => d.jabatan === 'SEKRETARIS');
-  const bendahara = data.filter(d => d.jabatan === 'BENDAHARA');
-  const komandan = data.filter(d => d.jabatan === 'KOMANDAN');
-  const anggota = data.filter(d => d.jabatan === 'ANGGOTA' || !['KETUA', 'WAKIL KETUA', 'SEKRETARIS', 'BENDAHARA', 'KOMANDAN'].includes(d.jabatan || ''));
+  const ketua = data.filter((d: any) => d.jabatan === 'KETUA');
+  const wakilKetua = data.filter((d: any) => d.jabatan === 'WAKIL KETUA');
+  const sekretaris = data.filter((d: any) => d.jabatan === 'SEKRETARIS');
+  const bendahara = data.filter((d: any) => d.jabatan === 'BENDAHARA');
+  const komandan = data.filter((d: any) => d.jabatan === 'KOMANDAN');
+  const anggota = data.filter((d: any) => d.jabatan === 'ANGGOTA' || !['KETUA', 'WAKIL KETUA', 'SEKRETARIS', 'BENDAHARA', 'KOMANDAN'].includes(d.jabatan || ''));
 
   return (
     <div id="menu-strukturOrganisasi" className="space-y-5 max-w-6xl mx-auto">
@@ -113,7 +105,7 @@ export default function StrukturOrganisasiView() {
             </h3>
 
             {isLoading ? (
-                <p className="text-center text-slate-400 font-medium py-12">Memuat bagan organisasi...</p>
+                <LoadingSpinner />
             ) : data.length === 0 ? (
                 <p className="text-center text-slate-400 font-medium py-12">Belum ada data pengurus untuk filter ini.</p>
             ) : (
@@ -121,7 +113,7 @@ export default function StrukturOrganisasiView() {
                     {/* KETUA */}
                     {ketua.length > 0 && (
                         <div className="flex justify-center">
-                            {ketua.map(k => <OrgCard key={k.id} person={k} color="red" />)}
+                            {ketua.map((k: any) => <OrgCard key={k.id} person={k} color="red" />)}
                         </div>
                     )}
 
@@ -132,10 +124,10 @@ export default function StrukturOrganisasiView() {
 
                     {/* WAKIL, SEKRETARIS, BENDAHARA */}
                     <div className="flex flex-wrap justify-center gap-4">
-                        {wakilKetua.map(k => <OrgCard key={k.id} person={k} color="orange" />)}
-                        {sekretaris.map(k => <OrgCard key={k.id} person={k} color="blue" />)}
-                        {bendahara.map(k => <OrgCard key={k.id} person={k} color="green" />)}
-                        {komandan.map(k => <OrgCard key={k.id} person={k} color="purple" />)}
+                        {wakilKetua.map((k: any) => <OrgCard key={k.id} person={k} color="orange" />)}
+                        {sekretaris.map((k: any) => <OrgCard key={k.id} person={k} color="blue" />)}
+                        {bendahara.map((k: any) => <OrgCard key={k.id} person={k} color="green" />)}
+                        {komandan.map((k: any) => <OrgCard key={k.id} person={k} color="purple" />)}
                     </div>
 
                     {/* CONNECTOR */}
@@ -148,7 +140,7 @@ export default function StrukturOrganisasiView() {
                         <div>
                             <h4 className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Anggota ({anggota.length})</h4>
                             <div className="flex flex-wrap justify-center gap-3">
-                                {anggota.map(k => <OrgCard key={k.id} person={k} color="slate" small />)}
+                                {anggota.map((k: any) => <OrgCard key={k.id} person={k} color="slate" small />)}
                             </div>
                         </div>
                     )}

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import DashboardView from '@/components/view/Dashboard';
 import DataAnggotaView from '@/components/view/DataAnggota';
 import StrukturOrganisasiView from '@/components/view/StrukturOrganisasi';
@@ -71,7 +72,7 @@ function DashboardContent() {
     }
   }, [searchParams, activeMenu]);
 
-  if (!isReady) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat...</div>;
+  if (!isReady) return <LoadingSpinner fullScreen />;
 
   return (
     <div className="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
@@ -108,7 +109,7 @@ function DashboardContent() {
 
 export default function Dashboard() {
   return (
-    <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat Aplikasi...</div>}>
+    <Suspense fallback={<LoadingSpinner fullScreen />}>
       <DashboardContent />
     </Suspense>
   );
