@@ -243,18 +243,8 @@ export default function DashboardView() {
                   </div>
               </div>
 
-              {/* Tiga Grafik */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
-                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
-                      <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
-                          <span className="material-icons text-red-500 text-base">pie_chart</span>
-                          Komposisi Gender
-                      </h3>
-                      <div className="flex-1 min-h-[200px] flex items-center justify-center">
-                          <Doughnut data={genderChartData} options={pieOptions} />
-                      </div>
-                  </div>
+              {/* Dua Grafik */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
                       {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
                       <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
