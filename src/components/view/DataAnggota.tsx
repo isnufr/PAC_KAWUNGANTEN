@@ -354,12 +354,14 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         )}
 
         {/* ACTION PANEL INPUT DATA */}
+        {filter !== 'verifikasi' && (
         <div className="mb-6 flex justify-center md:justify-end">
             <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
                 className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all duration-300 text-sm">
                 <span className="material-icons">add_circle</span> INPUT DATA BARU
             </button>
         </div>
+        )}
 
         {/* LIST DATA */}
         {filter === 'verifikasi' ? (
