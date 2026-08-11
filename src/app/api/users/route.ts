@@ -10,9 +10,7 @@ export async function GET() {
       select: {
         id: true,
         username: true,
-        role: true,
-        level_akses: true,
-        created_at: true
+        role: true
       }
     });
 
@@ -29,7 +27,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password, role, level_akses } = await req.json();
+    const { username, password, role } = await req.json();
     
     // Cek duplikasi
     const existing = await prisma.user.findUnique({
@@ -47,14 +45,12 @@ export async function POST(req: NextRequest) {
       data: {
         username,
         password: hashedPassword,
-        role,
-        level_akses: level_akses || ''
+        role
       },
       select: {
         id: true,
         username: true,
-        role: true,
-        level_akses: true
+        role: true
       }
     });
 

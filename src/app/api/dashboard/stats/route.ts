@@ -24,12 +24,10 @@ export async function GET() {
     });
 
     // Gender stats
-    const pria = await prisma.anggota.count({ where: { jenis_kelamin: 'LAKI-LAKI' } });
-    const wanita = await prisma.anggota.count({ where: { jenis_kelamin: 'PEREMPUAN' } });
+    const pria = await prisma.anggota.count({ where: { jenisKelamin: 'LAKI-LAKI' } });
+    const wanita = await prisma.anggota.count({ where: { jenisKelamin: 'PEREMPUAN' } });
 
-    // Status Data
-    const dataLengkap = await prisma.anggota.count({ where: { status_data: 'LENGKAP' } });
-    const dataBelumLengkap = await prisma.anggota.count({ where: { status_data: 'BELUM LENGKAP' } });
+    // Status Data removed as it's not in schema
 
     return NextResponse.json({
       success: true,
@@ -44,10 +42,6 @@ export async function GET() {
         gender: {
           LAKI_LAKI: pria,
           PEREMPUAN: wanita
-        },
-        statusData: {
-          LENGKAP: dataLengkap,
-          BELUM_LENGKAP: dataBelumLengkap
         }
       }
     });
