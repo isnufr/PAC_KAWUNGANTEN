@@ -34,7 +34,6 @@ export default function DataAnggotaView() {
 
   // Wilayah data for filters
   const [wilayahList, setWilayahList] = useState<WilayahItem[]>([]);
-  const [kecamatanList, setKecamatanList] = useState<string[]>([]);
   const [desaList, setDesaList] = useState<string[]>([]);
   const [dusunList, setDusunList] = useState<string[]>([]);
 
@@ -53,34 +52,24 @@ export default function DataAnggotaView() {
     fetch('/api/wilayah').then(r => r.json()).then(json => {
       if (json.success) {
         setWilayahList(json.data);
-        const kecs = Array.from(new Set(json.data.map((w: WilayahItem) => w.kecamatan))).sort() as string[];
-        setKecamatanList(kecs);
+        const desas = Array.from(new Set(json.data.map((w: WilayahItem) => w.desa))).sort() as string[];
+        setDesaList(desas);
       }
     }).catch(console.error);
   }, []);
 
-  // Update desa list when kecamatan changes
-  useEffect(() => {
-    if (kecamatan) {
-      const desas = Array.from(new Set(wilayahList.filter(w => w.kecamatan === kecamatan).map(w => w.desa))).sort() as string[];
-      setDesaList(desas);
-    } else {
-      setDesaList([]);
-    }
-    setDesa('');
-    setDusun('');
-  }, [kecamatan, wilayahList]);
+
 
   // Update dusun list when desa changes
   useEffect(() => {
     if (desa) {
-      const dusuns = Array.from(new Set(wilayahList.filter(w => w.kecamatan === kecamatan && w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
+      const dusuns = Array.from(new Set(wilayahList.filter(w => w.desa === desa).map(w => w.dusun).filter(Boolean))).sort() as string[];
       setDusunList(dusuns);
     } else {
       setDusunList([]);
     }
     setDusun('');
-  }, [desa, kecamatan, wilayahList]);
+  }, [desa, wilayahList]);
 
   useEffect(() => {
     fetchData();
@@ -201,14 +190,10 @@ export default function DataAnggotaView() {
                     <option value="KOMANDAN">KOMANDAN</option>
                 </select>
 
-                {/* Filter Kecamatan */}
-                <select value={kecamatan} onChange={e => setKecamatan(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Semua Kecamatan -</option>
-                    {kecamatanList.map(k => <option key={k} value={k}>{k}</option>)}
-                </select>
+
 
                 {/* Filter Desa */}
-                <select value={desa} onChange={e => setDesa(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!kecamatan}>
+                <select value={desa} onChange={e => setDesa(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
                     <option value="">- Semua Desa -</option>
                     {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
