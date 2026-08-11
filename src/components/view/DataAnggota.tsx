@@ -417,7 +417,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                                 <span className="text-red-200">|</span>
                                                 <span className="text-red-700">{item.jabatan || '-'}</span>
                                                 <span className="text-red-200">|</span>
-                                                <span className="text-red-500">{item.jenisKelamin || '-'}</span>
+                                                <span className="text-red-500">{item.jenisKelamin === 'Laki-Laki' ? 'L' : item.jenisKelamin === 'Perempuan' ? 'P' : item.jenisKelamin || '-'}</span>
                                                 <span className="text-red-200">|</span>
                                                 <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
                                             </div>
