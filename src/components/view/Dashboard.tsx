@@ -13,6 +13,8 @@ export default function DashboardView() {
   const [gender, setGender] = useState({ pria: 0, wanita: 0 });
   const [verification, setVerification] = useState({ tidakLengkap: 0, nikGanda: 0 });
   const [ulangTahun, setUlangTahun] = useState<any[]>([]);
+  const [kuota, setKuota] = useState<{ wilayah: any[]; rantingCounts: any[]; anakRantingCounts: any[] }>({ wilayah: [], rantingCounts: [], anakRantingCounts: [] });
+  const [selectedDesa, setSelectedDesa] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +48,13 @@ export default function DashboardView() {
           if (data.data.ulangTahun) {
             setUlangTahun(data.data.ulangTahun);
           }
+          if (data.data.kuota) {
+            setKuota(data.data.kuota);
+            const uniqueDesas = Array.from(new Set(data.data.kuota.wilayah.map((w: any) => w.desa))).sort();
+            if (uniqueDesas.length > 0) {
+              setSelectedDesa(uniqueDesas[0] as string);
+            }
+          }
         }
       })
       .catch(console.error)
@@ -55,6 +64,36 @@ export default function DashboardView() {
   const totalGender = gender.pria + gender.wanita;
   const priaPercent = totalGender > 0 ? Math.round((gender.pria / totalGender) * 100) : 0;
   const wanitaPercent = totalGender > 0 ? Math.round((gender.wanita / totalGender) * 100) : 0;
+
+  // Calculate Kesiapan PAC
+  const targetPac = 11;
+  const targetSatgas = 5;
+  const targetRantingPerDesa = 9;
+  const targetAnakRantingPerDusun = 5;
+
+  const uniqueDesas = Array.from(new Set(kuota.wilayah.map(w => w.desa))).sort() as string[];
+  const numDesa = uniqueDesas.length;
+  const numDusun = kuota.wilayah.filter(w => w.dusun && w.dusun.trim() !== '').length;
+  
+  const totalTarget = targetPac + targetSatgas + (numDesa * targetRantingPerDesa) + (numDusun * targetAnakRantingPerDusun);
+
+  const achievedPac = Math.min(stats.pac, targetPac);
+  const achievedSatgas = Math.min(stats.satgas, targetSatgas);
+  
+  let achievedRanting = 0;
+  kuota.rantingCounts.forEach(r => { achievedRanting += Math.min(r._count.id, targetRantingPerDesa); });
+  
+  let achievedAnakRanting = 0;
+  kuota.anakRantingCounts.forEach(a => { achievedAnakRanting += Math.min(a._count.id, targetAnakRantingPerDusun); });
+
+  const totalAchieved = achievedPac + achievedSatgas + achievedRanting + achievedAnakRanting;
+  const kesiapanPacPercent = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
+
+  // Data for selected desa
+  const currentRantingCount = kuota.rantingCounts.find(r => r.desa === selectedDesa)?._count.id || 0;
+  const currentRantingPercent = Math.min(100, Math.round((currentRantingCount / targetRantingPerDesa) * 100));
+
+  const dusunsInSelectedDesa = Array.from(new Set(kuota.wilayah.filter(w => w.desa === selectedDesa && w.dusun).map(w => w.dusun))).sort() as string[];
 
   return (
     <div id="menu-dashboard" className="space-y-5 md:space-y-6 max-w-6xl mx-auto">
@@ -101,7 +140,8 @@ export default function DashboardView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
           <div className="lg:col-span-2 space-y-5 md:space-y-6">
               {/* MONITORING KUOTA KEPENGURUSAN */}
-              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el relative">
+                  {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
                       <div>
                           <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800">
@@ -112,11 +152,111 @@ export default function DashboardView() {
                       </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 relative">
-                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
-                      <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
-                      <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
-                      <QuotaCard title="Satgas PAC" icon="security" target={5} current={stats.satgas} percent={Math.min(100, Math.round((stats.satgas / 5) * 100) || 0)} />
+                  {/* Top 3 Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="bg-gradient-to-br from-red-50/50 to-rose-50/50 rounded-2xl p-4 border border-red-100/60 flex flex-col justify-between">
+                          <div className="flex items-center gap-3 mb-6">
+                              <span className="material-icons text-red-600 bg-white shadow-sm p-1.5 rounded-lg border border-red-100 text-base">analytics</span>
+                              <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Kesiapan PAC</span>
+                          </div>
+                          <div className="flex items-end justify-between">
+                              <div className="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100 mb-1">
+                                  <div className="bg-red-600 h-2.5 rounded-full transition-all duration-1000" style={{ width: `${kesiapanPacPercent}%` }}></div>
+                              </div>
+                              <span className="text-2xl font-black text-red-700 leading-none">{kesiapanPacPercent}%</span>
+                          </div>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-red-50/50 to-rose-50/50 rounded-2xl p-4 border border-red-100/60 flex flex-col justify-between">
+                          <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                  <span className="material-icons text-red-600 bg-white shadow-sm p-1.5 rounded-lg border border-red-100 text-base">account_balance</span>
+                                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Pengurus PAC</span>
+                              </div>
+                              <span className="text-[9px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-100">Target: {targetPac}</span>
+                          </div>
+                          <div className="flex items-end justify-between">
+                              <div className="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100 mb-1">
+                                  <div className="bg-red-600 h-2.5 rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, (stats.pac/targetPac)*100)}%` }}></div>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                  <span className="text-lg font-black text-red-700 leading-none">{Math.min(100, Math.round((stats.pac/targetPac)*100))}%</span>
+                                  <span className="text-[9px] font-bold text-slate-400 mt-1">{stats.pac} / {targetPac}</span>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-red-50/50 to-rose-50/50 rounded-2xl p-4 border border-red-100/60 flex flex-col justify-between">
+                          <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                  <span className="material-icons text-red-600 bg-white shadow-sm p-1.5 rounded-lg border border-red-100 text-base">security</span>
+                                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Satgas PAC</span>
+                              </div>
+                              <span className="text-[9px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-100">Target: {targetSatgas}</span>
+                          </div>
+                          <div className="flex items-end justify-between">
+                              <div className="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100 mb-1">
+                                  <div className="bg-red-600 h-2.5 rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, (stats.satgas/targetSatgas)*100)}%` }}></div>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                  <span className="text-lg font-black text-red-700 leading-none">{Math.min(100, Math.round((stats.satgas/targetSatgas)*100))}%</span>
+                                  <span className="text-[9px] font-bold text-slate-400 mt-1">{stats.satgas} / {targetSatgas}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Desa Dropdown */}
+                  <div className="mb-4">
+                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Pilih Desa Untuk Melihat Kuota Ranting</label>
+                      <div className="relative">
+                          <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-red-600 text-lg">location_on</span>
+                          <select value={selectedDesa} onChange={e => setSelectedDesa(e.target.value)}
+                              className="w-full p-2.5 pl-10 border border-red-400 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 transition font-black text-red-700 text-xs uppercase appearance-none shadow-sm">
+                              {uniqueDesas.map(d => <option key={d} value={d}>{d}</option>)}
+                          </select>
+                          <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-red-600 text-lg pointer-events-none">expand_more</span>
+                      </div>
+                  </div>
+
+                  {/* Ranting Card */}
+                  <div className="bg-gradient-to-br from-red-50/50 to-rose-50/50 rounded-2xl p-4 border border-red-100/60 mb-4">
+                      <div className="flex justify-between items-center mb-4">
+                          <span className="text-[10px] font-black text-red-800 uppercase tracking-widest">Ranting</span>
+                          <span className="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-md border border-slate-100">Target: {targetRantingPerDesa}</span>
+                      </div>
+                      <div className="flex justify-between items-end mb-2">
+                          <span className="text-[10px] font-black text-slate-700">{currentRantingPercent}% TERPENUHI</span>
+                          <span className="text-[10px] font-bold text-teal-600">{currentRantingCount} / {targetRantingPerDesa}</span>
+                      </div>
+                      <div className="w-full bg-white rounded-full h-1.5 overflow-hidden border border-slate-100">
+                          <div className="bg-red-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${currentRantingPercent}%` }}></div>
+                      </div>
+                  </div>
+
+                  {/* Anak Ranting Dusuns */}
+                  <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
+                      <h4 className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-3">Anak Ranting Menurut Dusun (Target: {targetAnakRantingPerDusun}/Dusun)</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {dusunsInSelectedDesa.map(dusunName => {
+                              const arCount = kuota.anakRantingCounts.find(a => a.desa === selectedDesa && a.dusun === dusunName)?._count.id || 0;
+                              const arPercent = Math.min(100, Math.round((arCount / targetAnakRantingPerDusun) * 100));
+                              return (
+                                  <div key={dusunName} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                                      <div className="flex justify-between items-center mb-2">
+                                          <span className="text-[10px] font-black text-slate-700 uppercase">{dusunName}</span>
+                                          <span className="text-[10px] font-bold text-teal-600">{arCount} / {targetAnakRantingPerDusun}</span>
+                                      </div>
+                                      <div className="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
+                                          <div className="bg-teal-500 h-1 rounded-full transition-all duration-1000" style={{ width: `${arPercent}%` }}></div>
+                                      </div>
+                                  </div>
+                              );
+                          })}
+                          {dusunsInSelectedDesa.length === 0 && (
+                              <div className="col-span-2 text-center text-[10px] text-slate-400 py-2">Tidak ada data dusun untuk desa ini.</div>
+                          )}
+                      </div>
                   </div>
               </div>
 
@@ -196,33 +336,6 @@ function StatCard({ title, subtitle, icon, value, isWide = false }: { title: str
         </div>
         <span className="text-2xl md:text-3xl font-black text-slate-800 block">{value}</span>
         <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{title}</span>
-    </div>
-  )
-}
-
-function QuotaCard({ title, icon, target, current, percent }: { title: string, icon: string, target: number | null, current: number, percent: number }) {
-  return (
-    <div className="bg-gradient-to-br from-red-50/80 to-rose-50/80 rounded-2xl p-4 border border-red-100/60 theme-el flex flex-col justify-between">
-        <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-                <span className="material-icons text-red-600 bg-white shadow-sm p-2 rounded-xl border border-red-100 text-lg">{icon}</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{title}</span>
-            </div>
-            {target !== null && (
-              <span className="text-[10px] font-bold text-slate-400 bg-white px-2.5 py-1 rounded-lg border border-slate-100">Target: {target}</span>
-            )}
-        </div>
-        <div className="flex items-center justify-between">
-            <div className="w-full mr-4 bg-white rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-100">
-                <div className="bg-gradient-to-r from-red-500 to-red-600 h-2.5 rounded-full transition-all duration-1000" style={{ width: `${percent}%` }}></div>
-            </div>
-            <div className="flex flex-col items-end">
-                <span className="text-xl font-black text-red-700 leading-none">{percent}%</span>
-                {target !== null && (
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{current} / {target}</span>
-                )}
-            </div>
-        </div>
     </div>
   )
 }

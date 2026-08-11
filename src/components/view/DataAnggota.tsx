@@ -63,33 +63,51 @@ export default function DataAnggotaView() {
     return res.json();
   };
 
-  const handleKtpChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleKtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFileKtp(file);
-      setOcrStatus('Memindai KTP dengan AI...');
-      try {
-        const Tesseract = (await import('tesseract.js')).default;
-        const { data: { text } } = await Tesseract.recognize(file, 'ind');
-        setOcrStatus('Selesai memindai.');
-        
-        // Ekstrak NIK (16 digit)
-        const nikMatch = text.match(/\b\d{16}\b/);
-        if (nikMatch) handleFormChange('nik', nikMatch[0]);
-        
-        // Ekstrak Nama
-        const lines = text.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].toLowerCase().includes('nama')) {
-            const namaRaw = lines[i].replace(/nama/i, '').replace(/[:;-]/g, '').trim();
-            if (namaRaw) handleFormChange('nama', namaRaw);
-            break;
+      setFileKtp(e.target.files[0]);
+      setOcrStatus('');
+    } else {
+      setFileKtp(null);
+      setOcrStatus('');
+    }
+  };
+
+  const handleScanKtp = async () => {
+    if (!fileKtp) {
+      setOcrStatus('Pilih file KTP terlebih dahulu.');
+      return;
+    }
+    setOcrStatus('Memindai KTP dengan AI (harap tunggu)...');
+    try {
+      const Tesseract = (await import('tesseract.js')).default;
+      const worker = await Tesseract.createWorker('ind');
+      const { data: { text } } = await worker.recognize(fileKtp);
+      await worker.terminate();
+
+      setOcrStatus('Selesai memindai.');
+      
+      // Better regex logic for bad quality scans
+      const cleaned = text.replace(/[^a-zA-Z0-9\n:]/g, ' ').replace(/\s+/g, ' ');
+      const rawDigits = cleaned.replace(/\D/g, '');
+      const nikMatch = rawDigits.match(/\d{16}/);
+      if (nikMatch) handleFormChange('nik', nikMatch[0]);
+      
+      const lines = text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].toLowerCase().includes('nama')) {
+          let namaRaw = lines[i].replace(/nama/i, '').replace(/[:;-]/g, '').replace(/[^a-zA-Z\s]/g, '').trim();
+          if (namaRaw.length > 2) {
+            handleFormChange('nama', namaRaw);
+          } else if (i + 1 < lines.length) {
+            handleFormChange('nama', lines[i+1].replace(/[^a-zA-Z\s]/g, '').trim());
           }
+          break;
         }
-      } catch (err) {
-        setOcrStatus('Gagal memindai teks.');
-        console.error(err);
       }
+    } catch (err) {
+      setOcrStatus('Gagal memindai teks.');
+      console.error(err);
     }
   };
 
@@ -407,44 +425,118 @@ export default function DataAnggotaView() {
                         </div>
                         <button onClick={() => setIsModalOpen(false)} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
-                    <form onSubmit={handleSubmitAnggota} className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 text-xs sm:text-sm text-slate-800">
+                    <form onSubmit={handleSubmitAnggota} className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm text-slate-800 bg-red-50/30">
                         {formError && <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center font-bold text-xs">{formError}</div>}
                         {formSuccess && <div className="p-3 bg-green-50 text-green-600 rounded-xl border border-green-100 text-center font-bold text-xs">{formSuccess}</div>}
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <FormInput label="NIK *" value={formData.nik} onChange={v => handleFormChange('nik', v)} placeholder="Masukkan NIK (16 digit)" />
-                            <FormInput label="Nama Lengkap *" value={formData.nama} onChange={v => handleFormChange('nama', v)} placeholder="Masukkan nama lengkap" />
-                            <FormInput label="Tanggal Lahir" value={formData.tanggalLahir} onChange={v => handleFormChange('tanggalLahir', v)} placeholder="DD/MM/YYYY" />
-                            <FormSelect label="Jenis Kelamin" value={formData.jenisKelamin} onChange={v => handleFormChange('jenisKelamin', v)}
-                                options={[{ v: '', l: '- Pilih -' }, { v: 'LAKI-LAKI', l: 'LAKI-LAKI' }, { v: 'PEREMPUAN', l: 'PEREMPUAN' }]} />
-                            <FormInput label="Umur" value={formData.umur} onChange={v => handleFormChange('umur', v)} placeholder="Umur (angka)" type="number" />
-                            <FormInput label="Nomor HP" value={formData.nomorHp} onChange={v => handleFormChange('nomorHp', v)} placeholder="08xxxxxxxxxx" />
-                            <FormSelect label="Bagian" value={formData.bagian} onChange={v => handleFormChange('bagian', v)}
-                                options={[{ v: '', l: '- Pilih Bagian -' }, { v: 'PAC', l: 'PAC' }, { v: 'RANTING', l: 'RANTING' }, { v: 'ANAK RANTING', l: 'ANAK RANTING' }, { v: 'SATGAS', l: 'SATGAS' }]} />
-                            <FormSelect label="Jabatan" value={formData.jabatan} onChange={v => handleFormChange('jabatan', v)}
-                                options={[{ v: '', l: '- Pilih Jabatan -' }, { v: 'KETUA', l: 'KETUA' }, { v: 'WAKIL KETUA', l: 'WAKIL KETUA' }, { v: 'SEKRETARIS', l: 'SEKRETARIS' }, { v: 'BENDAHARA', l: 'BENDAHARA' }, { v: 'ANGGOTA', l: 'ANGGOTA' }, { v: 'KOMANDAN', l: 'KOMANDAN' }]} />
-                            <FormInput label="Kecamatan" value={formData.kecamatan} onChange={v => handleFormChange('kecamatan', v)} placeholder="Nama kecamatan" />
-                            <FormInput label="Desa" value={formData.desa} onChange={v => handleFormChange('desa', v)} placeholder="Nama desa" />
-                            <FormInput label="Dusun" value={formData.dusun} onChange={v => handleFormChange('dusun', v)} placeholder="Nama dusun" />
-                            
-                            {/* Upload KTP with OCR */}
-                            <div className="sm:col-span-2 bg-red-50 p-4 rounded-xl border border-red-100 flex flex-col gap-2">
-                                <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide">Upload & Scan KTP</label>
-                                <input type="file" accept="image/*" onChange={handleKtpChange} className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 transition" />
-                                {ocrStatus && <span className="text-[10px] font-bold text-red-600 mt-1">{ocrStatus}</span>}
+                        {/* Top: Upload KTP */}
+                        <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm flex flex-col gap-3">
+                            <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest">Unggah Foto KTP</label>
+                            <div className="border-2 border-dashed border-red-200 rounded-xl p-3 flex items-center gap-3">
+                                <label className="cursor-pointer bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition">
+                                    Pilih File
+                                    <input type="file" accept="image/*" onChange={handleKtpChange} className="hidden" />
+                                </label>
+                                <span className="text-xs text-slate-400 font-medium">{fileKtp ? fileKtp.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
-
-                            {/* Upload Pass Foto */}
-                            <div className="sm:col-span-2 bg-red-50 p-4 rounded-xl border border-red-100 flex flex-col gap-2">
-                                <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide">Upload Pass Foto</label>
-                                <input type="file" accept="image/*" onChange={(e) => { if(e.target.files) setFilePassFoto(e.target.files[0]) }} className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 transition" />
+                            <div className="flex items-center gap-3 mt-1">
+                                <button type="button" onClick={handleScanKtp} className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition flex items-center gap-2">
+                                    <span className="material-icons text-sm">document_scanner</span> Scan Data dari KTP
+                                </button>
+                                <span className="text-xs text-red-500 font-semibold">{ocrStatus || 'Bantu isi NIK & Nama otomatis'}</span>
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isSubmitting}
-                            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-3.5 rounded-xl font-bold shadow-lg transition-all flex justify-center items-center gap-2 text-sm active:scale-95 disabled:opacity-70">
-                            {isSubmitting ? 'Menyimpan...' : <><span className="material-icons text-sm">save</span> SIMPAN DATA ANGGOTA</>}
-                        </button>
+                        {/* Middle: Data Fields */}
+                        <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nomor NIK</label>
+                                    <input type="text" value={formData.nik} onChange={e => handleFormChange('nik', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
+                                    <input type="text" value={formData.nama} onChange={e => handleFormChange('nama', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Tanggal Lahir</label>
+                                    <input type="text" value={formData.tanggalLahir} onChange={e => handleFormChange('tanggalLahir', e.target.value)} placeholder="DD-MM-YYYY" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Jenis Kelamin</label>
+                                    <select value={formData.jenisKelamin} onChange={e => handleFormChange('jenisKelamin', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
+                                        <option value="">- Pilih -</option>
+                                        <option value="LAKI-LAKI">LAKI-LAKI</option>
+                                        <option value="PEREMPUAN">PEREMPUAN</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nomor Handphone (WA)</label>
+                                    <input type="text" value={formData.nomorHp} onChange={e => handleFormChange('nomorHp', e.target.value)} placeholder="08..." className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Posisi Bagian</label>
+                                    <select value={formData.bagian} onChange={e => handleFormChange('bagian', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
+                                        <option value="">- Pilih -</option>
+                                        <option value="PAC">PAC</option>
+                                        <option value="RANTING">RANTING</option>
+                                        <option value="ANAK RANTING">ANAK RANTING</option>
+                                        <option value="SATGAS">SATGAS</option>
+                                    </select>
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Jabatan Struktural</label>
+                                    <select value={formData.jabatan} onChange={e => handleFormChange('jabatan', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
+                                        <option value="">- Pilih -</option>
+                                        <option value="KETUA">KETUA</option>
+                                        <option value="WAKIL KETUA">WAKIL KETUA</option>
+                                        <option value="SEKRETARIS">SEKRETARIS</option>
+                                        <option value="BENDAHARA">BENDAHARA</option>
+                                        <option value="ANGGOTA">ANGGOTA</option>
+                                        <option value="KOMANDAN">KOMANDAN</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Wilayah */}
+                        <div className="bg-red-50 p-4 rounded-2xl border border-red-100 shadow-inner grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Desa</label>
+                                <select value={formData.desa} onChange={e => handleFormChange('desa', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white">
+                                    <option value="">- Pilih -</option>
+                                    {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Dusun</label>
+                                <select value={formData.dusun} onChange={e => handleFormChange('dusun', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white">
+                                    <option value="">- Pilih -</option>
+                                    {wilayahList.filter(w => w.desa === formData.desa && w.dusun).map(w => w.dusun).map(d => <option key={d} value={d}>{d}</option>)}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Bottom: Upload Pass Foto */}
+                        <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm flex flex-col gap-3">
+                            <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest">Unggah Pass Foto</label>
+                            <div className="border-2 border-dashed border-red-200 rounded-xl p-3 flex items-center gap-3">
+                                <label className="cursor-pointer bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition">
+                                    Pilih File
+                                    <input type="file" accept="image/*" onChange={(e) => { if(e.target.files) setFilePassFoto(e.target.files[0]) }} className="hidden" />
+                                </label>
+                                <span className="text-xs text-slate-400 font-medium">{filePassFoto ? filePassFoto.name : 'Tidak ada file yang dipilih'}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3 pt-2">
+                            <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full font-bold text-xs text-red-600 border border-red-600 hover:bg-red-50 transition">
+                                Batal
+                            </button>
+                            <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold shadow-md transition-all flex justify-center items-center gap-2 text-xs active:scale-95 disabled:opacity-70">
+                                {isSubmitting ? 'Menyimpan...' : 'Simpan Data'}
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -516,24 +608,3 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FormInput({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; type?: string }) {
-  return (
-    <div>
-      <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
-    </div>
-  );
-}
-
-function FormSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { v: string; l: string }[] }) {
-  return (
-    <div>
-      <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">{label}</label>
-      <select value={value} onChange={e => onChange(e.target.value)}
-        className="w-full p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-        {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
-      </select>
-    </div>
-  );
-}

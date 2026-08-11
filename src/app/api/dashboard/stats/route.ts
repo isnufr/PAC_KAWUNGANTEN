@@ -49,16 +49,30 @@ export async function GET() {
     const currentMonth = new Date().getMonth() + 1;
     const ulangTahunList = allAnggota.filter(a => {
       if (!a.tanggalLahir) return false;
-      // Handle DD/MM/YYYY or YYYY-MM-DD
       const parts = a.tanggalLahir.includes('/') ? a.tanggalLahir.split('/') : a.tanggalLahir.split('-');
       if (parts.length >= 2) {
-        // If it's DD/MM/YYYY, month is parts[1]
-        // If it's YYYY-MM-DD, month is parts[1]
         const m = parseInt(parts[1], 10);
         return m === currentMonth;
       }
       return false;
     }).map(a => ({ id: a.id, nama: a.nama, tanggalLahir: a.tanggalLahir }));
+
+    // KUOTA KEPENGURUSAN
+    const wilayahList = await prisma.wilayah.findMany();
+    
+    // Ranting by Desa
+    const rantingCounts = await prisma.anggota.groupBy({
+      by: ['desa'],
+      where: { bagian: 'RANTING' },
+      _count: { id: true }
+    });
+
+    // Anak Ranting by Dusun
+    const anakRantingCounts = await prisma.anggota.groupBy({
+      by: ['desa', 'dusun'],
+      where: { bagian: 'ANAK RANTING' },
+      _count: { id: true }
+    });
 
     return NextResponse.json({
       success: true,
@@ -78,7 +92,12 @@ export async function GET() {
           tidakLengkap: dataTidakLengkapCount,
           nikGanda: nikGandaCount
         },
-        ulangTahun: ulangTahunList
+        ulangTahun: ulangTahunList,
+        kuota: {
+          wilayah: wilayahList,
+          rantingCounts,
+          anakRantingCounts
+        }
       }
     });
   } catch (error) {
