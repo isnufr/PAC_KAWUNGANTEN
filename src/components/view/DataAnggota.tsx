@@ -379,49 +379,114 @@ export default function DataAnggotaView() {
 
         {/* MODAL DETAIL ANGGOTA */}
         {selectedAnggota && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
-                <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden my-auto max-h-[92vh] flex flex-col border border-red-200">
-                    <div className="bg-red-700 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
-                        <div className="flex items-center space-x-2">
-                            <span className="material-icons text-white text-lg">badge</span>
-                            <h3 className="font-extrabold text-sm sm:text-base tracking-wide">Detail Anggota</h3>
-                        </div>
-                        <button onClick={() => setSelectedAnggota(null)} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
-                    </div>
-                    <div className="p-4 sm:p-6 overflow-y-auto space-y-3 flex-1 text-xs sm:text-sm text-slate-800">
-                        <div className="flex justify-between items-center mb-4">
-                             <div className="flex-1"></div>
-                             <div className="w-24 h-24 rounded-full bg-slate-200 overflow-hidden border-4 border-white shadow-lg mx-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+                <div className="bg-slate-50 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden relative flex flex-col border border-red-100 max-h-[95vh] my-auto">
+                    {/* Header Background */}
+                    <div className="bg-red-700 h-32 w-full absolute top-0 left-0 rounded-b-[20%]"></div>
+                    
+                    {/* Close Button */}
+                    <button onClick={() => setSelectedAnggota(null)} className="absolute top-4 right-4 z-10 text-red-100 hover:text-white transition bg-red-800/50 hover:bg-red-800 p-1.5 rounded-full backdrop-blur-md">
+                        <span className="material-icons text-sm block">close</span>
+                    </button>
+
+                    {/* Content Scrollable */}
+                    <div className="relative z-10 flex-1 overflow-y-auto p-5 sm:p-6 mt-12 scrollbar-hide">
+                        {/* Avatar */}
+                        <div className="flex justify-center mb-4">
+                             <div className="w-28 h-28 rounded-2xl bg-slate-200 overflow-hidden border-[6px] border-white shadow-xl">
                                  {selectedAnggota.passFotoUrl ? (
                                      <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
                                  ) : (
-                                     <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-3xl">person</span></div>
+                                     <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-4xl">person</span></div>
                                  )}
                              </div>
-                             <div className="flex-1 flex justify-end">
-                                 <button onClick={() => { setIsPrinting(true); setTimeout(() => window.print(), 300); setTimeout(() => setIsPrinting(false), 2000); }} 
-                                         className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-1 transition">
-                                     <span className="material-icons text-sm">print</span> CETAK KTA
-                                 </button>
-                             </div>
                         </div>
-                        <DetailRow label="Nama" value={selectedAnggota.nama} />
-                        <DetailRow label="NIK" value={selectedAnggota.nik} />
-                        <DetailRow label="Tanggal Lahir" value={selectedAnggota.tanggalLahir || '-'} />
-                        <DetailRow label="Jenis Kelamin" value={selectedAnggota.jenisKelamin || '-'} />
-                        <DetailRow label="Umur" value={selectedAnggota.umur ? `${selectedAnggota.umur} tahun` : '-'} />
-                        <DetailRow label="Nomor HP" value={selectedAnggota.nomorHp || '-'} />
-                        <DetailRow label="Bagian" value={selectedAnggota.bagian || '-'} />
-                        <DetailRow label="Jabatan" value={selectedAnggota.jabatan || '-'} />
-                        <DetailRow label="Kecamatan" value={selectedAnggota.kecamatan || '-'} />
-                        <DetailRow label="Desa" value={selectedAnggota.desa || '-'} />
-                        <DetailRow label="Dusun" value={selectedAnggota.dusun || '-'} />
-                        {selectedAnggota.fotoKtpUrl && (
-                          <div className="mt-4 border-t border-slate-100 pt-4">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Foto KTP</p>
-                            <img src={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} alt="Foto KTP" className="w-full rounded-xl border border-slate-200 shadow-sm" />
-                          </div>
-                        )}
+
+                        {/* Name & Badges */}
+                        <div className="text-center mb-6">
+                            <h3 className="font-black text-xl text-slate-800 tracking-tight mb-2">{selectedAnggota.nama}</h3>
+                            <div className="flex justify-center gap-2">
+                                <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
+                                <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
+                            </div>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="space-y-3 mb-6">
+                            {/* Card 1: ID & NIK */}
+                            <div className="flex gap-3">
+                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-1">
+                                    <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">tag</span> ID SISTEM</p>
+                                    <p className="font-black text-slate-700 text-sm">{selectedAnggota.id}</p>
+                                </div>
+                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-1">
+                                    <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">badge</span> NOMOR NIK</p>
+                                    <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nik}</p>
+                                </div>
+                            </div>
+
+                            {/* Card 2: TTL & Jenis Kelamin */}
+                            <div className="flex gap-3">
+                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-[3]">
+                                    <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">cake</span> TTL (UMUR)</p>
+                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.tanggalLahir || '-'} {selectedAnggota.umur ? `(${selectedAnggota.umur} Tahun)` : ''}</p>
+                                </div>
+                                <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex-[2]">
+                                    <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">wc</span> JENIS KELAMIN</p>
+                                    <p className="font-bold text-slate-700 text-xs">{selectedAnggota.jenisKelamin || '-'}</p>
+                                </div>
+                            </div>
+
+                            {/* Card 3: WhatsApp */}
+                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
+                                <div>
+                                    <p className="text-[8px] font-bold text-green-500 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">phone</span> KONTAK WHATSAPP</p>
+                                    <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nomorHp || '-'}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <a href={`https://wa.me/${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="w-8 h-8 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
+                                        <span className="material-icons text-sm">chat</span>
+                                    </a>
+                                    <a href={`tel:${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} className="w-8 h-8 bg-slate-700 hover:bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
+                                        <span className="material-icons text-sm">contacts</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {/* Card 4: Alamat */}
+                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">location_on</span> ALAMAT DOMISILI</p>
+                                <p className="font-bold text-slate-700 text-xs leading-relaxed">
+                                    {selectedAnggota.dusun ? `Dsn. ${selectedAnggota.dusun}, ` : ''}
+                                    {selectedAnggota.desa ? `Ds. ${selectedAnggota.desa}, ` : ''}
+                                    Kec. KAWUNGANTEN
+                                </p>
+                            </div>
+
+                            {/* Card 5: KTP */}
+                            {selectedAnggota.fotoKtpUrl && (
+                                <div className="mt-2">
+                                    <p className="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-1"><span className="material-icons text-[10px]">credit_card</span> FOTO KTP</p>
+                                    <div className="relative group rounded-2xl border-2 border-dashed border-red-200 overflow-hidden bg-white p-1">
+                                        <img src={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} alt="Foto KTP" className="w-full rounded-xl object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-sm">
+                                            <a href={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} target="_blank" rel="noreferrer" className="w-10 h-10 bg-slate-700/80 hover:bg-slate-700 text-white rounded-full flex items-center justify-center transform hover:scale-110 transition">
+                                                <span className="material-icons text-lg">zoom_in</span>
+                                            </a>
+                                            <a href={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} download className="w-10 h-10 bg-red-600/90 hover:bg-red-600 text-white rounded-full flex items-center justify-center transform hover:scale-110 transition">
+                                                <span className="material-icons text-lg">download</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* CTA Button */}
+                        <button onClick={() => { setIsPrinting(true); setTimeout(() => window.print(), 300); setTimeout(() => setIsPrinting(false), 2000); }} 
+                                className="w-full bg-red-600 hover:bg-red-700 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 flex justify-center items-center gap-2 transition transform active:scale-95">
+                            <span className="material-icons text-base">badge</span> BUAT KARTU ANGGOTA DIGITAL
+                        </button>
                     </div>
                 </div>
             </div>
