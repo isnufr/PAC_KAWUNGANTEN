@@ -44,7 +44,7 @@ export default function LoginPage() {
 
         <div className="bg-white/95 backdrop-blur-xl p-6 md:p-10 rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.3)] border border-red-200 w-full max-w-md transform transition-all relative z-10">
             <div className="text-center mb-6 md:mb-8">
-                <div className="mx-auto h-20 w-20 md:h-24 md:w-24 bg-gradient-to-br from-white to-red-50 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30 mb-4 md:mb-5 transform hover:scale-105 transition duration-300 border-4 border-white p-2">
+                <div className="mx-auto h-28 w-28 md:h-32 md:w-32 flex items-center justify-center mb-2 md:mb-4 transform hover:scale-105 transition duration-300 drop-shadow-xl">
                     <img src="/logo.png" className="w-full h-full object-contain" alt="PAC Logo" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-extrabold text-red-800 tracking-tight">LOGIN APLIKASI</h2>

@@ -72,7 +72,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, o
         <div className="flex items-center justify-between h-20 border-b border-gray-100 px-4">
           <div className="flex items-center">
             <div className="relative w-10 h-10 sm:w-12 sm:h-12 mr-3 flex-shrink-0">
-              <div className="absolute inset-0 bg-red-100 rounded-full blur-md"></div>
+              {/* Removed the background blur for transparency */}
               <img src="/logo.png" alt="Logo PAC" className="relative z-10 w-full h-full object-contain drop-shadow-md" />
             </div>
             <div className="flex flex-col justify-center">

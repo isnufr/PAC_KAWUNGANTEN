@@ -823,7 +823,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
 
                     {/* Header */}
                     <div className="h-10 bg-red-800 w-full flex items-center px-3 relative z-10 border-b-2 border-yellow-500">
-                        <img src="/logo.png" alt="Logo PDIP" className="w-6 h-6 mr-2 object-contain bg-white rounded-full p-0.5" />
+                        <img src="/logo.png" alt="Logo PDIP" className="w-8 h-8 mr-2 object-contain p-0 drop-shadow-md" />
                         <div>
                             <h1 className="text-[10px] font-black leading-none text-white tracking-widest">KARTU TANDA ANGGOTA</h1>
                             <h2 className="text-[7px] font-bold text-yellow-400">PDI PERJUANGAN KAWUNGANTEN</h2>
