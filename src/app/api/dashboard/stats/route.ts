@@ -25,7 +25,6 @@ export async function GET() {
           { fotoKtpUrl: null },
           { passFotoUrl: '' },
           { fotoKtpUrl: '' },
-          { nik: null },
           { nik: '' }
         ]
       }
