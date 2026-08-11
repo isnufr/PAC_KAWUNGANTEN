@@ -7,10 +7,14 @@ export const metadata: Metadata = {
   description: "Sistem Informasi Basis Data PAC KAWUNGANTEN",
   themeColor: "#dc2626",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png"
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "PAC KWT",
+    title: "PAC KAWUNGANTEN",
   },
 };
 
@@ -26,8 +30,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="PAC KWT" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-title" content="PAC KAWUNGANTEN" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body>
         <Providers>
