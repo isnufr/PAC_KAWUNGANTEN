@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
 export default function KasOrganisasiView() {
   const queryClient = useQueryClient();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [tipe, setTipe] = useState('');
@@ -197,7 +201,7 @@ export default function KasOrganisasiView() {
         </div>
 
         {/* MODAL INPUT KAS */}
-        {isModalOpen && (
+        {mounted && isModalOpen && createPortal(
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
                 <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden my-auto flex flex-col border border-red-200">
                     <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
@@ -255,7 +259,7 @@ export default function KasOrganisasiView() {
                     </form>
                 </div>
             </div>
-        )}
+        ), document.body)}
     </div>
   );
 }

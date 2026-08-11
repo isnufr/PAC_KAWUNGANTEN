@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
@@ -24,6 +25,9 @@ interface WilayahItem {
 
 export default function DataAnggotaView({ filter }: { filter?: string }) {
   const queryClient = useQueryClient();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [bagian, setBagian] = useState('');
@@ -508,7 +512,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         )}
 
         {/* MODAL DETAIL ANGGOTA */}
-        {selectedAnggota && (
+        {mounted && selectedAnggota && createPortal(
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
                 <div className="bg-slate-50 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden relative flex flex-col border border-red-100 max-h-[95vh] my-auto">
                     {/* Header Background */}
@@ -628,10 +632,10 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </div>
                 </div>
             </div>
-        )}
+        ), document.body)}
 
         {/* MODAL INPUT DATA BARU */}
-        {isModalOpen && (
+        {mounted && isModalOpen && createPortal(
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-900/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
                 <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col border border-red-200">
                     <div className="bg-red-700 p-4 sm:p-5 text-white flex justify-between items-center flex-shrink-0">
@@ -843,11 +847,11 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     </div>
                 </div>
             </div>
-        )}
+        , document.body)}
 
         {/* MODAL FULL SCREEN IMAGE */}
-        {fullScreenImage && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+        {mounted && fullScreenImage && createPortal(
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
                 <button onClick={() => setFullScreenImage(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 text-white/70 hover:text-white transition bg-white/10 hover:bg-white/20 p-2 rounded-full backdrop-blur-md">
                     <span className="material-icons text-2xl block">close</span>
                 </button>
@@ -857,7 +861,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                     <span>UNDUH FOTO UTUH</span>
                 </a>
             </div>
-        )}
+        , document.body)}
     </div>
   );
 }
