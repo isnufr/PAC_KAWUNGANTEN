@@ -63,6 +63,14 @@ function DashboardContent() {
     return () => clearInterval(interval);
   }, [logout]);
 
+  // Sync menu state with URL search parameters
+  useEffect(() => {
+    const menu = searchParams?.get('menu');
+    if (menu && menu !== activeMenu) {
+      setActiveMenu(menu);
+    }
+  }, [searchParams, activeMenu]);
+
   if (!isReady) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat...</div>;
 
   return (
@@ -84,6 +92,7 @@ function DashboardContent() {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
            <div className="max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
+             {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" />}
              {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
              {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
              {activeMenu === 'kas_organisasi' && <KasOrganisasiView />}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
@@ -10,6 +10,20 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }: SidebarProps) {
   const router = useRouter();
+  const [verificationCount, setVerificationCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch verification count
+    fetch('/api/dashboard/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.verification) {
+          const { tidakLengkap, nikGanda } = data.data.verification;
+          setVerificationCount(tidakLengkap + nikGanda);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -31,22 +45,32 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
       
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {/* DASHBOARD */}
-        <button onClick={() => setActiveMenu('beranda')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'beranda' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+        <button onClick={() => { setActiveMenu('beranda'); router.push('/?menu=beranda'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'beranda' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
           <span className="material-icons mr-3 text-lg">dashboard</span> Dashboard
         </button>
         
+        {/* VERIFIKASI DATA */}
+        <button onClick={() => { setActiveMenu('verifikasi_data'); router.push('/?menu=verifikasi_data'); }} className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'verifikasi_data' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+          <div className="flex items-center">
+             <span className="material-icons mr-3 text-lg">fact_check</span> Verifikasi Data
+          </div>
+          {verificationCount > 0 && (
+            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{verificationCount}</span>
+          )}
+        </button>
+        
         {/* DATA ANGGOTA */}
-        <button onClick={() => setActiveMenu('data_anggota')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'data_anggota' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+        <button onClick={() => { setActiveMenu('data_anggota'); router.push('/?menu=data_anggota'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'data_anggota' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
           <span className="material-icons mr-3 text-lg">group</span> Data Anggota
         </button>
 
         {/* STRUKTUR ORGANISASI */}
-        <button onClick={() => setActiveMenu('struktur_organisasi')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'struktur_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+        <button onClick={() => { setActiveMenu('struktur_organisasi'); router.push('/?menu=struktur_organisasi'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'struktur_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
           <span className="material-icons mr-3 text-lg">account_tree</span> Struktur Organisasi
         </button>
 
         {/* EXPORT LAPORAN */}
-        <button onClick={() => setActiveMenu('laporan')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'laporan' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+        <button onClick={() => { setActiveMenu('laporan'); router.push('/?menu=laporan'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'laporan' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
           <span className="material-icons mr-3 text-lg">assignment_turned_in</span> Export Laporan
         </button>
 
@@ -56,7 +80,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
             <div className="pt-4 pb-2 px-4">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Keuangan</p>
             </div>
-            <button onClick={() => setActiveMenu('kas_organisasi')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'kas_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <button onClick={() => { setActiveMenu('kas_organisasi'); router.push('/?menu=kas_organisasi'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'kas_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
               <span className="material-icons mr-3 text-lg">account_balance_wallet</span> Kas Organisasi
             </button>
           </>
@@ -68,10 +92,10 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole }:
             <div className="pt-4 pb-2 px-4">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sistem</p>
             </div>
-            <button onClick={() => setActiveMenu('log_aktivitas')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'log_aktivitas' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <button onClick={() => { setActiveMenu('log_aktivitas'); router.push('/?menu=log_aktivitas'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'log_aktivitas' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
               <span className="material-icons mr-3 text-lg">history</span> Log Aktivitas
             </button>
-            <button onClick={() => setActiveMenu('manajemen_akun')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'manajemen_akun' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <button onClick={() => { setActiveMenu('manajemen_akun'); router.push('/?menu=manajemen_akun'); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'manajemen_akun' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
               <span className="material-icons mr-3 text-lg">manage_accounts</span> Manajemen Akun
             </button>
           </>
