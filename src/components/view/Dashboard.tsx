@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function DashboardView() {
-  // Mock data untuk tampilan sementara
-  const stats = {
+  const [stats, setStats] = useState({
     total: 0,
     pac: 0,
     ranting: 0,
     anakRanting: 0,
     satgas: 0
-  };
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/dashboard/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setStats({
+            total: data.data.totalAnggota || 0,
+            pac: data.data.bagian.PAC || 0,
+            ranting: data.data.bagian.RANTING || 0,
+            anakRanting: data.data.bagian.ANAK_RANTING || 0,
+            satgas: data.data.bagian.SATGAS || 0
+          });
+        }
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, []);
 
   return (
     <div id="menu-dashboard" className="space-y-5 md:space-y-6 max-w-6xl mx-auto">
@@ -23,7 +41,8 @@ export default function DashboardView() {
       </div>
 
       {/* Dashboard Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 relative">
+          {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat data...</span></div>}
           <StatCard title="Anggota" subtitle="Total" icon="groups" value={stats.total} />
           <StatCard title="Pengurus" subtitle="PAC" icon="account_balance" value={stats.pac} />
           <StatCard title="Pengurus" subtitle="Ranting" icon="store" value={stats.ranting} />
@@ -43,10 +62,11 @@ export default function DashboardView() {
               </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-              <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={0} percent={0} />
-              <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={0} percent={0} />
-              <QuotaCard title="Satgas PAC" icon="security" target={5} current={0} percent={0} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 relative">
+              {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
+              <QuotaCard title="Kesiapan PAC" icon="analytics" target={null} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
+              <QuotaCard title="Pengurus PAC" icon="account_balance" target={11} current={stats.pac} percent={Math.min(100, Math.round((stats.pac / 11) * 100) || 0)} />
+              <QuotaCard title="Satgas PAC" icon="security" target={5} current={stats.satgas} percent={Math.min(100, Math.round((stats.satgas / 5) * 100) || 0)} />
           </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
 import DashboardView from '@/components/view/Dashboard';
@@ -14,9 +15,26 @@ import LogAktivitasView from '@/components/view/LogAktivitas';
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('beranda');
-  
-  // Dummy user role for now, akan diganti dengan data dari JWT
-  const userRole = 'Super Admin';
+  const [userRole, setUserRole] = useState('Viewer');
+  const [isReady, setIsReady] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    } else {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user && user.role) {
+          setUserRole(user.role);
+        }
+      } catch (e) {}
+      setIsReady(true);
+    }
+  }, [router]);
+
+  if (!isReady) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat...</div>;
 
   return (
     <div className="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">

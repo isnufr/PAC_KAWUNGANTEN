@@ -1,7 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function KasOrganisasiView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [saldo, setSaldo] = useState({ pemasukan: 0, pengeluaran: 0, aktif: 0 });
+  const [search, setSearch] = useState('');
+  const [tipe, setTipe] = useState('');
+  const [kategori, setKategori] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, [tipe, kategori]);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (tipe) params.append('tipe', tipe);
+      if (kategori) params.append('kategori', kategori);
+
+      const res = await fetch(`/api/kas?${params.toString()}`);
+      const json = await res.json();
+      if (json.success) {
+        setData(json.data);
+        setSaldo({
+          pemasukan: json.summary.totalPemasukan,
+          pengeluaran: json.summary.totalPengeluaran,
+          aktif: json.summary.saldoAkhir
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    fetchData();
+  };
+
+  const handleReset = () => {
+    setSearch('');
+    setTipe('');
+    setKategori('');
+    setTimeout(fetchData, 100);
+  };
+
 
   return (
     <div id="menu-kasOrganisasi" className="space-y-6 max-w-6xl mx-auto">
@@ -10,17 +57,17 @@ export default function KasOrganisasiView() {
             <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-3xl shadow-lg shadow-emerald-500/20 text-white flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">account_balance_wallet</span></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL PEMASUKAN</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.pemasukan.toLocaleString('id-ID')}</span>
             </div>
             <div className="bg-gradient-to-br from-rose-500 to-red-600 p-5 rounded-3xl shadow-lg shadow-red-500/20 text-white flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">shopping_cart</span></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">TOTAL PENGELUARAN</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.pengeluaran.toLocaleString('id-ID')}</span>
             </div>
             <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-5 rounded-3xl shadow-lg shadow-blue-500/20 text-white flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute -right-3 -top-3 opacity-20"><span className="material-icons text-7xl">savings</span></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase opacity-80">SALDO AKTIF KAS</span>
-                <span className="text-xl sm:text-2xl font-black mt-2">Rp0</span>
+                <span className="text-xl sm:text-2xl font-black mt-2">Rp{saldo.aktif.toLocaleString('id-ID')}</span>
             </div>
         </div>
 
@@ -39,15 +86,16 @@ export default function KasOrganisasiView() {
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
                 <input type="text" placeholder="Cari keterangan..."
+                    value={search} onChange={e => setSearch(e.target.value)}
                     className="p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900 theme-el" />
 
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={tipe} onChange={e => setTipe(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Semua Tipe -</option>
                     <option value="PEMASUKAN">PEMASUKAN</option>
                     <option value="PENGELUARAN">PENGELUARAN</option>
                 </select>
 
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={kategori} onChange={e => setKategori(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Semua Kategori -</option>
                     <option value="Iuran Anggota">Iuran Anggota</option>
                     <option value="Sumbangan">Sumbangan</option>
@@ -58,8 +106,8 @@ export default function KasOrganisasiView() {
                 </select>
 
                 <div className="flex gap-2">
-                    <button className="flex-1 py-2.5 border border-red-200 rounded-xl text-red-600 font-bold hover:bg-red-50 transition theme-el">Reset</button>
-                    <button className="flex-1 py-2.5 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center gap-1 theme-el">
+                    <button onClick={handleReset} className="flex-1 py-2.5 border border-red-200 rounded-xl text-red-600 font-bold hover:bg-red-50 transition theme-el">Reset</button>
+                    <button onClick={handleSearch} className="flex-1 py-2.5 bg-red-700 text-white font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center gap-1 theme-el">
                         <span className="material-icons text-sm">search</span> Cari
                     </button>
                 </div>
@@ -97,9 +145,28 @@ export default function KasOrganisasiView() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-red-50 bg-white theme-el">
-                            <tr>
-                                <td colSpan={6} className="text-center py-6 text-red-400">Memuat catatan keuangan...</td>
-                            </tr>
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={6} className="text-center py-6 text-red-400 font-bold">Memuat catatan keuangan...</td>
+                                </tr>
+                            ) : data.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="text-center py-6 text-red-400 font-bold">Tidak ada transaksi ditemukan.</td>
+                                </tr>
+                            ) : data.map((item, index) => (
+                                <tr key={item.id} className="hover:bg-red-50/30 transition">
+                                    <td className="p-3">{new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
+                                    <td className="p-3 font-bold text-[10px] md:text-xs">
+                                        <span className={item.tipe === 'PEMASUKAN' ? 'text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100' : 'text-rose-600 bg-rose-50 px-2 py-1 rounded-md border border-rose-100'}>{item.tipe}</span>
+                                    </td>
+                                    <td className="p-3">{item.kategori}</td>
+                                    <td className="p-3">{item.keterangan || '-'}</td>
+                                    <td className="p-3 font-bold text-slate-700">Rp{item.nominal.toLocaleString('id-ID')}</td>
+                                    <td className="p-3 text-center">
+                                        <button className="text-slate-400 hover:text-red-600 transition"><span className="material-icons text-sm">delete</span></button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

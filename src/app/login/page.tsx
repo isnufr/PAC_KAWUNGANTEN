@@ -7,15 +7,31 @@ export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy login logic for now
-    if (username === 'admin' && password === 'admin') {
-      router.push('/');
-    } else {
-      setError('Username atau password salah!');
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        router.push('/');
+      } else {
+        setError(data.error || 'Login gagal!');
+      }
+    } catch (err) {
+      setError('Terjadi kesalahan koneksi');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,9 +83,9 @@ export default function LoginPage() {
                             placeholder="Masukkan kata sandi" />
                     </div>
                 </div>
-                <button type="submit"
-                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-3.5 md:p-4 rounded-xl font-bold shadow-xl shadow-red-200 transition-all flex justify-center items-center mt-4 text-sm active:scale-95">
-                    Masuk ke Sistem
+                <button type="submit" disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white p-3.5 md:p-4 rounded-xl font-bold shadow-xl shadow-red-200 transition-all flex justify-center items-center mt-4 text-sm active:scale-95 disabled:opacity-70">
+                    {isLoading ? 'Memproses...' : 'Masuk ke Sistem'}
                 </button>
             </form>
         </div>

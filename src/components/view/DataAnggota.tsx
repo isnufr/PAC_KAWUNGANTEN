@@ -1,7 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function DataAnggotaView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [bagian, setBagian] = useState('');
+  const [jabatan, setJabatan] = useState('');
+  const [kecamatan, setKecamatan] = useState('');
+  const [desa, setDesa] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, [bagian, jabatan, kecamatan, desa]);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (bagian) params.append('bagian', bagian);
+      if (jabatan) params.append('jabatan', jabatan);
+      if (kecamatan) params.append('kecamatan', kecamatan);
+      if (desa) params.append('desa', desa);
+
+      const res = await fetch(`/api/anggota?${params.toString()}`);
+      const json = await res.json();
+      if (json.success) {
+        setData(json.data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    fetchData();
+  };
+
+  const handleReset = () => {
+    setSearch('');
+    setBagian('');
+    setJabatan('');
+    setKecamatan('');
+    setDesa('');
+    setTimeout(fetchData, 100);
+  };
 
   return (
     <div id="menu-dataAnggota" className="space-y-4 max-w-6xl mx-auto">
@@ -12,34 +58,45 @@ export default function DataAnggotaView() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
                 <input type="text" placeholder="Tulis Nama/NIK..." 
+                    value={search} onChange={e => setSearch(e.target.value)}
                     className="p-2.5 border border-red-200 rounded-xl outline-none w-full focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900 theme-el" />
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={bagian} onChange={e => setBagian(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Bagian -</option>
                     <option value="PAC">PAC</option>
                     <option value="RANTING">RANTING</option>
                     <option value="ANAK RANTING">ANAK RANTING</option>
                     <option value="SATGAS">SATGAS</option>
                 </select>
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Jabatan -</option>
                     <option value="KETUA">KETUA</option>
                     <option value="SEKRETARIS">SEKRETARIS</option>
                     <option value="BENDAHARA">BENDAHARA</option>
                     <option value="ANGGOTA">ANGGOTA</option>
                 </select>
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={kecamatan} onChange={e => setKecamatan(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Kecamatan -</option>
+                    <option value="KAWUNGANTEN">KAWUNGANTEN</option>
                 </select>
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
+                <select value={desa} onChange={e => setDesa(e.target.value)} className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
                     <option value="">- Desa -</option>
-                </select>
-                <select className="p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs theme-el">
-                    <option value="">- Dusun -</option>
+                    <option value="BABAKAN">BABAKAN</option>
+                    <option value="BOJONG">BOJONG</option>
+                    <option value="BRINGKENG">BRINGKENG</option>
+                    <option value="GOMBONG">GOMBONG</option>
+                    <option value="KALIKUDI">KALIKUDI</option>
+                    <option value="KAWUNGANTEN">KAWUNGANTEN</option>
+                    <option value="KAWUNGANTEN LOR">KAWUNGANTEN LOR</option>
+                    <option value="KUBANGKANGKUNG">KUBANGKANGKUNG</option>
+                    <option value="MENTASAN">MENTASAN</option>
+                    <option value="SARWADADI">SARWADADI</option>
+                    <option value="SIDAURIP">SIDAURIP</option>
+                    <option value="UJUNGMANIK">UJUNGMANIK</option>
                 </select>
             </div>
             <div className="flex justify-end space-x-2.5 pt-1">
-                <button className="px-4 py-2 border border-red-200 rounded-xl text-red-600 text-xs font-bold hover:bg-red-50 transition theme-el">Reset</button>
-                <button className="px-5 py-2 bg-red-700 text-white text-xs font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center space-x-1 theme-el">
+                <button onClick={handleReset} className="px-4 py-2 border border-red-200 rounded-xl text-red-600 text-xs font-bold hover:bg-red-50 transition theme-el">Reset</button>
+                <button onClick={handleSearch} className="px-5 py-2 bg-red-700 text-white text-xs font-bold rounded-xl hover:bg-red-800 shadow-md transition flex items-center space-x-1 theme-el">
                     <span className="material-icons text-sm">search</span><span>Cari Data</span>
                 </button>
             </div>
@@ -55,9 +112,50 @@ export default function DataAnggotaView() {
 
         {/* LIST DATA */}
         <div className="space-y-4">
-            <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100">
-                <p className="text-center text-slate-500 py-8">Memuat Data Anggota...</p>
-                {/* Tabel Anggota akan ditaruh di sini nantinya */}
+            <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-red-100 overflow-x-auto">
+                {isLoading ? (
+                    <p className="text-center text-slate-500 py-8">Memuat Data Anggota...</p>
+                ) : data.length === 0 ? (
+                    <p className="text-center text-slate-500 py-8">Tidak ada data anggota yang ditemukan.</p>
+                ) : (
+                    <table className="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr className="border-b-2 border-red-100 text-red-800 text-[10px] md:text-xs uppercase tracking-wider">
+                                <th className="p-3 font-bold text-center">No</th>
+                                <th className="p-3 font-bold">Foto</th>
+                                <th className="p-3 font-bold">NIK / Nama</th>
+                                <th className="p-3 font-bold">Bagian</th>
+                                <th className="p-3 font-bold">Jabatan</th>
+                                <th className="p-3 font-bold text-center">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-xs md:text-sm text-slate-700">
+                            {data.map((item, index) => (
+                                <tr key={item.id} className="border-b border-slate-100 hover:bg-red-50/50 transition duration-150">
+                                    <td className="p-3 font-medium text-center">{index + 1}</td>
+                                    <td className="p-3">
+                                        <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
+                                            {item.passFotoUrl ? (
+                                                <img src={item.passFotoUrl} alt={item.nama} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-sm">person</span></div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="p-3">
+                                        <div className="font-bold text-slate-800">{item.nama}</div>
+                                        <div className="text-[10px] text-slate-500 tracking-wider">{item.nik}</div>
+                                    </td>
+                                    <td className="p-3 font-semibold text-red-600">{item.bagian || '-'}</td>
+                                    <td className="p-3 text-slate-600">{item.jabatan || '-'}</td>
+                                    <td className="p-3 text-center">
+                                        <button className="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg transition"><span className="material-icons text-[18px]">visibility</span></button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
 
