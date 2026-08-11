@@ -20,7 +20,7 @@ interface WilayahItem {
   dusun: string;
 }
 
-export default function DataAnggotaView() {
+export default function DataAnggotaView({ filter }: { filter?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -164,6 +164,7 @@ export default function DataAnggotaView() {
       if (kecamatan) params.append('kecamatan', kecamatan);
       if (desa) params.append('desa', desa);
       if (dusun) params.append('dusun', dusun);
+      if (filter) params.append('filter', filter);
 
       const res = await fetch(`/api/anggota?${params.toString()}`);
       const json = await res.json();
@@ -313,7 +314,7 @@ export default function DataAnggotaView() {
         <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm space-y-4 theme-el">
             <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 border-b border-red-50 pb-3">
                 <span className="material-icons text-red-600 bg-red-100 p-1 rounded-lg">filter_alt</span>
-                Filter Data Anggota
+                Filter Data Anggota {filter === 'verifikasi' && <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px] ml-2">MODE VERIFIKASI (TIDAK LENGKAP/GANDA)</span>}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
                 <input type="text" placeholder="Cari nama / NIK..."
@@ -572,10 +573,20 @@ export default function DataAnggotaView() {
                                 <span className="text-xs text-slate-400 font-medium">{fileKtp ? fileKtp.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
 
-                            {fileKtp && (
-                                <div className="mt-1 flex flex-col items-center bg-red-50/50 p-3 rounded-xl border border-red-100">
-                                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">PREVIEW KTP:</span>
-                                    <img src={URL.createObjectURL(fileKtp)} alt="Preview KTP" className="max-h-64 object-contain rounded-lg shadow-sm" />
+                            {(fileKtp || formData.fotoKtpUrl) && (
+                                <div className="mt-1 flex gap-4 bg-red-50/50 p-3 rounded-xl border border-red-100 overflow-x-auto">
+                                    {formData.fotoKtpUrl && (
+                                        <div className="flex flex-col items-center flex-shrink-0">
+                                            <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">FOTO KTP SAAT INI:</span>
+                                            <img src={getDirectImageUrl(formData.fotoKtpUrl) || ''} alt="KTP Saat Ini" className="max-h-48 object-contain rounded-lg shadow-sm" />
+                                        </div>
+                                    )}
+                                    {fileKtp && (
+                                        <div className="flex flex-col items-center flex-shrink-0">
+                                            <span className="text-[10px] font-bold text-green-700 uppercase tracking-widest mb-2">FOTO KTP BARU:</span>
+                                            <img src={URL.createObjectURL(fileKtp)} alt="Preview KTP Baru" className="max-h-48 object-contain rounded-lg shadow-sm border-2 border-green-400" />
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -666,10 +677,20 @@ export default function DataAnggotaView() {
                                 <span className="text-xs text-slate-400 font-medium">{filePassFoto ? filePassFoto.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
 
-                            {filePassFoto && (
-                                <div className="mt-1 flex flex-col items-center bg-red-50/50 p-3 rounded-xl border border-red-100">
-                                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">PREVIEW PASS FOTO:</span>
-                                    <img src={URL.createObjectURL(filePassFoto)} alt="Preview Pass Foto" className="max-h-48 object-contain rounded-lg shadow-sm" />
+                            {(filePassFoto || formData.passFotoUrl) && (
+                                <div className="mt-1 flex gap-4 bg-red-50/50 p-3 rounded-xl border border-red-100 overflow-x-auto">
+                                    {formData.passFotoUrl && (
+                                        <div className="flex flex-col items-center flex-shrink-0">
+                                            <span className="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-2">PASS FOTO SAAT INI:</span>
+                                            <img src={getDirectImageUrl(formData.passFotoUrl) || ''} alt="Pass Foto Saat Ini" className="max-h-48 object-contain rounded-lg shadow-sm" />
+                                        </div>
+                                    )}
+                                    {filePassFoto && (
+                                        <div className="flex flex-col items-center flex-shrink-0">
+                                            <span className="text-[10px] font-bold text-green-700 uppercase tracking-widest mb-2">PASS FOTO BARU:</span>
+                                            <img src={URL.createObjectURL(filePassFoto)} alt="Preview Pass Foto Baru" className="max-h-48 object-contain rounded-lg shadow-sm border-2 border-green-400" />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

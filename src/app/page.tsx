@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopHeader from '@/components/TopHeader';
 import DashboardView from '@/components/view/Dashboard';
@@ -21,9 +21,11 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState('beranda');
+  const searchParams = useSearchParams();
+  const initialMenu = searchParams?.get('menu') || 'beranda';
+  const [activeMenu, setActiveMenu] = useState(initialMenu);
   const [userRole, setUserRole] = useState('Viewer');
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
@@ -82,7 +84,7 @@ export default function Dashboard() {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
            <div className="max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
-             {activeMenu === 'data_anggota' && <DataAnggotaView />}
+             {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
              {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
              {activeMenu === 'kas_organisasi' && <KasOrganisasiView />}
              {activeMenu === 'laporan' && <LaporanView />}
@@ -92,5 +94,13 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-red-700 font-bold">Memuat Aplikasi...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

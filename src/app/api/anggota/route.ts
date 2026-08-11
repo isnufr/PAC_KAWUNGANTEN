@@ -20,6 +20,8 @@ export async function GET(req: NextRequest) {
 
     const whereClause: any = {};
 
+    const filter = searchParams.get('filter');
+
     if (search) {
       whereClause.OR = [
         { nama: { contains: search } },
@@ -31,6 +33,23 @@ export async function GET(req: NextRequest) {
     if (kecamatan) whereClause.kecamatan = kecamatan;
     if (desa) whereClause.desa = desa;
     if (dusun) whereClause.dusun = dusun;
+
+    if (filter === 'verifikasi') {
+        const groupByNik = await prisma.anggota.groupBy({
+          by: ['nik'],
+          having: { nik: { _count: { gt: 1 } } }
+        });
+        const nikGandaList = groupByNik.filter(g => g.nik && g.nik.trim() !== '').map(g => g.nik);
+
+        whereClause.OR = [
+          { passFotoUrl: null },
+          { fotoKtpUrl: null },
+          { passFotoUrl: '' },
+          { fotoKtpUrl: '' },
+          { nik: '' },
+          { nik: { in: nikGandaList as string[] } }
+        ];
+    }
 
     const [data, total] = await Promise.all([
       prisma.anggota.findMany({
