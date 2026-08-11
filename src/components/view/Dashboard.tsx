@@ -226,11 +226,11 @@ export default function DashboardView() {
                           <span className="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-md border border-slate-100">Target: {targetRantingPerDesa}</span>
                       </div>
                       <div className="flex justify-between items-end mb-2">
-                          <span className="text-[10px] font-black text-slate-700">{currentRantingPercent}% TERPENUHI</span>
-                          <span className="text-[10px] font-bold text-teal-600">{currentRantingCount} / {targetRantingPerDesa}</span>
+                          <span className={`text-[10px] font-black ${currentRantingPercent >= 100 ? 'text-teal-600' : 'text-slate-700'}`}>{currentRantingPercent}% TERPENUHI</span>
+                          <span className={`text-[10px] font-bold ${currentRantingCount >= targetRantingPerDesa ? 'text-teal-600' : 'text-red-600'}`}>{currentRantingCount} / {targetRantingPerDesa}</span>
                       </div>
                       <div className="w-full bg-white rounded-full h-1.5 overflow-hidden border border-slate-100">
-                          <div className="bg-red-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${currentRantingPercent}%` }}></div>
+                          <div className={`h-1.5 rounded-full transition-all duration-1000 ${currentRantingPercent >= 100 ? 'bg-teal-500' : 'bg-red-500'}`} style={{ width: `${currentRantingPercent}%` }}></div>
                       </div>
                   </div>
 
@@ -245,10 +245,10 @@ export default function DashboardView() {
                                   <div key={dusunName} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
                                       <div className="flex justify-between items-center mb-2">
                                           <span className="text-[10px] font-black text-slate-700 uppercase">{dusunName}</span>
-                                          <span className="text-[10px] font-bold text-teal-600">{arCount} / {targetAnakRantingPerDusun}</span>
+                                          <span className={`text-[10px] font-bold ${arCount >= targetAnakRantingPerDusun ? 'text-teal-600' : 'text-red-600'}`}>{arCount} / {targetAnakRantingPerDusun}</span>
                                       </div>
                                       <div className="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
-                                          <div className="bg-teal-500 h-1 rounded-full transition-all duration-1000" style={{ width: `${arPercent}%` }}></div>
+                                          <div className={`h-1 rounded-full transition-all duration-1000 ${arCount >= targetAnakRantingPerDusun ? 'bg-teal-500' : 'bg-red-500'}`} style={{ width: `${arPercent}%` }}></div>
                                       </div>
                                   </div>
                               );
