@@ -53,25 +53,25 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
         <h2 className="text-sm sm:text-lg font-semibold text-slate-700 truncate">{formatTitle(activeMenu)}</h2>
       </div>
       
-      <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
         {/* Refresh — mobile only */}
-        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-1.5 sm:p-2 rounded-xl hover:bg-red-50 transition-colors active:scale-95" title="Muat Ulang Halaman">
-          <span className="material-icons text-[16px] sm:text-[18px]">refresh</span>
+        <button onClick={() => window.location.reload()} className="md:hidden w-[28px] h-[28px] flex items-center justify-center text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors active:scale-95" title="Muat Ulang Halaman">
+          <span className="material-icons text-[18px]">refresh</span>
         </button>
 
         {/* Global Add Button (Premium Design) - Muncul di semua halaman */}
         <button 
           onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
-          className="p-1.5 sm:p-2 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-md flex items-center justify-center transition-all active:scale-95 border border-red-500/50"
+          className="w-[28px] h-[28px] sm:w-9 sm:h-9 flex items-center justify-center bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 border border-red-500/50"
           title="Tambah Data Baru"
         >
-          <span className="material-icons text-[16px] sm:text-[18px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
+          <span className="material-icons text-[18px] sm:text-[20px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
         </button>
 
         {/* Date display */}
-        <div className="flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-2.5 sm:py-2 bg-red-50/80 border border-red-100 rounded-lg sm:rounded-xl">
-          <span className="material-icons text-red-500 text-[12px] sm:text-[14px]">calendar_today</span>
-          <span className="text-[9px] sm:text-xs font-bold text-red-700 tracking-wide whitespace-nowrap">{currentDate}</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 h-[28px] sm:h-9 sm:px-3 bg-red-50/80 border border-red-100 rounded-lg sm:rounded-xl">
+          <span className="material-icons text-red-500 text-[14px]">calendar_today</span>
+          <span className="text-[10px] sm:text-xs font-bold text-red-700 tracking-wide whitespace-nowrap">{currentDate}</span>
         </div>
       </div>
     </header>
