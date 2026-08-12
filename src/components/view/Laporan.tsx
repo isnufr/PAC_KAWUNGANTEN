@@ -287,27 +287,102 @@ export default function LaporanView() {
         }
       } else if (format === 'PDF') {
         const doc = new jsPDF('landscape');
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
 
-        const pageWidth = doc.internal.pageSize.getWidth();
-        doc.text("PDI PERJUANGAN", pageWidth / 2, 12, { align: "center" });
-        doc.text("PAC KAWUNGANTEN", pageWidth / 2, 18, { align: "center" });
-        doc.text("PERIODE 2026 - 2031", pageWidth / 2, 24, { align: "center" });
+        if (bagian === 'ANAK RANTING' && desa) {
+            const dusunToExport = selectedDusuns.length > 0 ? selectedDusuns : [...Array.from(new Set(rawData.map((d: any) => d.dusun).filter(Boolean)))].sort() as string[];
+            let isFirst = true;
+            let currentY = 36;
 
-        doc.setFontSize(10);
-        doc.text(filterLeftText, 14, 32);
-        doc.text(summaryRightText, pageWidth - 14, 32, { align: "right" });
+            dusunToExport.forEach((dsn) => {
+                const dusunDataRaw = rawData.filter((d: any) => d.dusun === dsn);
+                if (dusunDataRaw.length === 0) return;
+                
+                const total = dusunDataRaw.length;
+                const l = dusunDataRaw.filter((d: any) => String(d.jenisKelamin).toUpperCase() === 'LAKI-LAKI').length;
+                const p = dusunDataRaw.filter((d: any) => String(d.jenisKelamin).toUpperCase() === 'PEREMPUAN').length;
 
-        autoTable(doc, {
-            startY: 36,
-            head: [headers],
-            body: commonDataRows,
-            headStyles: { fillColor: [220, 38, 38] },
-            styles: { fontSize: 8, cellPadding: 2 }
-        });
+                const dusunRows = dusunDataRaw.map((d: any, idx: number) => {
+                    let row: any[] = [idx + 1];
+                    if (cols.nik) row.push(d.nik ? "'" + d.nik : '-');
+                    if (cols.nama) row.push(d.nama || '-');
+                    if (cols.jenisKelamin) {
+                        let jk = '-';
+                        if (String(d.jenisKelamin).toUpperCase() === 'LAKI-LAKI') jk = 'L';
+                        else if (String(d.jenisKelamin).toUpperCase() === 'PEREMPUAN') jk = 'P';
+                        row.push(jk);
+                    }
+                    if (cols.tanggalLahir) row.push(d.tanggalLahir || '-');
+                    if (cols.usia) row.push(d.umur || '-');
+                    if (cols.nomorHp) row.push(d.nomorHp || '-');
+                    if (cols.desa) row.push(d.desa || '-');
+                    if (cols.dusun) row.push(d.dusun || '-');
+                    if (cols.bagian) row.push(d.bagian || '-');
+                    if (cols.jabatan) row.push(d.jabatan || '-');
+                    return row;
+                });
 
-        doc.save(`${fileName}.pdf`);
+                if (currentY > doc.internal.pageSize.getHeight() - 40 && !isFirst) {
+                    doc.addPage();
+                    currentY = 36;
+                }
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.text(`DUSUN: ${dsn.toUpperCase()}`, 14, currentY);
+                doc.text(`Total: ${total} Anggota | Laki-laki: ${l} | Perempuan: ${p}`, doc.internal.pageSize.getWidth() - 14, currentY, { align: "right" });
+                
+                currentY += 4; // Jarak teks ke tabel
+
+                autoTable(doc, {
+                    startY: currentY,
+                    head: [headers],
+                    body: dusunRows,
+                    headStyles: { fillColor: [220, 38, 38] },
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    margin: { top: 36 },
+                    didDrawPage: (data) => {
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(12);
+                        const pw = doc.internal.pageSize.getWidth();
+                        doc.text("PDI PERJUANGAN", pw / 2, 12, { align: "center" });
+                        doc.text("PAC KAWUNGANTEN", pw / 2, 18, { align: "center" });
+                        doc.text("PERIODE 2026 - 2031", pw / 2, 24, { align: "center" });
+                    }
+                });
+
+                currentY = (doc as any).lastAutoTable.finalY + 10;
+                isFirst = false;
+            });
+
+            if (isFirst) {
+                doc.setFont("helvetica", "bold");
+                doc.text("Data Kosong", 14, 20);
+            }
+
+            doc.save(`${fileName}.pdf`);
+        } else {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            autoTable(doc, {
+                startY: 36,
+                head: [headers],
+                body: commonDataRows,
+                headStyles: { fillColor: [220, 38, 38] },
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { top: 36 },
+                didDrawPage: (data) => {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    doc.text("PDI PERJUANGAN", pageWidth / 2, 12, { align: "center" });
+                    doc.text("PAC KAWUNGANTEN", pageWidth / 2, 18, { align: "center" });
+                    doc.text("PERIODE 2026 - 2031", pageWidth / 2, 24, { align: "center" });
+                    doc.setFontSize(10);
+                    doc.text(filterLeftText, 14, 32);
+                    doc.text(summaryRightText, pageWidth - 14, 32, { align: "right" });
+                }
+            });
+
+            doc.save(`${fileName}.pdf`);
+        }
       }
     } catch (e) {
       console.error(e);

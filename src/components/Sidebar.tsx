@@ -109,14 +109,14 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
         
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
           {/* DASHBOARD */}
-          <button onClick={() => handleMenuClick('beranda')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'beranda' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <span className="material-icons mr-3 text-lg">dashboard</span> Dashboard
+          <button onClick={() => handleMenuClick('beranda')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'beranda' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <span className="material-icons text-[18px] shrink-0">dashboard</span> <span className="flex-1 text-left">Dashboard</span>
           </button>
           
           {/* VERIFIKASI DATA */}
-          <button onClick={() => handleMenuClick('verifikasi_data')} className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'verifikasi_data' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <div className="flex items-center">
-               <span className="material-icons mr-3 text-lg">fact_check</span> Verifikasi Data
+          <button onClick={() => handleMenuClick('verifikasi_data')} className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'verifikasi_data' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <div className="flex items-center gap-3 flex-1">
+               <span className="material-icons text-[18px] shrink-0">fact_check</span> <span className="flex-1 text-left">Verifikasi Data</span>
             </div>
             {verificationCount > 0 && (
               <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{verificationCount}</span>
@@ -124,18 +124,18 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
           </button>
           
           {/* DATA ANGGOTA */}
-          <button onClick={() => handleMenuClick('data_anggota')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'data_anggota' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <span className="material-icons mr-3 text-lg">group</span> Data Anggota
+          <button onClick={() => handleMenuClick('data_anggota')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'data_anggota' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <span className="material-icons text-[18px] shrink-0">group</span> <span className="flex-1 text-left">Data Anggota</span>
           </button>
 
           {/* STRUKTUR ORGANISASI */}
-          <button onClick={() => handleMenuClick('struktur_organisasi')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'struktur_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <span className="material-icons mr-3 text-lg">account_tree</span> Struktur Organisasi
+          <button onClick={() => handleMenuClick('struktur_organisasi')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'struktur_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <span className="material-icons text-[18px] shrink-0">account_tree</span> <span className="flex-1 text-left">Struktur Organisasi</span>
           </button>
 
           {/* EXPORT LAPORAN */}
-          <button onClick={() => handleMenuClick('laporan')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'laporan' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <span className="material-icons mr-3 text-lg">assignment_turned_in</span> Export Laporan
+          <button onClick={() => handleMenuClick('laporan')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'laporan' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+            <span className="material-icons text-[18px] shrink-0">assignment_turned_in</span> <span className="flex-1 text-left">Export Laporan</span>
           </button>
 
           {/* ADMIN SECTION */}
@@ -144,8 +144,8 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
               <div className="pt-4 pb-2 px-4">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Keuangan</p>
               </div>
-              <button onClick={() => handleMenuClick('kas_organisasi')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'kas_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-                <span className="material-icons mr-3 text-lg">account_balance_wallet</span> Kas Organisasi
+              <button onClick={() => handleMenuClick('kas_organisasi')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'kas_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+                <span className="material-icons text-[18px] shrink-0">account_balance_wallet</span> <span className="flex-1 text-left">Kas Organisasi</span>
               </button>
             </>
           )}
@@ -156,11 +156,11 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
               <div className="pt-4 pb-2 px-4">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sistem</p>
               </div>
-              <button onClick={() => handleMenuClick('log_aktivitas')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'log_aktivitas' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-                <span className="material-icons mr-3 text-lg">history</span> Log Aktivitas
+              <button onClick={() => handleMenuClick('log_aktivitas')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'log_aktivitas' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+                <span className="material-icons text-[18px] shrink-0">history</span> <span className="flex-1 text-left">Log Aktivitas</span>
               </button>
-              <button onClick={() => handleMenuClick('manajemen_akun')} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'manajemen_akun' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-                <span className="material-icons mr-3 text-lg">manage_accounts</span> Manajemen Akun
+              <button onClick={() => handleMenuClick('manajemen_akun')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'manajemen_akun' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+                <span className="material-icons text-[18px] shrink-0">manage_accounts</span> <span className="flex-1 text-left">Manajemen Akun</span>
               </button>
             </>
           )}
