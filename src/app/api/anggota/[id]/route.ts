@@ -48,10 +48,36 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
           return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
       }
       
+      const currentAnggota = await prisma.anggota.findUnique({
+        where: { id },
+        select: { fotoKtpUrl: true, passFotoUrl: true }
+      });
+
       await prisma.anggota.delete({
         where: { id }
       });
   
+      // Hapus file fisik setelah data dihapus
+      const deleteOldFile = async (oldUrl: string | null) => {
+        if (!oldUrl) return;
+        try {
+          const { unlink } = await import('fs/promises');
+          const { join } = await import('path');
+          const oldFileName = oldUrl.split('/').pop();
+          if (oldFileName) {
+            const oldFilePath = join(process.cwd(), 'public', 'uploads', oldFileName);
+            await unlink(oldFilePath);
+          }
+        } catch (err) {
+          console.error('Gagal menghapus file saat hapus anggota:', err);
+        }
+      };
+
+      if (currentAnggota) {
+        await deleteOldFile(currentAnggota.fotoKtpUrl);
+        await deleteOldFile(currentAnggota.passFotoUrl);
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Data anggota berhasil dihapus'

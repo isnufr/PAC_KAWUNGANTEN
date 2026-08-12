@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 
 const prisma = new PrismaClient();
@@ -50,13 +50,34 @@ export async function POST(request: Request) {
 
     const fileUrl = `/api/uploads/${fileName}`;
 
+    // Dapatkan data anggota saat ini untuk menghapus file lama jika ada
+    const currentAnggota = await prisma.anggota.findUnique({
+      where: { id },
+      select: { fotoKtpUrl: true, passFotoUrl: true }
+    });
+
+    const deleteOldFile = async (oldUrl: string | null) => {
+      if (!oldUrl) return;
+      try {
+        const oldFileName = oldUrl.split('/').pop();
+        if (oldFileName) {
+          const oldFilePath = join(process.cwd(), 'public', 'uploads', oldFileName);
+          await unlink(oldFilePath);
+        }
+      } catch (err) {
+        console.error('Gagal menghapus file lama:', err);
+      }
+    };
+
     // Update Prisma
     if (type.toUpperCase() === 'KTP') {
+      await deleteOldFile(currentAnggota?.fotoKtpUrl || null);
       await prisma.anggota.update({
         where: { id },
         data: { fotoKtpUrl: fileUrl }
       });
     } else if (type.toUpperCase() === 'PASSFOTO') {
+      await deleteOldFile(currentAnggota?.passFotoUrl || null);
       await prisma.anggota.update({
         where: { id },
         data: { passFotoUrl: fileUrl }

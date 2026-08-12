@@ -561,7 +561,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-1.5 mb-0.5">
                                                     <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight truncate">{item.nama}</h4>
-                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[12px] sm:text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
+                                                    {isLengkap && <span className="material-icons text-emerald-500 !text-[12px] md:!text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
                                                 </div>
                                                 <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1">
                                                     <span className="text-red-500 whitespace-nowrap">{item.bagian || '-'}</span>
