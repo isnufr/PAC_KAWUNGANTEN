@@ -702,16 +702,16 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         </div>
                         
                         {/* CTA Buttons Row (Edit, Hapus, Cetak KTA) */}
-                        <div className="flex gap-2 mt-4">
-                            <button onClick={handleEdit} className="w-12 h-12 shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-lg shadow-yellow-500/30 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
-                                <span className="material-icons text-[20px]">edit</span>
+                        <div className="flex gap-2.5 mt-4 px-1">
+                            <button onClick={handleEdit} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-full shadow-md shadow-yellow-500/20 border border-yellow-300/50 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
+                                <span className="material-icons text-[18px] sm:text-[20px]">edit</span>
                             </button>
-                            <button onClick={handleDelete} className="w-12 h-12 shrink-0 bg-slate-800 hover:bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-800/30 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
-                                <span className="material-icons text-[20px]">delete</span>
+                            <button onClick={handleDelete} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-full shadow-md shadow-slate-800/20 border border-slate-600/50 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
+                                <span className="material-icons text-[18px] sm:text-[20px]">delete</span>
                             </button>
                             <button onClick={() => setIsPrinting(true)} 
-                                    className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-lg shadow-red-200 flex justify-center items-center gap-1.5 transition transform active:scale-95">
-                                <span className="material-icons text-[18px] shrink-0">badge</span> 
+                                    className="flex-1 h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                <span className="material-icons text-[16px] sm:text-[18px] shrink-0">badge</span> 
                                 <span className="truncate">KARTU DIGITAL</span>
                             </button>
                         </div>
