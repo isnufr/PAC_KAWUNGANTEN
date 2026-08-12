@@ -45,24 +45,35 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
       <div className="flex items-center min-w-0">
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-          className="md:hidden text-slate-500 hover:text-red-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100 mr-2 flex-shrink-0 active:scale-95 transition-all"
+          className="md:hidden text-slate-500 hover:text-red-600 focus:outline-none p-1.5 rounded-lg hover:bg-slate-100 mr-2 flex-shrink-0 active:scale-95 transition-all"
           aria-label="Toggle menu"
         >
-          <span className="material-icons text-[22px]">menu</span>
+          <span className="material-icons text-[20px]">menu</span>
         </button>
         <h2 className="text-base sm:text-lg font-semibold text-slate-700 truncate">{formatTitle(activeMenu)}</h2>
       </div>
       
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
         {/* Refresh — mobile only */}
-        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors active:scale-95" title="Muat Ulang Halaman">
-          <span className="material-icons text-[20px]">refresh</span>
+        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-1.5 rounded-xl hover:bg-red-50 transition-colors active:scale-95" title="Muat Ulang Halaman">
+          <span className="material-icons text-[18px]">refresh</span>
         </button>
 
+        {/* Global Add Button (Premium Design) */}
+        {['data_anggota', 'kas_organisasi', 'manajemen_akun'].includes(activeMenu) && (
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
+            className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-md shadow-red-200 flex items-center justify-center transition-all active:scale-95 border border-red-500/50"
+            title="Tambah Data Baru"
+          >
+            <span className="material-icons text-[16px] sm:text-[22px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
+          </button>
+        )}
+
         {/* Date display */}
-        <div className="flex items-center gap-1.5 bg-red-50/80 border border-red-100 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
-          <span className="material-icons text-red-500 text-[14px] sm:text-[16px]">calendar_today</span>
-          <span className="text-[10px] sm:text-xs font-bold text-red-700 tracking-wide whitespace-nowrap">{currentDate}</span>
+        <div className="flex items-center gap-1 sm:gap-1.5 bg-red-50/80 border border-red-100 rounded-lg sm:rounded-xl px-2 py-1 sm:px-4 sm:py-2 h-7 sm:h-10">
+          <span className="material-icons text-red-500 text-[12px] sm:text-[16px]">calendar_today</span>
+          <span className="text-[9px] sm:text-xs font-bold text-red-700 tracking-wide whitespace-nowrap">{currentDate}</span>
         </div>
       </div>
     </header>

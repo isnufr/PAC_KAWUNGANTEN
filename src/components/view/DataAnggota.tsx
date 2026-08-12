@@ -74,6 +74,18 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const handleGlobalAdd = () => {
+      if (filter !== 'verifikasi') {
+        setIsModalOpen(true); 
+        setFormError(''); 
+        setFormSuccess('');
+      }
+    };
+    window.addEventListener('global-add-action', handleGlobalAdd);
+    return () => window.removeEventListener('global-add-action', handleGlobalAdd);
+  }, [filter]);
+
   // File Upload & OCR State
   const [fileKtp, setFileKtp] = useState<File | null>(null);
   const [filePassFoto, setFilePassFoto] = useState<File | null>(null);
@@ -174,7 +186,6 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
     }
   });
 
-  const handleSearch = () => { fetchData(); };
   const handleReset = () => {
     setSearch(''); setBagian(''); setJabatan(''); setKecamatan(''); setDesa(''); setDusun('');
   };
@@ -342,61 +353,49 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                 FILTER PENCARIAN
             </h3>
             
-            <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
                 <input type="text" placeholder="Tulis Nama/NIK..."
                     value={search} onChange={e => setSearch(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                    className="flex-1 p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
+                    className="flex-1 p-2 md:p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
 
-                <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Bagian -</option>
-                    <option value="PAC">PAC</option>
-                    <option value="RANTING">RANTING</option>
-                    <option value="ANAK RANTING">ANAK RANTING</option>
-                    <option value="SATGAS">SATGAS</option>
-                </select>
+                <div className="grid grid-cols-2 md:flex gap-2 sm:gap-3 w-full md:w-auto">
+                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                        <option value="">- Bagian -</option>
+                        <option value="PAC">PAC</option>
+                        <option value="RANTING">RANTING</option>
+                        <option value="ANAK RANTING">ANAK RANTING</option>
+                        <option value="SATGAS">SATGAS</option>
+                    </select>
 
-                <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Jabatan -</option>
-                    <option value="KETUA">KETUA</option>
-                    <option value="SEKRETARIS">SEKRETARIS</option>
-                    <option value="BENDAHARA">BENDAHARA</option>
-                    <option value="ANGGOTA">ANGGOTA</option>
-                </select>
+                    <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                        <option value="">- Jabatan -</option>
+                        <option value="KETUA">KETUA</option>
+                        <option value="SEKRETARIS">SEKRETARIS</option>
+                        <option value="BENDAHARA">BENDAHARA</option>
+                        <option value="ANGGOTA">ANGGOTA</option>
+                    </select>
 
-                {/* Filter Desa */}
-                <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                    <option value="">- Desa -</option>
-                    {desaList.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+                    {/* Filter Desa */}
+                    <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
+                        <option value="">- Desa -</option>
+                        {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
 
-                {/* Filter Dusun */}
-                <select value={dusun} onChange={e => setDusun(e.target.value)} className="w-full md:w-32 p-2.5 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!desa}>
-                    <option value="">- Dusun -</option>
-                    {dusunList.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+                    {/* Filter Dusun */}
+                    <select value={dusun} onChange={e => setDusun(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!desa}>
+                        <option value="">- Dusun -</option>
+                        {dusunList.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
 
-                <div className="flex gap-2">
-                    <button onClick={handleReset} className="w-11 h-11 border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
-                        <span className="material-icons text-xl">restart_alt</span>
-                    </button>
-                    <button onClick={handleSearch} className="w-11 h-11 bg-red-700 text-white rounded-xl hover:bg-red-800 shadow-md transition flex items-center justify-center" title="Cari Data">
-                        <span className="material-icons text-xl">search</span>
+                    <button onClick={handleReset} className="col-span-2 md:col-span-1 w-full md:w-11 h-11 md:h-auto border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
+                        <span className="material-icons text-xl md:text-xl md:mr-0 mr-1">restart_alt</span>
+                        <span className="md:hidden text-xs font-bold">Reset</span>
                     </button>
                 </div>
             </div>
         </div>
         )}
 
-        {/* ACTION PANEL INPUT DATA */}
-        {filter !== 'verifikasi' && (
-        <div className="mb-6 flex justify-center md:justify-end">
-            <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
-                className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg font-bold flex items-center justify-center gap-2 transform active:scale-95 transition-all duration-300 text-sm">
-                <span className="material-icons">add_circle</span> INPUT DATA BARU
-            </button>
-        </div>
-        )}
 
         {/* LIST DATA */}
         {filter === 'verifikasi' ? (
@@ -489,8 +488,8 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                 const jk = item.jenisKelamin ? item.jenisKelamin.toUpperCase() : '';
                                 const jkShort = jk === 'LAKI-LAKI' ? 'L' : jk === 'PEREMPUAN' ? 'P' : item.jenisKelamin || '-';
                                 return (
-                                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group">
-                                        <div className="flex items-center gap-3">
+                                    <div key={item.id} className="flex items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group gap-2">
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
                                             {/* Foto */}
                                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
                                                 {item.passFotoUrl ? (
@@ -502,25 +501,25 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                             </div>
                                             
                                             {/* Info */}
-                                            <div>
+                                            <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-1.5 mb-0.5">
-                                                    <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight">{item.nama}</h4>
-                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[14px]" title="Data Lengkap">verified</span>}
+                                                    <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight truncate">{item.nama}</h4>
+                                                    {isLengkap && <span className="material-icons text-emerald-500 text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
                                                 </div>
                                                 <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1">
-                                                    <span className="text-red-500">{item.bagian || '-'}</span>
+                                                    <span className="text-red-500 whitespace-nowrap">{item.bagian || '-'}</span>
                                                     <span className="text-red-200">|</span>
-                                                    <span className="text-red-700">{item.jabatan || '-'}</span>
+                                                    <span className="text-red-700 whitespace-nowrap">{item.jabatan || '-'}</span>
                                                     <span className="text-red-200">|</span>
-                                                    <span className="text-red-500">{jkShort}</span>
+                                                    <span className="text-red-500 whitespace-nowrap">{jkShort}</span>
                                                     <span className="text-red-200">|</span>
-                                                    <span className="text-red-500">{item.umur ? `${item.umur} THN` : '-'}</span>
+                                                    <span className="text-red-500 whitespace-nowrap">{item.umur ? `${item.umur} THN` : '-'}</span>
                                                 </div>
                                             </div>
                                         </div>
                                         
                                         {/* Action Buttons */}
-                                        <div className="flex items-center gap-2 mt-4 sm:mt-0 pl-16 sm:pl-0">
+                                        <div className="flex items-center gap-1.5 flex-shrink-0">
                                             {item.nomorHp && (
                                                 <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
