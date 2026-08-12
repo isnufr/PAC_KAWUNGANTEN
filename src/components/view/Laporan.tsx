@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -201,6 +201,12 @@ export default function LaporanView() {
                 { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
                 { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }
             ];
+            ws['!merges'].forEach(m => {
+                const cellRef = XLSX.utils.encode_cell({ c: m.s.c, r: m.s.r });
+                if (ws[cellRef]) {
+                    ws[cellRef].s = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
+                }
+            });
             ws['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 12 }, { wch: 5 }, { wch: 15 }];
             
             const wb = XLSX.utils.book_new();
@@ -252,6 +258,12 @@ export default function LaporanView() {
 
             const ws = XLSX.utils.aoa_to_sheet(excelData);
             ws['!merges'] = merges;
+            merges.forEach(m => {
+                const cellRef = XLSX.utils.encode_cell({ c: m.s.c, r: m.s.r });
+                if (ws[cellRef]) {
+                    ws[cellRef].s = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
+                }
+            });
             ws['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 5 }, { wch: 15 }];
             
             const wb = XLSX.utils.book_new();
@@ -279,6 +291,12 @@ export default function LaporanView() {
                 { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
                 { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } }
             ];
+            ws['!merges'].forEach(m => {
+                const cellRef = XLSX.utils.encode_cell({ c: m.s.c, r: m.s.r });
+                if (ws[cellRef]) {
+                    ws[cellRef].s = { font: { bold: true, sz: 12 }, alignment: { horizontal: 'center', vertical: 'center' } };
+                }
+            });
             ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 5) + 2 }));
             
             const wb = XLSX.utils.book_new();
