@@ -23,7 +23,7 @@ function getDirectImageUrl(url: string | null | undefined): string | null {
 export default function DashboardView() {
   const router = useRouter();
   const [selectedDesa, setSelectedDesa] = useState<string>('');
-  const [userRole, setUserRole] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
 
   React.useEffect(() => {
       if (typeof window !== 'undefined') {
@@ -31,7 +31,7 @@ export default function DashboardView() {
           if (userStr) {
               try {
                   const user = JSON.parse(userStr);
-                  setUserRole(user.role || '');
+                  setUserName(user.username || user.role || '');
               } catch(e) {}
           }
       }
@@ -180,7 +180,7 @@ export default function DashboardView() {
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/4"></div>
           <div className="absolute bottom-0 left-1/2 w-32 h-32 bg-white/5 rounded-full translate-y-1/2"></div>
           <div className="relative z-10">
-              <h2 className="text-lg sm:text-xl font-black tracking-tight uppercase">SELAMAT DATANG {userRole} 👋</h2>
+              <h2 className="text-lg sm:text-xl font-black tracking-tight uppercase">SELAMAT DATANG {userName} 👋</h2>
               <p className="text-white/70 text-xs sm:text-sm font-medium mt-1">Panel Kontrol Database Anggota PAC Kawunganten</p>
           </div>
       </div>
