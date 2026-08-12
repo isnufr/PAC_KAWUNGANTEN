@@ -9,6 +9,18 @@ export default function ManajemenAkunView() {
   useEffect(() => setMounted(true), []);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalAdd = () => {
+      setEditUser(null);
+      setFormData({ username: '', password: '', role: 'Viewer' });
+      setFormError('');
+      setFormSuccess('');
+      setIsModalOpen(true);
+    };
+    window.addEventListener('global-add-action', handleGlobalAdd);
+    return () => window.removeEventListener('global-add-action', handleGlobalAdd);
+  }, []);
   const [editUser, setEditUser] = useState<any>(null);
 
   // Form

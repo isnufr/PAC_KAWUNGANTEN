@@ -9,6 +9,16 @@ export default function KasOrganisasiView() {
   useEffect(() => setMounted(true), []);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalAdd = () => {
+      setIsModalOpen(true);
+      setFormError('');
+      setFormSuccess('');
+    };
+    window.addEventListener('global-add-action', handleGlobalAdd);
+    return () => window.removeEventListener('global-add-action', handleGlobalAdd);
+  }, []);
   const [search, setSearch] = useState('');
   const [tipe, setTipe] = useState('');
   const [kategori, setKategori] = useState('');
