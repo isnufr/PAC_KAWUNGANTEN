@@ -191,7 +191,23 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   };
 
   const handleFormChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Auto calculate age (umur) when tanggalLahir changes
+      if (field === 'tanggalLahir' && value) {
+        const birthDate = new Date(value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        newData.umur = age >= 0 ? age.toString() : '0';
+      }
+      
+      return newData;
+    });
   };
 
   const handleEdit = () => {
@@ -387,9 +403,8 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         {dusunList.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
 
-                    <button onClick={handleReset} className="col-span-2 md:col-span-1 w-full md:w-11 h-11 md:h-auto border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
-                        <span className="material-icons text-xl md:text-xl md:mr-0 mr-1">restart_alt</span>
-                        <span className="md:hidden text-xs font-bold">Reset</span>
+                    <button onClick={handleReset} className="col-span-2 md:col-span-1 w-full md:w-11 h-11 border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
+                        <span className="material-icons text-xl">restart_alt</span>
                     </button>
                 </div>
             </div>
@@ -544,43 +559,45 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
         {mounted && selectedAnggota && createPortal(
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
                 <div className="bg-slate-50 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden relative flex flex-col border border-red-100 max-h-[95vh] my-auto">
-                    {/* Header Background */}
-                    <div className="bg-red-700 h-32 w-full absolute top-0 left-0 rounded-b-[20%]"></div>
                     
-                    {/* Close Button */}
-                    <button onClick={() => setSelectedAnggota(null)} className="absolute top-4 right-4 z-10 text-red-100 hover:text-white transition bg-red-800/50 hover:bg-red-800 p-1.5 rounded-full backdrop-blur-md">
-                        <span className="material-icons text-sm block">close</span>
-                    </button>
+                    {/* Locked/Sticky Header */}
+                    <div className="relative z-20 flex flex-col items-center pt-8 pb-4 px-4 shrink-0 bg-slate-50 border-b border-red-100 shadow-sm">
+                        {/* Header Background */}
+                        <div className="bg-red-700 h-28 w-full absolute top-0 left-0 rounded-b-[30%]"></div>
+                        
+                        {/* Close Button */}
+                        <button onClick={() => setSelectedAnggota(null)} className="absolute top-4 right-4 z-10 text-red-100 hover:text-white transition bg-red-800/50 hover:bg-red-800 p-1.5 rounded-full backdrop-blur-md">
+                            <span className="material-icons text-sm block">close</span>
+                        </button>
 
-                    {/* Content Scrollable */}
-                    <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-5 mt-10 scrollbar-hide">
                         {/* Avatar */}
-                        <div className="flex justify-center mb-4">
-                             <div className="w-28 h-28 rounded-2xl bg-slate-200 overflow-hidden border-[6px] border-white shadow-xl group relative cursor-pointer" onClick={() => selectedAnggota.passFotoUrl && setFullScreenImage(getDirectImageUrl(selectedAnggota.passFotoUrl))}>
-                                 {selectedAnggota.passFotoUrl ? (
-                                     <>
-                                        <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                            <span className="material-icons text-white text-3xl drop-shadow-md">zoom_in</span>
-                                        </div>
-                                     </>
-                                 ) : (
-                                     <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-4xl">person</span></div>
-                                 )}
-                             </div>
+                        <div className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-200 overflow-hidden border-[4px] border-white shadow-xl group cursor-pointer mb-3" onClick={() => selectedAnggota.passFotoUrl && setFullScreenImage(getDirectImageUrl(selectedAnggota.passFotoUrl))}>
+                            {selectedAnggota.passFotoUrl ? (
+                                <>
+                                <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                    <span className="material-icons text-white text-3xl drop-shadow-md">zoom_in</span>
+                                </div>
+                                </>
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span className="material-icons text-3xl">person</span></div>
+                            )}
                         </div>
 
                         {/* Name & Badges */}
-                        <div className="text-center mb-5">
-                            <h3 className="font-black text-lg text-slate-800 tracking-tight mb-2">{selectedAnggota.nama}</h3>
+                        <div className="relative z-10 text-center w-full">
+                            <h3 className="font-black text-base sm:text-lg text-slate-800 tracking-tight mb-2 truncate px-2">{selectedAnggota.nama}</h3>
                             <div className="flex justify-center gap-2">
                                 <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
                                 <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
                             </div>
                         </div>
+                    </div>
 
+                    {/* Content Scrollable */}
+                    <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-5 scrollbar-hide">
                         {/* Details Grid */}
-                        <div className="space-y-2 mb-5">
+                        <div className="space-y-2 mb-2">
                             {/* Card 1: ID & NIK */}
                             <div className="flex gap-2">
                                 <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-1">
@@ -613,23 +630,18 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                     <p className="text-[8px] font-bold text-green-500 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">phone</span> KONTAK WHATSAPP</p>
                                     <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nomorHp || '-'}</p>
                                 </div>
-                                <div className="flex gap-2">
-                                    <a href={`https://wa.me/${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="w-8 h-8 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
-                                        <span className="material-icons text-sm">chat</span>
-                                    </a>
-                                    <a href={`tel:${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} className="w-8 h-8 bg-slate-700 hover:bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
-                                        <span className="material-icons text-sm">contacts</span>
-                                    </a>
-                                </div>
+                                <a href={`https://wa.me/${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
+                                    <span className="material-icons text-[20px]">chat</span>
+                                </a>
                             </div>
 
                             {/* Card 4: Alamat */}
                             <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
                                 <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">location_on</span> ALAMAT DOMISILI</p>
-                                <p className="font-bold text-slate-700 text-xs leading-relaxed">
-                                    {selectedAnggota.dusun ? `Dsn. ${selectedAnggota.dusun}, ` : ''}
-                                    {selectedAnggota.desa ? `Ds. ${selectedAnggota.desa}, ` : ''}
-                                    Kec. KAWUNGANTEN
+                                <p className="font-bold text-slate-700 text-xs leading-relaxed uppercase">
+                                    {selectedAnggota.dusun ? `DUSUN ${selectedAnggota.dusun}, ` : ''}
+                                    {selectedAnggota.desa ? `DESA ${selectedAnggota.desa}, ` : ''}
+                                    KECAMATAN KAWUNGANTEN
                                 </p>
                             </div>
 
@@ -647,19 +659,20 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                             )}
                         </div>
                         
-                        {/* CTA Button */}
-                        <div className="flex gap-2">
-                            <button onClick={handleEdit} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-yellow-500/30 flex justify-center items-center gap-2 transition transform active:scale-95">
-                                <span className="material-icons text-base">edit</span> EDIT
+                        {/* CTA Buttons Row (Edit, Hapus, Cetak KTA) */}
+                        <div className="flex gap-2 mt-4">
+                            <button onClick={handleEdit} className="w-12 h-12 shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-lg shadow-yellow-500/30 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
+                                <span className="material-icons text-[20px]">edit</span>
                             </button>
-                            <button onClick={handleDelete} className="flex-1 bg-slate-800 hover:bg-slate-900 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-slate-800/30 flex justify-center items-center gap-2 transition transform active:scale-95">
-                                <span className="material-icons text-base">delete</span> HAPUS
+                            <button onClick={handleDelete} className="w-12 h-12 shrink-0 bg-slate-800 hover:bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-800/30 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
+                                <span className="material-icons text-[20px]">delete</span>
+                            </button>
+                            <button onClick={() => setIsPrinting(true)} 
+                                    className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-lg shadow-red-200 flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                <span className="material-icons text-[18px] shrink-0">badge</span> 
+                                <span className="truncate">KARTU DIGITAL</span>
                             </button>
                         </div>
-                        <button onClick={() => setIsPrinting(true)} 
-                                className="w-full mt-2 bg-red-600 hover:bg-red-700 text-white p-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 flex justify-center items-center gap-2 transition transform active:scale-95">
-                            <span className="material-icons text-base">badge</span> BUAT KARTU ANGGOTA DIGITAL
-                        </button>
                     </div>
                 </div>
             </div>

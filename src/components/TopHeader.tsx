@@ -59,16 +59,14 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
           <span className="material-icons text-[18px]">refresh</span>
         </button>
 
-        {/* Global Add Button (Premium Design) */}
-        {['data_anggota', 'kas_organisasi', 'manajemen_akun'].includes(activeMenu) && (
-          <button 
-            onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
-            className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-md shadow-red-200 flex items-center justify-center transition-all active:scale-95 border border-red-500/50"
-            title="Tambah Data Baru"
-          >
-            <span className="material-icons text-[16px] sm:text-[22px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
-          </button>
-        )}
+        {/* Global Add Button (Premium Design) - Muncul di semua halaman */}
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
+          className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-md shadow-red-200 flex items-center justify-center transition-all active:scale-95 border border-red-500/50"
+          title="Tambah Data Baru"
+        >
+          <span className="material-icons text-[16px] sm:text-[22px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
+        </button>
 
         {/* Date display */}
         <div className="flex items-center gap-1 sm:gap-1.5 bg-red-50/80 border border-red-100 rounded-lg sm:rounded-xl px-2 py-1 sm:px-4 sm:py-2 h-7 sm:h-10">
