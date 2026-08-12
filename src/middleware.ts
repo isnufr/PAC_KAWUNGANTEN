@@ -52,6 +52,14 @@ export async function middleware(request: NextRequest) {
       }
     }
 
+    // Proteksi Ekstra: Viewer tidak boleh melakukan aksi ubah data (POST, PUT, DELETE)
+    const protectedDataRoutes = ['/api/anggota', '/api/kas', '/api/upload'];
+    if (protectedDataRoutes.some(route => request.nextUrl.pathname.startsWith(route)) && request.method !== 'GET') {
+      if (payload.role === 'Viewer') {
+        return NextResponse.json({ success: false, error: 'Forbidden: Viewer hanya dapat melihat data' }, { status: 403 });
+      }
+    }
+
     return NextResponse.next({
       request: {
         headers: requestHeaders,

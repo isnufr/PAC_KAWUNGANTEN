@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
-export default function ManajemenAkunView() {
+export default function ManajemenAkunView({ userRole }: { userRole?: string }) {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -121,9 +121,11 @@ export default function ManajemenAkunView() {
                     </h2>
                     <p className="text-xs text-red-400 mt-1">Daftar kredensial pengguna yang dapat masuk ke dalam sistem.</p>
                 </div>
-                <button onClick={openAddModal} className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
-                    <span className="material-icons text-sm">add_circle</span> Tambah Akun Baru
-                </button>
+                {userRole === 'Super Admin' && (
+                  <button onClick={openAddModal} className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                      <span className="material-icons text-sm">add_circle</span> Tambah Akun Baru
+                  </button>
+                )}
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-red-100">
@@ -133,7 +135,7 @@ export default function ManajemenAkunView() {
                             <th className="p-3 sm:p-4">No</th>
                             <th className="p-3 sm:p-4">Username</th>
                             <th className="p-3 sm:p-4">Level Role</th>
-                            <th className="p-3 sm:p-4 text-center">Aksi</th>
+                            {userRole === 'Super Admin' && <th className="p-3 sm:p-4 text-center">Aksi</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
@@ -148,12 +150,14 @@ export default function ManajemenAkunView() {
                                 <td className="p-3 sm:p-4">
                                     <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${roleColor(user.role)}`}>{user.role}</span>
                                 </td>
-                                <td className="p-3 sm:p-4 text-center">
-                                    <div className="flex justify-center gap-2">
-                                        <button onClick={() => openEditModal(user)} className="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">edit</span></button>
-                                        <button onClick={() => handleDelete(user.id, user.username)} className="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">delete</span></button>
-                                    </div>
-                                </td>
+                                {userRole === 'Super Admin' && (
+                                  <td className="p-3 sm:p-4 text-center">
+                                      <div className="flex justify-center gap-2">
+                                          <button onClick={() => openEditModal(user)} className="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">edit</span></button>
+                                          <button onClick={() => handleDelete(user.id, user.username)} className="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition"><span className="material-icons text-[16px]">delete</span></button>
+                                      </div>
+                                  </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>

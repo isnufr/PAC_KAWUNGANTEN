@@ -4,9 +4,10 @@ interface TopHeaderProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
   activeMenu: string;
+  userRole?: string;
 }
 
-export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu }: TopHeaderProps) {
+export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu, userRole }: TopHeaderProps) {
   const [currentDate, setCurrentDate] = useState('');
 
   useEffect(() => {
@@ -59,14 +60,16 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
           <span className="material-icons text-[18px]">refresh</span>
         </button>
 
-        {/* Global Add Button (Premium Design) - Muncul di semua halaman */}
-        <button 
-          onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
-          className="w-[28px] h-[28px] sm:w-9 sm:h-9 flex items-center justify-center bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 border border-red-500/50"
-          title="Tambah Data Baru"
-        >
-          <span className="material-icons text-[18px] sm:text-[20px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
-        </button>
+        {/* Global Add Button (Premium Design) - Muncul di semua halaman kecuali Viewer */}
+        {userRole !== 'Viewer' && (
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('global-add-action'))} 
+            className="w-[28px] h-[28px] sm:w-9 sm:h-9 flex items-center justify-center bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 border border-red-500/50"
+            title="Tambah Data Baru"
+          >
+            <span className="material-icons text-[18px] sm:text-[20px] font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>add</span>
+          </button>
+        )}
 
         {/* Date display */}
         <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 h-[28px] sm:h-9 sm:px-3 bg-red-50/80 border border-red-100 rounded-lg sm:rounded-xl">

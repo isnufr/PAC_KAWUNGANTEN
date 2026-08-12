@@ -26,7 +26,7 @@ interface WilayahItem {
   dusun: string;
 }
 
-export default function DataAnggotaView({ filter }: { filter?: string }) {
+export default function DataAnggotaView({ filter, userRole }: { filter?: string, userRole?: string }) {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -483,7 +483,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                     <th className="p-4 sm:p-5 min-w-[150px]">Nama Anggota</th>
                                     <th className="p-4 sm:p-5 min-w-[200px]">Wilayah</th>
                                     <th className="p-4 sm:p-5 text-center">Status</th>
-                                    <th className="p-4 sm:p-5 text-center">Aksi</th>
+                                    {userRole !== 'Viewer' && <th className="p-4 sm:p-5 text-center">Aksi</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-red-50">
@@ -499,21 +499,23 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                                 <span className="material-icons text-[12px]">error_outline</span> BELUM LENGKAP
                                             </span>
                                         </td>
-                                        <td className="p-4 sm:p-5 text-center">
-                                            <button onClick={() => { 
-                                                // Trigger same edit logic as standard view
-                                                setSelectedAnggota(item); 
-                                                setTimeout(() => {
-                                                    setEditId(item.id);
-                                                    setFormData({
-                                                        nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
-                                                    });
-                                                    setFileKtp(null); setFilePassFoto(null); setFormError(''); setFormSuccess(''); setIsModalOpen(true); setSelectedAnggota(null);
-                                                }, 0);
-                                            }} className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition shadow-md shadow-amber-200 flex items-center justify-center gap-1.5 mx-auto active:scale-95 whitespace-nowrap">
-                                                <span className="material-icons text-[14px]">edit_square</span> Perbaiki
-                                            </button>
-                                        </td>
+                                        {userRole !== 'Viewer' && (
+                                          <td className="p-4 sm:p-5 text-center">
+                                              <button onClick={() => { 
+                                                  // Trigger same edit logic as standard view
+                                                  setSelectedAnggota(item); 
+                                                  setTimeout(() => {
+                                                      setEditId(item.id);
+                                                      setFormData({
+                                                          nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
+                                                      });
+                                                      setFileKtp(null); setFilePassFoto(null); setFormError(''); setFormSuccess(''); setIsModalOpen(true); setSelectedAnggota(null);
+                                                  }, 0);
+                                              }} className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition shadow-md shadow-amber-200 flex items-center justify-center gap-1.5 mx-auto active:scale-95 whitespace-nowrap">
+                                                  <span className="material-icons text-[14px]">edit_square</span> Perbaiki
+                                              </button>
+                                          </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
@@ -703,12 +705,16 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                         
                         {/* CTA Buttons Row (Edit, Hapus, Cetak KTA) */}
                         <div className="flex gap-2.5 mt-4 px-1">
-                            <button onClick={handleEdit} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-full shadow-md shadow-yellow-500/20 border border-yellow-300/50 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
-                                <span className="material-icons text-[18px] sm:text-[20px]">edit</span>
-                            </button>
-                            <button onClick={handleDelete} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-full shadow-md shadow-slate-800/20 border border-slate-600/50 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
-                                <span className="material-icons text-[18px] sm:text-[20px]">delete</span>
-                            </button>
+                            {userRole !== 'Viewer' && (
+                              <>
+                                <button onClick={handleEdit} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-full shadow-md shadow-yellow-500/20 border border-yellow-300/50 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
+                                    <span className="material-icons text-[18px] sm:text-[20px]">edit</span>
+                                </button>
+                                <button onClick={handleDelete} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-full shadow-md shadow-slate-800/20 border border-slate-600/50 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
+                                    <span className="material-icons text-[18px] sm:text-[20px]">delete</span>
+                                </button>
+                              </>
+                            )}
                             <button onClick={() => setIsPrinting(true)} 
                                     className="flex-1 h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
                                 <span className="material-icons text-[16px] sm:text-[18px] shrink-0">badge</span> 

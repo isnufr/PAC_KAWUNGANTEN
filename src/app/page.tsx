@@ -99,18 +99,19 @@ function DashboardContent() {
           isSidebarOpen={isSidebarOpen} 
           setIsSidebarOpen={setIsSidebarOpen} 
           activeMenu={activeMenu} 
+          userRole={userRole}
         />
 
         <main ref={mainRef} className="flex-1 overflow-x-hidden overflow-y-auto bg-[#fafafa] p-3 sm:p-6 lg:p-8">
            {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
            <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
-             {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" />}
-             {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} />}
+             {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" userRole={userRole} />}
+             {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} userRole={userRole} />}
              {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
-             {activeMenu === 'kas_organisasi' && <KasOrganisasiView />}
+             {activeMenu === 'kas_organisasi' && <KasOrganisasiView userRole={userRole} />}
              {activeMenu === 'laporan' && <LaporanView />}
-             {activeMenu === 'manajemen_akun' && <ManajemenAkunView />}
+             {activeMenu === 'manajemen_akun' && <ManajemenAkunView userRole={userRole} />}
              {activeMenu === 'log_aktivitas' && <LogAktivitasView />}
            </div>
         </main>

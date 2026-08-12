@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
-export default function KasOrganisasiView() {
+export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -134,10 +134,12 @@ export default function KasOrganisasiView() {
                 <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2">
                     <span className="material-icons text-red-600 bg-red-100 p-1 rounded-lg">filter_alt</span>Filter Transaksi Kas
                 </h3>
-                <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
-                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-200 active:scale-95 transition-all duration-200">
-                    <span className="material-icons text-sm">add_circle</span> CATAT TRANSAKSI
-                </button>
+                {userRole !== 'Viewer' && (
+                  <button onClick={() => { setIsModalOpen(true); setFormError(''); setFormSuccess(''); }}
+                      className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-200 active:scale-95 transition-all duration-200">
+                      <span className="material-icons text-sm">add_circle</span> CATAT TRANSAKSI
+                  </button>
+                )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
                 <input type="text" placeholder="Cari keterangan..." value={search} onChange={e => setSearch(e.target.value)}
@@ -182,7 +184,7 @@ export default function KasOrganisasiView() {
                             <th className="p-3">Keterangan</th>
                             <th className="p-3">Nominal</th>
                             <th className="p-3">Operator</th>
-                            <th className="p-3 text-center">Aksi</th>
+                            {userRole !== 'Viewer' && <th className="p-3 text-center">Aksi</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
@@ -200,9 +202,11 @@ export default function KasOrganisasiView() {
                                 <td className="p-3">{item.keterangan || '-'}</td>
                                 <td className="p-3 font-bold text-slate-700">Rp{item.nominal.toLocaleString('id-ID')}</td>
                                 <td className="p-3 text-slate-500">{item.operator || '-'}</td>
-                                <td className="p-3 text-center">
-                                    <button onClick={() => handleDeleteKas(item.id)} className="text-slate-400 hover:text-red-600 transition"><span className="material-icons text-sm">delete</span></button>
-                                </td>
+                                {userRole !== 'Viewer' && (
+                                  <td className="p-3 text-center">
+                                      <button onClick={() => handleDeleteKas(item.id)} className="text-slate-400 hover:text-red-600 transition"><span className="material-icons text-sm">delete</span></button>
+                                  </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
