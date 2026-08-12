@@ -14,8 +14,7 @@ export async function middleware(request: NextRequest) {
     '/uploads',
     '/api/uploads',
     '/favicon.ico',
-    '/manifest.json',
-    '/api/setup'
+    '/manifest.json'
   ];
 
   // Jika pathname berawalan dengan salah satu publicPaths, izinkan langsung
