@@ -195,70 +195,6 @@ export default function DashboardView() {
           <StatCard title="Anggota" subtitle="Satgas" icon="security" value={stats.satgas} isWide />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
-          
-          {/* VISUALISASI DATA BARU */}
-          <div className="lg:col-span-3 space-y-5">
-              {/* Progress Data */}
-              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-red-100 theme-el relative">
-                  {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
-                  <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-black tracking-tight flex items-center gap-2.5 text-slate-800">
-                          <span className="material-icons text-red-600 bg-red-50 p-1.5 rounded-lg text-lg">data_usage</span>
-                          Progress Data
-                      </h3>
-                      <span className="text-xs font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-full">{progressPercent}%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 rounded-full h-3 mb-4 overflow-hidden border border-slate-200">
-                      <div className="bg-red-600 h-3 rounded-full transition-all duration-1000 relative overflow-hidden" style={{ width: `${progressPercent}%` }}>
-                           <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }}></div>
-                      </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-red-50/50 border border-red-100 rounded-xl p-4 flex items-center gap-4">
-                          <span className="material-icons text-red-600 bg-red-100 p-2 rounded-full">verified_user</span>
-                          <div>
-                              <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-1">Data Lengkap</p>
-                              <p className="text-xl font-black text-slate-800">{dataLengkap}</p>
-                          </div>
-                      </div>
-                      <div className="bg-red-50/30 border border-red-100 rounded-xl p-4 flex items-center gap-4">
-                          <span className="material-icons text-red-400 bg-red-100 p-2 rounded-full">privacy_tip</span>
-                          <div>
-                              <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Perlu Dilengkapi</p>
-                              <p className="text-xl font-black text-slate-800">{verification.tidakLengkap}</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              {/* Dua Grafik */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
-                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
-                      <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
-                          <span className="material-icons text-red-500 text-base">hourglass_bottom</span>
-                          Kelompok Usia
-                      </h3>
-                      <div className="flex-1 min-h-[200px] flex items-center justify-center">
-                          <Pie data={usiaChartData} options={pieOptions} />
-                      </div>
-                  </div>
-                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
-                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
-                      <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
-                          <span className="material-icons text-red-500 text-base">bar_chart</span>
-                          5 Desa Terbanyak
-                      </h3>
-                      <div className="flex-1 min-h-[200px] w-full">
-                          <Bar data={topDesaChartData} options={barOptions} />
-                      </div>
-                  </div>
-              </div>
-          </div>
-          {/* END VISUALISASI DATA BARU */}
-
-          <div className="lg:col-span-2 space-y-5 md:space-y-6">
               {/* MONITORING KUOTA KEPENGURUSAN */}
               <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el relative">
                   {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"><span className="text-red-600 font-bold">Memuat...</span></div>}
@@ -380,6 +316,70 @@ export default function DashboardView() {
                   </div>
               </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+          
+          {/* VISUALISASI DATA BARU */}
+          <div className="lg:col-span-3 space-y-5">
+              {/* Progress Data */}
+              <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-red-100 theme-el relative">
+                  {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
+                  <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-black tracking-tight flex items-center gap-2.5 text-slate-800">
+                          <span className="material-icons text-red-600 bg-red-50 p-1.5 rounded-lg text-lg">data_usage</span>
+                          Progress Data
+                      </h3>
+                      <span className="text-xs font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-full">{progressPercent}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-3 mb-4 overflow-hidden border border-slate-200">
+                      <div className="bg-red-600 h-3 rounded-full transition-all duration-1000 relative overflow-hidden" style={{ width: `${progressPercent}%` }}>
+                           <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }}></div>
+                      </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-red-50/50 border border-red-100 rounded-xl p-4 flex items-center gap-4">
+                          <span className="material-icons text-red-600 bg-red-100 p-2 rounded-full">verified_user</span>
+                          <div>
+                              <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-1">Data Lengkap</p>
+                              <p className="text-xl font-black text-slate-800">{dataLengkap}</p>
+                          </div>
+                      </div>
+                      <div className="bg-red-50/30 border border-red-100 rounded-xl p-4 flex items-center gap-4">
+                          <span className="material-icons text-red-400 bg-red-100 p-2 rounded-full">privacy_tip</span>
+                          <div>
+                              <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Perlu Dilengkapi</p>
+                              <p className="text-xl font-black text-slate-800">{verification.tidakLengkap}</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              {/* Dua Grafik */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
+                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
+                      <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
+                          <span className="material-icons text-red-500 text-base">hourglass_bottom</span>
+                          Kelompok Usia
+                      </h3>
+                      <div className="flex-1 min-h-[200px] flex items-center justify-center">
+                          <Pie data={usiaChartData} options={pieOptions} />
+                      </div>
+                  </div>
+                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative">
+                      {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl"></div>}
+                      <h3 className="text-[11px] font-black tracking-widest uppercase flex items-center gap-2 text-slate-700 mb-6 border-b border-slate-100 pb-3">
+                          <span className="material-icons text-red-500 text-base">bar_chart</span>
+                          5 Desa Terbanyak
+                      </h3>
+                      <div className="flex-1 min-h-[200px] w-full">
+                          <Bar data={topDesaChartData} options={barOptions} />
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {/* END VISUALISASI DATA BARU */}
+
+          <div className="lg:col-span-2 space-y-5 md:space-y-6">
               {/* STATISTIK GENDER */}
               <div className="bg-white p-5 md:p-6 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100 text-slate-800 theme-el">
                   <h3 className="text-sm md:text-base font-black tracking-tight flex items-center gap-2.5 text-slate-800 border-b border-red-100 pb-4 mb-5">

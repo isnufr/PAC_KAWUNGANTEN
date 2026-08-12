@@ -73,6 +73,38 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [nikError, setNikError] = useState('');
+
+  useEffect(() => {
+    const checkNik = async () => {
+      if (!formData.nik) {
+          setNikError('');
+          return;
+      }
+      if (formData.nik.length !== 16) {
+          setNikError('NIK harus tepat 16 digit angka');
+          return;
+      }
+      
+      try {
+          const res = await fetch(`/api/anggota/check-nik?nik=${formData.nik}${editId ? `&excludeId=${editId}` : ''}`);
+          const json = await res.json();
+          if (json.exists) {
+              setNikError('Peringatan: NIK ini sudah terdaftar di sistem!');
+          } else {
+              setNikError('');
+          }
+      } catch (err) {
+          console.error(err);
+      }
+    };
+    
+    const timer = setTimeout(() => {
+        checkNik();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [formData.nik, editId]);
 
   useEffect(() => {
     const handleGlobalAdd = () => {
@@ -266,6 +298,16 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
 
     if (!formData.nik || !formData.nama) {
       setFormError('NIK dan Nama wajib diisi!');
+      return;
+    }
+
+    if (formData.nik.length !== 16) {
+      setFormError('Gagal menyimpan: NIK harus tepat 16 digit!');
+      return;
+    }
+
+    if (nikError) {
+      setFormError('Gagal menyimpan: ' + nikError);
       return;
     }
 
@@ -734,7 +776,8 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nomor NIK</label>
-                                    <input type="text" value={formData.nik} onChange={e => handleFormChange('nik', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                    <input type="text" inputMode="numeric" maxLength={16} value={formData.nik} onChange={e => handleFormChange('nik', e.target.value.replace(/\D/g, ''))} className={`w-full p-2.5 border ${nikError ? 'border-red-500 bg-red-50' : 'border-red-200'} rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700`} />
+                                    {nikError && <p className="text-[9px] font-bold text-red-600 mt-1 flex items-center gap-1"><span className="material-icons text-[10px]">error</span> {nikError}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
@@ -754,7 +797,7 @@ export default function DataAnggotaView({ filter }: { filter?: string }) {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Nomor Handphone (WA)</label>
-                                    <input type="text" value={formData.nomorHp} onChange={e => handleFormChange('nomorHp', e.target.value)} placeholder="08..." className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                    <input type="text" inputMode="numeric" value={formData.nomorHp} onChange={e => handleFormChange('nomorHp', e.target.value.replace(/\D/g, ''))} placeholder="08..." className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Posisi Bagian</label>
