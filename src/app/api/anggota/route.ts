@@ -61,9 +61,26 @@ export async function GET(req: NextRequest) {
       prisma.anggota.count({ where: whereClause })
     ]);
 
+    // Recalculate umur dynamically based on tanggalLahir for all members
+    const enrichedData = data.map((item: any) => {
+        if (item.tanggalLahir) {
+            const birthDate = new Date(item.tanggalLahir);
+            if (!isNaN(birthDate.getTime())) {
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                item.umur = age >= 0 ? age.toString() : '0';
+            }
+        }
+        return item;
+    });
+
     return NextResponse.json({
       success: true,
-      data,
+      data: enrichedData,
       meta: {
         total,
         page,
