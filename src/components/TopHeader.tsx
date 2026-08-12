@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface TopHeaderProps {
   isSidebarOpen: boolean;
@@ -7,6 +7,34 @@ interface TopHeaderProps {
 }
 
 export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu }: TopHeaderProps) {
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    const formatDate = () => {
+      const now = new Date();
+      const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      
+      const dayName = days[now.getDay()];
+      const date = now.getDate();
+      const monthName = months[now.getMonth()];
+      const year = now.getFullYear();
+      
+      return `${dayName}, ${date} ${monthName} ${year}`;
+    };
+
+    setCurrentDate(formatDate());
+
+    // Update date at midnight
+    const now = new Date();
+    const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+    const midnightTimer = setTimeout(() => {
+      setCurrentDate(formatDate());
+    }, msUntilMidnight);
+
+    return () => clearTimeout(midnightTimer);
+  }, []);
+
   // Format judul agar lebih rapi (misal: "data_anggota" -> "Data Anggota")
   const formatTitle = (str: string) => {
     return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -25,15 +53,16 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu 
         <h2 className="text-base sm:text-lg font-semibold text-slate-700 truncate">{formatTitle(activeMenu)}</h2>
       </div>
       
-      <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-2 rounded-full hover:bg-slate-100 transition-colors active:scale-95" title="Muat Ulang Halaman">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        {/* Refresh — mobile only */}
+        <button onClick={() => window.location.reload()} className="md:hidden text-slate-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors active:scale-95" title="Muat Ulang Halaman">
           <span className="material-icons text-[20px]">refresh</span>
         </button>
-        <button className="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors active:scale-95" title="Toggle Theme">
-          <span className="material-icons text-[20px] sm:text-[24px]">dark_mode</span>
-        </button>
-        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs sm:text-sm border border-red-200 shadow-sm cursor-pointer hover:bg-red-200 transition-colors">
-          A
+
+        {/* Date display */}
+        <div className="flex items-center gap-1.5 bg-red-50/80 border border-red-100 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
+          <span className="material-icons text-red-500 text-[14px] sm:text-[16px]">calendar_today</span>
+          <span className="text-[10px] sm:text-xs font-bold text-red-700 tracking-wide whitespace-nowrap">{currentDate}</span>
         </div>
       </div>
     </header>

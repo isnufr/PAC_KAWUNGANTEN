@@ -18,9 +18,9 @@
 
 @layer utilities {
   .active-menu {
-    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
     color: white !important;
-    box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.35);
+    box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.35) !important;
   }
 
   .animate-blob {
@@ -38,16 +38,20 @@
 @keyframes softFade {
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translate3d(0, 4px, 0);
+  }
+  60% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .page-transition {
-  animation: softFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: softFade 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  will-change: opacity, transform;
 }
 
 .fade-in {
@@ -89,6 +93,115 @@
   66% { transform: translate(-20px, 20px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
+
+/* ============================================
+   SPLASH / LAUNCH SCREEN ANIMATIONS
+   ============================================ */
+
+/* Logo entrance — scale + fade */
+@keyframes splashLogoIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.splash-logo {
+  animation: splashLogoIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+/* Glow pulse behind logo */
+@keyframes splashGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1.2); }
+  50% { opacity: 0.7; transform: scale(1.35); }
+}
+
+.splash-glow {
+  animation: splashGlow 3s ease-in-out infinite;
+}
+
+/* Text entrance — staggered fade-slide */
+@keyframes splashTextIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-text {
+  animation: splashTextIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s both;
+}
+
+/* Loader entrance */
+.splash-loader {
+  animation: splashTextIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s both;
+}
+
+/* Counter-rotating inner ring */
+@keyframes spinReverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.splash-spin-reverse {
+  animation: spinReverse 2s linear infinite;
+}
+
+/* Pulsing center dot */
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+.splash-pulse-dot {
+  animation: pulseDot 1.5s ease-in-out infinite;
+}
+
+/* Bouncing dots */
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+.splash-dot {
+  animation: bounceDot 1.4s ease-in-out infinite;
+}
+
+.splash-dot-1 { animation-delay: 0s; }
+.splash-dot-2 { animation-delay: 0.16s; }
+.splash-dot-3 { animation-delay: 0.32s; }
+
+/* Background orbs — gentle floating */
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -20px); }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-25px, 15px); }
+}
+
+@keyframes floatOrb3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.splash-orb-1 { animation: floatOrb1 6s ease-in-out infinite; }
+.splash-orb-2 { animation: floatOrb2 7s ease-in-out infinite 1s; }
+.splash-orb-3 { animation: floatOrb3 5s ease-in-out infinite 0.5s; }
 
 /* ============================================
    MODAL TRANSITIONS
@@ -187,6 +300,277 @@ main {
 
 button, a, input, select, textarea {
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================
+   MODERN BUTTON DESIGN SYSTEM — Mobile-First
+   ============================================ */
+
+/* --- Base Button Enhancements --- */
+button {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  cursor: pointer;
+}
+
+/* Subtle shine overlay for colored buttons (non-icon, non-sidebar) */
+main button:not([class*="p-1"]):not([class*="p-2 rounded-full"])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.15) 0%,
+    rgba(255,255,255,0.05) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+main button:not([class*="p-1"]):not([class*="p-2 rounded-full"]):hover::after {
+  opacity: 1;
+}
+
+/* --- Primary / CTA Buttons (gradient red, solid red, solid yellow, etc.) --- */
+main button[class*="bg-red-6"],
+main button[class*="bg-red-7"],
+main button[class*="from-red-6"],
+main button[class*="bg-yellow-5"],
+main button[class*="bg-slate-7"],
+main button[class*="bg-slate-8"] {
+  letter-spacing: 0.03em;
+  font-weight: 700;
+  transform: translateZ(0);
+  transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+main button[class*="bg-red-6"]:hover,
+main button[class*="bg-red-7"]:hover,
+main button[class*="from-red-6"]:hover {
+  box-shadow: 0 6px 20px -4px rgba(220, 38, 38, 0.4),
+              0 2px 6px -2px rgba(220, 38, 38, 0.2);
+  transform: translateY(-1px) translateZ(0);
+}
+
+main button[class*="bg-yellow-5"]:hover {
+  box-shadow: 0 6px 20px -4px rgba(245, 158, 11, 0.4),
+              0 2px 6px -2px rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px) translateZ(0);
+}
+
+main button[class*="bg-slate-7"]:hover,
+main button[class*="bg-slate-8"]:hover {
+  box-shadow: 0 6px 20px -4px rgba(30, 41, 59, 0.4),
+              0 2px 6px -2px rgba(30, 41, 59, 0.2);
+  transform: translateY(-1px) translateZ(0);
+}
+
+/* Active press state — all primary-style buttons */
+main button[class*="bg-red-"]:active,
+main button[class*="from-red-"]:active,
+main button[class*="bg-yellow-"]:active,
+main button[class*="bg-slate-"]:active {
+  transform: scale(0.97) translateZ(0) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+  transition-duration: 0.08s;
+}
+
+/* --- Outline / Ghost Buttons (border-based, text buttons) --- */
+main button[class*="border"][class*="text-red-6"] {
+  transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+main button[class*="border"][class*="text-red-6"]:hover {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+  box-shadow: 0 2px 8px -2px rgba(220, 38, 38, 0.15);
+}
+
+/* --- Small Icon Buttons (table actions, close buttons) --- */
+main button[class*="p-1.5"][class*="rounded-lg"],
+main button[class*="p-1.5"][class*="rounded-full"] {
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+main button[class*="p-1.5"][class*="rounded-lg"]:hover,
+main button[class*="p-1.5"][class*="rounded-full"]:hover {
+  transform: scale(1.08);
+}
+
+main button[class*="p-1.5"][class*="rounded-lg"]:active,
+main button[class*="p-1.5"][class*="rounded-full"]:active {
+  transform: scale(0.92);
+  transition-duration: 0.06s;
+}
+
+/* --- Square/Circle Action Buttons (w-9 h-9 / w-11 h-11 patterns) --- */
+main button[class*="w-9"][class*="h-9"],
+main button[class*="w-11"][class*="h-11"],
+main a[class*="w-9"][class*="h-9"] {
+  transition: all 0.2s ease;
+}
+
+main button[class*="w-9"][class*="h-9"]:hover,
+main button[class*="w-11"][class*="h-11"]:hover,
+main a[class*="w-9"][class*="h-9"]:hover {
+  transform: scale(1.06);
+  box-shadow: 0 3px 10px -3px rgba(220, 38, 38, 0.2);
+}
+
+main button[class*="w-9"][class*="h-9"]:active,
+main button[class*="w-11"][class*="h-11"]:active,
+main a[class*="w-9"][class*="h-9"]:active {
+  transform: scale(0.93);
+  transition-duration: 0.06s;
+}
+
+/* --- Disabled State --- */
+button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(30%);
+  opacity: 0.65 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   MOBILE BUTTON ENHANCEMENTS (< 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Ensure all interactive buttons have 44px min touch target (WCAG) */
+  main button:not([class*="p-1"]):not([class*="absolute"]) {
+    min-height: 44px;
+  }
+
+  /* Make primary action buttons more prominent on mobile */
+  main button[class*="bg-red-6"][class*="rounded-xl"],
+  main button[class*="bg-red-7"][class*="rounded-xl"],
+  main button[class*="from-red-6"][class*="rounded-xl"] {
+    border-radius: 16px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  /* Full-width CTA buttons on mobile */
+  main button[class*="bg-red-6"][class*="w-full"],
+  main button[class*="from-red-6"][class*="w-full"],
+  main button[class*="bg-red-7"][class*="w-full"] {
+    border-radius: 18px;
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  /* Square action buttons — enlarge for fat fingers */
+  main button[class*="w-9"][class*="h-9"],
+  main a[class*="w-9"][class*="h-9"] {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  main button[class*="w-11"][class*="h-11"] {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Detail view action buttons (edit/delete/cetak) */
+  main button[class*="p-3.5"][class*="rounded-xl"] {
+    padding: 16px;
+    border-radius: 18px;
+    font-size: 12px;
+  }
+
+  /* Filter action row (reset + search) */
+  main .flex.gap-2 button[class*="border"][class*="rounded-xl"],
+  main .flex.gap-2 button[class*="bg-red-7"][class*="rounded-xl"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Table delete icon buttons — bigger tap target */
+  main td button[class*="text-slate-4"] {
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+  }
+
+  main td button[class*="text-slate-4"]:hover {
+    background-color: #fef2f2;
+  }
+
+  /* Export / download button on Laporan page */
+  main button[class*="rounded-full"][class*="shadow-xl"] {
+    border-radius: 20px;
+    padding: 18px 24px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+}
+
+/* ============================================
+   SIDEBAR MENU ITEMS — Smooth active state
+   ============================================ */
+
+#sidebar button {
+  transition: background 0.25s ease,
+              color 0.2s ease,
+              box-shadow 0.25s ease,
+              transform 0.15s ease;
+  will-change: background, box-shadow;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+#sidebar button:active {
+  transform: scale(0.98);
+}
+
+/* ============================================
+   MODAL CLOSE BUTTON REFINEMENTS
+   ============================================ */
+
+button[class*="bg-red-800"][class*="p-1.5"][class*="rounded-lg"] {
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+button[class*="bg-red-800"][class*="p-1.5"][class*="rounded-lg"]:hover {
+  background-color: rgba(127, 29, 29, 1);
+  transform: rotate(90deg) scale(1.05);
+}
+
+/* ============================================
+   INPUT & SELECT MOBILE ENHANCEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  main input, main select, main textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    min-height: 44px;
+    border-radius: 14px;
+  }
+
+  main select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23991b1b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
 }
 
 /* ============================================

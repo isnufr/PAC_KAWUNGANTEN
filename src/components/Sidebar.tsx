@@ -7,12 +7,14 @@ interface SidebarProps {
   activeMenu: string;
   setActiveMenu: (menu: string) => void;
   userRole: string;
+  userName: string;
   onClose: () => void;
 }
 
-export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, userName, onClose }: SidebarProps) {
   const router = useRouter();
   const [verificationCount, setVerificationCount] = useState(0);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     // Fetch verification count
@@ -46,10 +48,25 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, o
   };
 
   const handleMenuClick = (menu: string) => {
+    if (menu === activeMenu) return; // Already on this menu, skip
     setActiveMenu(menu);
-    router.push(`/?menu=${menu}`);
+    // Use replaceState to update URL without triggering Next.js navigation overhead
+    window.history.replaceState(null, '', `/?menu=${menu}`);
     // Auto-close sidebar on mobile
     onClose();
+  };
+
+  // Get user initials for avatar
+  const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
+
+  // Format role label color
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'Super Admin': return 'bg-red-600 text-white';
+      case 'Admin': return 'bg-amber-500 text-white';
+      case 'Editor': return 'bg-blue-500 text-white';
+      default: return 'bg-slate-400 text-white';
+    }
   };
 
   return (
@@ -150,12 +167,63 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, o
 
         </div>
         
-        {/* FOOTER SIDEBAR */}
-        <div className="p-4 border-t border-gray-100">
-          <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                  onClick={handleLogout}>
-            <span className="material-icons mr-2">logout</span> Keluar
-          </button>
+        {/* FOOTER SIDEBAR — User Card + Logout */}
+        <div className="border-t border-gray-100">
+          {/* User Info Card */}
+          <div className="p-3">
+            <div className="bg-gradient-to-br from-slate-50 to-red-50/50 rounded-2xl p-3 border border-red-100/60">
+              <div className="flex items-center gap-3">
+                {/* Avatar */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-200">
+                    {userInitial}
+                  </div>
+                  {/* Online indicator */}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white shadow-sm"></div>
+                </div>
+                
+                {/* User details */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-slate-700 truncate leading-tight">{userName || 'User'}</p>
+                  <span className={`inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-md tracking-wider uppercase ${getRoleBadge(userRole)}`}>
+                    {userRole}
+                  </span>
+                </div>
+
+                {/* Logout button */}
+                <button 
+                  onClick={() => setShowLogoutConfirm(true)}
+                  className="flex-shrink-0 w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 flex items-center justify-center text-red-500 hover:text-red-700 transition-all active:scale-95"
+                  title="Keluar"
+                >
+                  <span className="material-icons text-[18px]">logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Logout Confirmation */}
+          {showLogoutConfirm && (
+            <div className="px-3 pb-3 -mt-1">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-2.5">
+                <p className="text-[11px] font-bold text-red-700 text-center">Yakin ingin keluar dari sistem?</p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowLogoutConfirm(false)} 
+                    className="flex-1 py-2 text-[11px] font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all active:scale-95"
+                  >
+                    Batal
+                  </button>
+                  <button 
+                    onClick={handleLogout} 
+                    className="flex-1 py-2 text-[11px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-200 transition-all active:scale-95 flex items-center justify-center gap-1"
+                  >
+                    <span className="material-icons text-[14px]">logout</span> Keluar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </aside>
     </>

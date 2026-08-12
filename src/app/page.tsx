@@ -29,6 +29,7 @@ function DashboardContent() {
   const initialMenu = searchParams?.get('menu') || 'beranda';
   const [activeMenu, setActiveMenu] = useState(initialMenu);
   const [userRole, setUserRole] = useState('Viewer');
+  const [userName, setUserName] = useState('');
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
 
@@ -49,6 +50,9 @@ function DashboardContent() {
         if (user && user.role) {
           setUserRole(user.role);
         }
+        if (user && user.username) {
+          setUserName(user.username);
+        }
       } catch (e) {}
       setIsReady(true);
     }
@@ -65,13 +69,13 @@ function DashboardContent() {
     return () => clearInterval(interval);
   }, [logout]);
 
-  // Sync menu state with URL search parameters
+  // Scroll main content to top on menu change to avoid layout shift from stale scroll position
+  const mainRef = React.useRef<HTMLElement>(null);
   useEffect(() => {
-    const menu = searchParams?.get('menu');
-    if (menu && menu !== activeMenu) {
-      setActiveMenu(menu);
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
-  }, [searchParams, activeMenu]);
+  }, [activeMenu]);
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
@@ -86,6 +90,7 @@ function DashboardContent() {
         activeMenu={activeMenu} 
         setActiveMenu={setActiveMenu} 
         userRole={userRole}
+        userName={userName}
         onClose={closeSidebar}
       />
 
@@ -96,7 +101,7 @@ function DashboardContent() {
           activeMenu={activeMenu} 
         />
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#fafafa] p-3 sm:p-6 lg:p-8">
+        <main ref={mainRef} className="flex-1 overflow-x-hidden overflow-y-auto bg-[#fafafa] p-3 sm:p-6 lg:p-8">
            {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
            <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
