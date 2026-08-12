@@ -108,11 +108,9 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
 
   useEffect(() => {
     const handleGlobalAdd = () => {
-      if (filter !== 'verifikasi') {
-        setIsModalOpen(true); 
-        setFormError(''); 
-        setFormSuccess('');
-      }
+      setIsModalOpen(true); 
+      setFormError(''); 
+      setFormSuccess('');
     };
     window.addEventListener('global-add-action', handleGlobalAdd);
     return () => window.removeEventListener('global-add-action', handleGlobalAdd);
@@ -580,14 +578,14 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                         {/* Action Buttons */}
                                         <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                                             {item.nomorHp && (
-                                                <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px]" fill="currentColor" viewBox="0 0 16 16">
+                                                <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 flex items-center justify-center transition" title="WhatsApp">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-[20px] sm:h-[20px]" fill="currentColor" viewBox="0 0 16 16">
                                                       <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
                                                     </svg>
                                                 </a>
                                             )}
-                                            <button onClick={() => setSelectedAnggota(item)} className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition" title="Lihat Detail">
-                                                <span className="material-icons text-[14px] sm:text-[18px]">visibility</span>
+                                            <button onClick={() => setSelectedAnggota(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition" title="Lihat Detail">
+                                                <span className="material-icons text-[16px] sm:text-[20px]">visibility</span>
                                             </button>
                                         </div>
                                     </div>
@@ -911,45 +909,57 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                 </div>
 
                 {/* The Card */}
-                <div id="printable-id-card" className="w-[85.6mm] h-[53.98mm] bg-red-600 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden border border-red-800 text-white transform transition-transform hover:scale-105" style={{ fontFamily: 'Arial, sans-serif' }}>
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full mix-blend-screen opacity-50 -mr-10 -mt-10"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-700 rounded-full mix-blend-multiply opacity-50 -ml-10 -mb-10"></div>
-
+                <div id="printable-id-card" className="w-[85.6mm] h-[53.98mm] bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden border border-slate-200 text-slate-800 transform transition-transform hover:scale-105" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {/* Background Accents */}
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-red-50 to-transparent rounded-full -mr-10 -mt-10 opacity-80"></div>
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-red-50 to-transparent rounded-full -ml-10 -mb-10 opacity-80"></div>
+                    
+                    {/* Abstract Polygon/Wave Footer */}
+                    <div className="absolute bottom-0 left-0 w-full h-[14mm] bg-gradient-to-r from-red-700 to-red-600" style={{ clipPath: 'polygon(0 30%, 100% 0, 100% 100%, 0% 100%)' }}></div>
+                    <div className="absolute bottom-0 left-0 w-full h-[14mm] bg-red-800 opacity-30" style={{ clipPath: 'polygon(0 50%, 100% 10%, 100% 100%, 0% 100%)' }}></div>
+                    
                     {/* Header */}
-                    <div className="h-10 bg-red-800 w-full flex items-center px-3 relative z-10 border-b-2 border-yellow-500">
-                        <img src="/logo.png" alt="Logo PDIP" className="w-8 h-8 mr-2 object-contain p-0 drop-shadow-md" />
+                    <div className="h-[12mm] bg-gradient-to-r from-red-700 via-red-600 to-red-700 w-full flex items-center px-3 relative z-10 shadow-md border-b-2 border-yellow-500">
+                        <img src="/logo.png" alt="Logo PDIP" className="w-[8mm] h-[8mm] mr-2 object-contain drop-shadow-md" />
                         <div>
-                            <h1 className="text-[10px] font-black leading-none text-white tracking-widest">KARTU TANDA ANGGOTA</h1>
-                            <h2 className="text-[7px] font-bold text-yellow-400">PDI PERJUANGAN KAWUNGANTEN</h2>
+                            <h1 className="text-[10px] font-black leading-[1.1] text-white tracking-widest drop-shadow-sm uppercase">Kartu Tanda Anggota</h1>
+                            <h2 className="text-[5.5px] font-bold text-yellow-400 uppercase tracking-widest drop-shadow-sm mt-0.5">PDI Perjuangan PAC Kawunganten</h2>
                         </div>
                     </div>
 
                     {/* Body */}
-                    <div className="flex p-2 gap-2 relative z-10 h-[calc(100%-40px)]">
-                        {/* Photo */}
-                        <div className="w-[20mm] h-[25mm] bg-white rounded-md p-0.5 shadow-sm mt-1">
+                    <div className="flex px-3 pt-2 pb-1 gap-3 relative z-10">
+                        {/* Photo Container */}
+                        <div className="w-[20mm] h-[26mm] bg-slate-100 rounded-md p-[1px] shadow-sm border border-slate-200 shrink-0 relative overflow-hidden mt-1 bg-white">
                             {selectedAnggota.passFotoUrl ? (
-                                <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt="Foto" className="w-full h-full object-cover rounded-sm" />
+                                <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt="Foto" className="w-full h-full object-cover rounded-[5px]" />
                             ) : (
-                                <div className="w-full h-full bg-slate-200 flex items-center justify-center rounded-sm"><span className="material-icons text-slate-400 text-xl">person</span></div>
+                                <div className="w-full h-full bg-slate-100 flex items-center justify-center rounded-[5px]"><span className="material-icons text-slate-300 text-3xl">person</span></div>
                             )}
                         </div>
 
                         {/* Details */}
-                        <div className="flex-1 flex flex-col justify-center space-y-0.5 mt-1">
-                            <div className="font-black text-xs uppercase text-yellow-400 drop-shadow-md">{selectedAnggota.nama}</div>
-                            <div className="text-[8px] font-bold text-red-100 tracking-wider font-mono bg-red-900/50 inline-block px-1 rounded-sm w-max mb-1">{selectedAnggota.nik}</div>
+                        <div className="flex-1 flex flex-col justify-start mt-0.5">
+                            <div className="font-black text-[11px] leading-none uppercase text-red-700 tracking-tight">{selectedAnggota.nama || 'NAMA ANGGOTA'}</div>
+                            <div className="text-[7.5px] font-bold text-slate-800 tracking-widest font-mono mt-0.5 mb-1.5">{selectedAnggota.nik || '3300000000000000'}</div>
                             
-                            <table className="text-[6px] w-full mt-1">
+                            <table className="text-[5px] w-full leading-[1.4] text-slate-800 font-bold">
                                 <tbody>
-                                    <tr><td className="w-12 font-bold text-red-200">Bagian</td><td>: {selectedAnggota.bagian || '-'}</td></tr>
-                                    <tr><td className="font-bold text-red-200">Jabatan</td><td>: {selectedAnggota.jabatan || '-'}</td></tr>
-                                    <tr><td className="font-bold text-red-200">Desa</td><td>: {selectedAnggota.desa || '-'}</td></tr>
+                                    <tr><td className="w-14 text-slate-500 font-semibold uppercase">Tgl Lahir</td><td>: {selectedAnggota.tanggalLahir ? selectedAnggota.tanggalLahir.split('-').reverse().join('-') : '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">J. Kelamin</td><td>: {selectedAnggota.jenisKelamin || '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">Bagian</td><td>: {selectedAnggota.bagian || '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">Jabatan</td><td>: {selectedAnggota.jabatan || '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">Alamat</td><td className="truncate max-w-[30mm]">: Dsn. {selectedAnggota.dusun || '-'}, Ds. {selectedAnggota.desa || '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">Kecamatan</td><td>: {selectedAnggota.kecamatan || 'KAWUNGANTEN'}</td></tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    
+                    {/* Bottom Footer Text */}
+                    <div className="absolute bottom-[2mm] left-[4mm] right-[4mm] z-10 flex justify-between items-center">
+                         <div className="text-[4px] text-white/80 font-mono tracking-widest uppercase">KTA Digital Resmi - PAC Kawunganten</div>
+                         <div className="text-[4px] text-white/90 font-bold tracking-widest">{new Date().getFullYear()}</div>
                     </div>
                 </div>
             </div>

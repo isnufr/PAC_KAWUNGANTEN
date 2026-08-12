@@ -69,6 +69,21 @@ function DashboardContent() {
     return () => clearInterval(interval);
   }, [logout]);
 
+  // Listener untuk global-add-action dari TopHeader pada menu non-native
+  useEffect(() => {
+    const handleGlobalAdd = () => {
+      const nativeAddMenus = ['data_anggota', 'kas_organisasi', 'manajemen_akun', 'verifikasi_data'];
+      if (!nativeAddMenus.includes(activeMenu)) {
+        setActiveMenu('data_anggota');
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('global-add-action'));
+        }, 100);
+      }
+    };
+    window.addEventListener('global-add-action', handleGlobalAdd);
+    return () => window.removeEventListener('global-add-action', handleGlobalAdd);
+  }, [activeMenu]);
+
   // Scroll main content to top on menu change to avoid layout shift from stale scroll position
   const mainRef = React.useRef<HTMLElement>(null);
   useEffect(() => {
