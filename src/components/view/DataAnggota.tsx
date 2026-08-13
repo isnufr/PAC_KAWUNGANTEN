@@ -263,24 +263,26 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
     });
   };
 
-  const handleEdit = () => {
-      setEditId(selectedAnggota.id);
+  const handleEdit = (targetItem?: any) => {
+      const itemToEdit = targetItem || selectedAnggota;
+      if (!itemToEdit) return;
+      setEditId(itemToEdit.id);
       setFormData({
-          nik: selectedAnggota.nik || '',
-          nama: selectedAnggota.nama || '',
-          tanggalLahir: selectedAnggota.tanggalLahir || '',
-          jenisKelamin: selectedAnggota.jenisKelamin || '',
-          umur: selectedAnggota.umur?.toString() || '',
-          nomorHp: selectedAnggota.nomorHp || '',
-          bagian: selectedAnggota.bagian || '',
-          jabatan: selectedAnggota.jabatan || '',
-          kecamatan: selectedAnggota.kecamatan || '',
-          desa: selectedAnggota.desa || '',
-          dusun: selectedAnggota.dusun || '',
-          rt: selectedAnggota.rt || '',
-          rw: selectedAnggota.rw || '',
-          fotoKtpUrl: selectedAnggota.fotoKtpUrl || '',
-          passFotoUrl: selectedAnggota.passFotoUrl || ''
+          nik: itemToEdit.nik || '',
+          nama: itemToEdit.nama || '',
+          tanggalLahir: itemToEdit.tanggalLahir || '',
+          jenisKelamin: itemToEdit.jenisKelamin || '',
+          umur: itemToEdit.umur?.toString() || '',
+          nomorHp: itemToEdit.nomorHp || '',
+          bagian: itemToEdit.bagian || '',
+          jabatan: itemToEdit.jabatan || '',
+          kecamatan: itemToEdit.kecamatan || '',
+          desa: itemToEdit.desa || '',
+          dusun: itemToEdit.dusun || '',
+          rt: itemToEdit.rt || '',
+          rw: itemToEdit.rw || '',
+          fotoKtpUrl: itemToEdit.fotoKtpUrl || '',
+          passFotoUrl: itemToEdit.passFotoUrl || ''
       });
       setFileKtp(null);
       setFilePassFoto(null);
@@ -305,14 +307,16 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
       }
     },
     onError: () => {
-      showAlert("Terjadi kesalahan koneksi", 'info');
+      showAlert("Terjadi kesalahan koneksi", 'error');
     }
   });
 
-  const handleDelete = async () => {
+  const handleDelete = async (targetId?: number) => {
+      const idToDelete = targetId || selectedAnggota?.id;
+      if (!idToDelete) return;
       const confirmed = await showConfirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?");
-    if (!confirmed) return;
-      deleteMutation.mutate(selectedAnggota.id);
+      if (!confirmed) return;
+      deleteMutation.mutate(idToDelete);
   };
 
   const handleSubmitAnggota = async (e: React.FormEvent) => {
@@ -517,18 +521,11 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                         </td>
                                         {userRole !== 'Viewer' && (
                                           <td className="p-4 sm:p-5 text-center">
-                                              <button onClick={() => { 
-                                                  // Trigger same edit logic as standard view
-                                                  setSelectedAnggota(item); 
-                                                  setTimeout(() => {
-                                                      setEditId(item.id);
-                                                      setFormData({
-                                                          nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', rt: item.rt || '', rw: item.rw || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
-                                                      });
-                                                      setFileKtp(null); setFilePassFoto(null); setFormError(''); setFormSuccess(''); setIsModalOpen(true); setSelectedAnggota(null);
-                                                  }, 0);
-                                              }} className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition shadow-md shadow-amber-200 flex items-center justify-center gap-1.5 mx-auto active:scale-95 whitespace-nowrap">
-                                                  <span className="material-icons text-[14px]">edit_square</span> Perbaiki
+                                              <button onClick={() => handleEdit(item)} className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition shadow-md shadow-amber-200 flex items-center justify-center gap-1.5 mx-auto active:scale-95 whitespace-nowrap">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[14px] h-[14px]">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                  </svg>
+                                                  Perbaiki
                                               </button>
                                           </td>
                                         )}
@@ -593,18 +590,26 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                             </div>
                                         </div>
                                         
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                                            {item.nomorHp && (
-                                                <a href={`https://wa.me/${item.nomorHp.replace(/^0/, '62')}`} target="_blank" rel="noopener noreferrer" className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition" title="WhatsApp">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-[20px] sm:h-[20px]" fill="currentColor" viewBox="0 0 16 16">
-                                                      <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
-                                                    </svg>
-                                                </a>
-                                            )}
-                                            <button onClick={() => setSelectedAnggota(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-red-600 hover:bg-red-50 flex items-center justify-center transition" title="Lihat Detail">
-                                                <span className="material-icons text-[16px] sm:text-[20px]">visibility</span>
+                                            <button onClick={() => setSelectedAnggota(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center transition" title="Lihat Detail">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
                                             </button>
+                                            {userRole !== 'Viewer' && (
+                                                <>
+                                                    <button onClick={() => handleEdit(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-amber-500 hover:bg-amber-50 flex items-center justify-center transition" title="Edit Data">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                        </svg>
+                                                    </button>
+                                                    <button onClick={() => handleDelete(item.id)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-red-600 hover:bg-red-50 flex items-center justify-center transition" title="Hapus Data">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
+                                                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                        </svg>
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -691,7 +696,9 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                     <p className="font-black text-slate-700 text-sm tracking-wide">{selectedAnggota.nomorHp || '-'}</p>
                                 </div>
                                 <a href={`https://wa.me/${selectedAnggota.nomorHp?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center text-white shadow-sm transition transform hover:scale-105">
-                                    <span className="material-icons text-[20px]">chat</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 16 16">
+                                      <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                                    </svg>
                                 </a>
                             </div>
 
@@ -720,20 +727,10 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             )}
                         </div>
                         
-                        {/* CTA Buttons Row (Edit, Hapus, Cetak KTA) */}
-                        <div className="flex gap-2.5 mt-4 px-1">
-                            {userRole !== 'Viewer' && (
-                              <>
-                                <button onClick={handleEdit} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-full shadow-md shadow-yellow-500/20 border border-yellow-300/50 flex justify-center items-center transition transform active:scale-95" title="Edit Data">
-                                    <span className="material-icons text-[18px] sm:text-[20px]">edit</span>
-                                </button>
-                                <button onClick={handleDelete} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-gradient-to-tr from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-full shadow-md shadow-slate-800/20 border border-slate-600/50 flex justify-center items-center transition transform active:scale-95" title="Hapus Data">
-                                    <span className="material-icons text-[18px] sm:text-[20px]">delete</span>
-                                </button>
-                              </>
-                            )}
+                        {/* CTA Buttons Row (Cetak KTA) */}
+                        <div className="flex mt-4 px-1">
                             <button onClick={() => setIsPrinting(true)} 
-                                    className="flex-1 h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                    className="w-full h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
                                 <span className="material-icons text-[16px] sm:text-[18px] shrink-0">badge</span> 
                                 <span className="truncate">KARTU DIGITAL</span>
                             </button>
@@ -861,13 +858,15 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                     {wilayahList.filter(w => w.desa === formData.desa && w.dusun).map(w => w.dusun).map(d => <option key={d} value={d}>{d}</option>)}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RT</label>
-                                <input type="text" inputMode="numeric" maxLength={3} value={formData.rt} onChange={e => handleFormChange('rt', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RW</label>
-                                <input type="text" inputMode="numeric" maxLength={3} value={formData.rw} onChange={e => handleFormChange('rw', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
+                            <div className="grid grid-cols-2 gap-4 sm:col-span-2">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RT</label>
+                                    <input type="text" inputMode="numeric" maxLength={3} value={formData.rt} onChange={e => handleFormChange('rt', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RW</label>
+                                    <input type="text" inputMode="numeric" maxLength={3} value={formData.rw} onChange={e => handleFormChange('rw', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
+                                </div>
                             </div>
                         </div>
 
