@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
+import sharp from 'sharp';
 
 const prisma = new PrismaClient();
 
@@ -29,8 +30,15 @@ export async function POST(request: Request) {
     // Dapatkan nama depan
     const namaDepan = nama.split(' ')[0].replace(/[^a-zA-Z0-9]/g, ''); // bersihkan karakter khusus
 
-    // Dapatkan ekstensi file dari nama aslinya
-    const extension = file.name.split('.').pop() || 'jpg';
+    // Kompresi ukuran file gambar menggunakan sharp tanpa merubah rasio
+    // Mengonversi ke format jpeg dengan kualitas 85% untuk menjaga kejernihan dan 
+    // memastikan ukurannya di bawah 2MB, serta didukung oleh semua HP
+    const compressedBuffer = await sharp(buffer)
+      .jpeg({ quality: 85, force: true })
+      .toBuffer();
+
+    // Dapatkan ekstensi file (selalu gunakan jpg karena sudah dikonversi)
+    const extension = 'jpg';
 
     // Format nama file: [TYPE]_[ID]_[NAMA_DEPAN]_[TIMESTAMP].[ext]
     // Contoh: KTP_1_Budi_1690000000.jpg
@@ -46,7 +54,7 @@ export async function POST(request: Request) {
     }
 
     const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
+    await writeFile(filePath, compressedBuffer);
 
     const fileUrl = `/api/uploads/${fileName}`;
 

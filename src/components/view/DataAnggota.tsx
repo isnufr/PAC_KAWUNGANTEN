@@ -68,6 +68,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
   const [formData, setFormData] = useState({
     nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '',
     nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '',
+    rt: '', rw: '',
     fotoKtpUrl: '', passFotoUrl: ''
   });
   const [formError, setFormError] = useState('');
@@ -254,6 +255,8 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
           kecamatan: selectedAnggota.kecamatan || '',
           desa: selectedAnggota.desa || '',
           dusun: selectedAnggota.dusun || '',
+          rt: selectedAnggota.rt || '',
+          rw: selectedAnggota.rw || '',
           fotoKtpUrl: selectedAnggota.fotoKtpUrl || '',
           passFotoUrl: selectedAnggota.passFotoUrl || ''
       });
@@ -323,6 +326,8 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         kecamatan: formData.kecamatan || null,
         desa: formData.desa || null,
         dusun: formData.dusun || null,
+        rt: formData.rt || null,
+        rw: formData.rw || null,
         fotoKtpUrl: formData.fotoKtpUrl || null,
         passFotoUrl: formData.passFotoUrl || null,
       };
@@ -505,7 +510,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                   setTimeout(() => {
                                                       setEditId(item.id);
                                                       setFormData({
-                                                          nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
+                                                          nik: item.nik || '', nama: item.nama || '', tanggalLahir: item.tanggalLahir || '', jenisKelamin: item.jenisKelamin || '', umur: item.umur?.toString() || '', nomorHp: item.nomorHp || '', bagian: item.bagian || '', jabatan: item.jabatan || '', kecamatan: item.kecamatan || '', desa: item.desa || '', dusun: item.dusun || '', rt: item.rt || '', rw: item.rw || '', fotoKtpUrl: item.fotoKtpUrl || '', passFotoUrl: item.passFotoUrl || ''
                                                       });
                                                       setFileKtp(null); setFilePassFoto(null); setFormError(''); setFormSuccess(''); setIsModalOpen(true); setSelectedAnggota(null);
                                                   }, 0);
@@ -682,6 +687,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 <p className="text-[8px] font-bold text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><span className="material-icons text-[10px]">location_on</span> ALAMAT DOMISILI</p>
                                 <p className="font-bold text-slate-700 text-xs leading-relaxed uppercase">
                                     {selectedAnggota.dusun ? `DUSUN ${selectedAnggota.dusun}, ` : ''}
+                                    {selectedAnggota.rt && selectedAnggota.rw ? `RT ${selectedAnggota.rt}/RW ${selectedAnggota.rw}, ` : selectedAnggota.rt ? `RT ${selectedAnggota.rt}, ` : selectedAnggota.rw ? `RW ${selectedAnggota.rw}, ` : ''}
                                     {selectedAnggota.desa ? `DESA ${selectedAnggota.desa}, ` : ''}
                                     KECAMATAN KAWUNGANTEN
                                 </p>
@@ -841,6 +847,14 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                     <option value="">- Pilih -</option>
                                     {wilayahList.filter(w => w.desa === formData.desa && w.dusun).map(w => w.dusun).map(d => <option key={d} value={d}>{d}</option>)}
                                 </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RT</label>
+                                <input type="text" inputMode="numeric" maxLength={3} value={formData.rt} onChange={e => handleFormChange('rt', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">RW</label>
+                                <input type="text" inputMode="numeric" maxLength={3} value={formData.rw} onChange={e => handleFormChange('rw', e.target.value.replace(/\D/g, ''))} placeholder="001" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white" />
                             </div>
                         </div>
 
