@@ -368,7 +368,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
             setGlobalNotification({ message: editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!', type: 'success' });
         }
 
-        setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' });
+        setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '' });
         setFileKtp(null);
         setFilePassFoto(null);
         setOcrStatus('');
@@ -739,7 +739,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <span className="material-icons text-white text-lg">edit_document</span>
                             <h3 className="font-extrabold text-sm sm:text-base tracking-wide">{editId ? 'Edit Data Anggota' : 'Input Data Anggota Baru'}</h3>
                         </div>
-                        <button onClick={() => { setIsModalOpen(false); setEditId(null); setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', fotoKtpUrl: '', passFotoUrl: '' }); }} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
+                        <button onClick={() => { setIsModalOpen(false); setEditId(null); setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '' }); }} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
                     <form onSubmit={handleSubmitAnggota} className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm text-slate-800 bg-red-50/30">
                         {formError && <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center font-bold text-xs">{formError}</div>}
