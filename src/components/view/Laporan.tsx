@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useAlert } from '../AlertProvider';
 import { useQuery } from '@tanstack/react-query';
 import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
@@ -12,6 +13,7 @@ interface WilayahItem {
 }
 
 export default function LaporanView() {
+  const { showAlert, showConfirm } = useAlert();
   const [format, setFormat] = useState('EXCEL');
   const [bagian, setBagian] = useState('');
   const [desa, setDesa] = useState('');
@@ -71,7 +73,7 @@ export default function LaporanView() {
       const res = await fetch(`/api/anggota?${params.toString()}`);
       const json = await res.json();
       if (!json.success || !json.data.length) {
-        alert('Tidak ada data anggota untuk filter tersebut.');
+        showAlert('Tidak ada data anggota untuk filter tersebut.', 'error');
         setIsExporting(false);
         return;
       }
@@ -84,7 +86,7 @@ export default function LaporanView() {
       }
 
       if (rawData.length === 0) {
-        alert('Tidak ada data untuk kombinasi filter tersebut.');
+        showAlert('Tidak ada data untuk kombinasi filter tersebut.', 'error');
         setIsExporting(false);
         return;
       }
@@ -404,7 +406,7 @@ export default function LaporanView() {
       }
     } catch (e) {
       console.error(e);
-      alert('Gagal mengekspor data.');
+      showAlert('Gagal mengekspor data.', 'error');
     } finally {
       setIsExporting(false);
     }

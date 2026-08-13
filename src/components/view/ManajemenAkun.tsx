@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useAlert } from '../AlertProvider';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
 export default function ManajemenAkunView({ userRole }: { userRole?: string }) {
+  const { showAlert, showConfirm } = useAlert();
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -11,7 +13,7 @@ export default function ManajemenAkunView({ userRole }: { userRole?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const handleGlobalAdd = () => {
+    const handleGlobalAdd = async () => {
       setEditUser(null);
       setFormData({ username: '', password: '', role: 'Viewer' });
       setFormError('');
@@ -96,8 +98,9 @@ export default function ManajemenAkunView({ userRole }: { userRole?: string }) {
     }
   });
 
-  const handleDelete = (id: number, username: string) => {
-    if (!confirm(`Yakin ingin menghapus akun "${username}"?`)) return;
+  const handleDelete = async (id: number, username: string) => {
+    const confirmed = await showConfirm(`Yakin ingin menghapus akun "${username}"?`);
+    if (!confirmed) return;
     deleteMutation.mutate(id);
   };
 

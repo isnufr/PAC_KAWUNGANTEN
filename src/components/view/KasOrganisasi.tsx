@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useAlert } from '../AlertProvider';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
 
 export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
+  const { showAlert, showConfirm } = useAlert();
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -11,7 +13,7 @@ export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const handleGlobalAdd = () => {
+    const handleGlobalAdd = async () => {
       setIsModalOpen(true);
       setFormError('');
       setFormSuccess('');
@@ -93,8 +95,9 @@ export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
     }
   });
 
-  const handleDeleteKas = (id: number) => {
-    if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
+  const handleDeleteKas = async (id: number) => {
+    const confirmed = await showConfirm('Yakin ingin menghapus transaksi ini?');
+    if (!confirmed) return;
     deleteMutation.mutate(id);
   };
 

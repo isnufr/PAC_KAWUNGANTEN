@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAlert } from '../AlertProvider';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
@@ -27,6 +28,7 @@ interface WilayahItem {
 }
 
 export default function DataAnggotaView({ filter, userRole }: { filter?: string, userRole?: string }) {
+  const { showAlert, showConfirm } = useAlert();
   const queryClient = useQueryClient();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -42,8 +44,6 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
-  const [globalNotification, setGlobalNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
-
   const { data: wilayahListResponse = [] } = useQuery({
     queryKey: ['wilayah'],
     queryFn: async () => {
@@ -108,7 +108,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
   }, [formData.nik, editId]);
 
   useEffect(() => {
-    const handleGlobalAdd = () => {
+    const handleGlobalAdd = async () => {
       setIsModalOpen(true); 
       setFormError(''); 
       setFormSuccess('');
@@ -297,20 +297,21 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
     },
     onSuccess: (json) => {
       if (json.success) {
-        alert("Data berhasil dihapus!");
+        showAlert("Data berhasil dihapus!", 'success');
         setSelectedAnggota(null);
         queryClient.invalidateQueries({ queryKey: ['anggota'] });
       } else {
-        alert(json.error || "Gagal menghapus data");
+        showAlert(json.error || "Gagal menghapus data", 'error');
       }
     },
     onError: () => {
-      alert("Terjadi kesalahan koneksi");
+      showAlert("Terjadi kesalahan koneksi", 'info');
     }
   });
 
-  const handleDelete = () => {
-      if (!window.confirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?")) return;
+  const handleDelete = async () => {
+      const confirmed = await showConfirm("Apakah Anda yakin ingin menghapus data anggota ini secara permanen?");
+    if (!confirmed) return;
       deleteMutation.mutate(selectedAnggota.id);
   };
 
@@ -380,14 +381,17 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
             }
             if (uploadSuccess) {
                 setFormSuccess('Data & Foto berhasil disimpan!');
-                setGlobalNotification({ message: 'Data Anggota & Foto berhasil disimpan!', type: 'success' });
+                showAlert('Data & Foto berhasil disimpan!', 'success');
+                
             } else {
                 setFormSuccess('Data disimpan, namun sebagian foto gagal diunggah.');
-                setGlobalNotification({ message: 'Data Anggota disimpan, namun beberapa foto gagal diunggah.', type: 'error' });
+                showAlert('Data disimpan, namun sebagian foto gagal diunggah.', 'warning');
+                
             }
         } else {
             setFormSuccess(editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!');
-            setGlobalNotification({ message: editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!', type: 'success' });
+            showAlert(editId ? 'Data anggota berhasil diperbarui!' : 'Anggota berhasil ditambahkan!', 'success');
+            
         }
 
         setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '' });
@@ -400,18 +404,13 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         setIsModalOpen(false); 
         setFormSuccess('');
         
-        setTimeout(() => {
-            setGlobalNotification(null);
-        }, 5000);
+        
+        
       } else {
         setFormError(json.error || 'Gagal menyimpan data anggota');
-        setGlobalNotification({ message: json.error || 'Gagal menyimpan data anggota', type: 'error' });
-        setTimeout(() => setGlobalNotification(null), 5000);
       }
     } catch (err) {
       setFormError('Terjadi kesalahan koneksi');
-      setGlobalNotification({ message: 'Terjadi kesalahan koneksi', type: 'error' });
-      setTimeout(() => setGlobalNotification(null), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -419,15 +418,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
 
   return (
     <div id="menu-dataAnggota" className="space-y-5 max-w-6xl mx-auto">
-        {/* GLOBAL TOAST NOTIFICATION */}
-        {globalNotification && mounted && createPortal(
-            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-top-10 fade-in duration-300">
-                <div className={`px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm text-white ${globalNotification.type === 'success' ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-red-500 shadow-red-500/30'}`}>
-                    <span className="material-icons">{globalNotification.type === 'success' ? 'check_circle' : 'error'}</span>
-                    {globalNotification.message}
-                </div>
-            </div>
-        , document.body)}
+        
         {/* FILTER DATA */}
         {filter !== 'verifikasi' && (
         <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm theme-el mb-6">
