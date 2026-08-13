@@ -192,6 +192,28 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
           break;
         }
       }
+
+      // Extract RT / RW
+      const rtRwMatch = text.match(/rt[\s/]*rw\D*(\d{1,3})\s*[/|]\s*(\d{1,3})/i);
+      if (rtRwMatch) {
+          if (rtRwMatch[1]) handleFormChange('rt', rtRwMatch[1].padStart(3, '0'));
+          if (rtRwMatch[2]) handleFormChange('rw', rtRwMatch[2].padStart(3, '0'));
+      }
+
+      // Extract Desa / Kelurahan
+      // Mencocokkan teks OCR dengan daftar desa yang ada di database
+      const textUpper = text.toUpperCase();
+      const foundDesa = desaList.find(d => textUpper.includes(d.toUpperCase()));
+      if (foundDesa) {
+          handleFormChange('desa', foundDesa);
+      }
+
+      // Extract Dusun
+      const allDusuns = Array.from(new Set(wilayahList.map(w => w.dusun).filter(Boolean))) as string[];
+      const foundDusun = allDusuns.find(d => textUpper.includes(d.toUpperCase()));
+      if (foundDusun) {
+          handleFormChange('dusun', foundDusun);
+      }
     } catch (err) {
       setOcrStatus('Gagal memindai teks.');
       console.error(err);
