@@ -425,28 +425,33 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         
         {/* FILTER DATA */}
         {filter !== 'verifikasi' && (
-        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-red-100 shadow-sm theme-el mb-6">
-            <h3 className="text-xs md:text-sm font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-2 mb-4">
-                <span className="material-icons text-red-600 bg-red-100 p-1.5 rounded-lg text-lg">filter_alt</span>
-                FILTER PENCARIAN
-            </h3>
+        <div className="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-[2rem] border border-red-50 shadow-xl shadow-red-900/5 mb-6 theme-el">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[11px] md:text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                    <span className="material-icons text-red-500 bg-red-50 p-1.5 rounded-xl text-lg shadow-sm">filter_list</span>
+                    FILTER PENCARIAN
+                </h3>
+                <button onClick={handleReset} className="h-8 w-8 md:h-9 md:w-9 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl flex items-center justify-center transition shadow-sm border border-red-100/50" title="Reset Filter">
+                    <span className="material-icons text-[18px]">restart_alt</span>
+                </button>
+            </div>
             
-            <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
-                <input type="text" placeholder="Tulis Nama/NIK..."
+            <div className="flex flex-col md:flex-row gap-2.5">
+                <input type="text" placeholder="Ketik Nama atau NIK..."
                     value={search} onChange={e => setSearch(e.target.value)}
-                    className="flex-1 p-2 md:p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition bg-red-50 text-xs text-red-900" />
+                    className="flex-1 px-3 py-2 md:p-2.5 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition bg-white text-[11px] md:text-xs text-slate-700 shadow-inner placeholder:text-slate-400 font-medium" />
 
-                <div className="grid grid-cols-2 md:flex gap-2 sm:gap-3 w-full md:w-auto">
-                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                        <option value="">- Bagian -</option>
+                <div className="grid grid-cols-2 md:flex gap-2 w-full md:w-auto">
+                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm">
+                        <option value="">Bagian</option>
                         <option value="PAC">PAC</option>
                         <option value="RANTING">RANTING</option>
                         <option value="ANAK RANTING">ANAK RANTING</option>
                         <option value="SATGAS">SATGAS</option>
                     </select>
 
-                    <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                        <option value="">- Jabatan -</option>
+                    <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm">
+                        <option value="">Jabatan</option>
                         <option value="KETUA">KETUA</option>
                         <option value="SEKRETARIS">SEKRETARIS</option>
                         <option value="BENDAHARA">BENDAHARA</option>
@@ -454,20 +459,16 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                     </select>
 
                     {/* Filter Desa */}
-                    <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs">
-                        <option value="">- Desa -</option>
+                    <select value={desa} onChange={e => setDesa(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm">
+                        <option value="">Desa</option>
                         {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
 
                     {/* Filter Dusun */}
-                    <select value={dusun} onChange={e => setDusun(e.target.value)} className="w-full md:w-28 p-2 border border-red-200 rounded-xl bg-red-50 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800 text-xs" disabled={!desa}>
-                        <option value="">- Dusun -</option>
+                    <select value={dusun} onChange={e => setDusun(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled={!desa}>
+                        <option value="">Dusun</option>
                         {dusunList.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
-
-                    <button onClick={handleReset} className="col-span-2 md:col-span-1 w-full md:w-11 h-11 border border-red-200 rounded-xl text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Reset Filter">
-                        <span className="material-icons text-xl">restart_alt</span>
-                    </button>
                 </div>
             </div>
         </div>
