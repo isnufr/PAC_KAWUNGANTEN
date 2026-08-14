@@ -63,24 +63,38 @@ export async function GET(request: Request) {
       const folderDusun = anggota.dusun || 'TANPA_DUSUN';
       const safeNama = anggota.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'TanpaNama';
 
-      const processFile = (url: string | null, typeFolder: string, typePrefix: string) => {
+      const processFile = async (url: string | null, typeFolder: string, typePrefix: string) => {
         if (!url) return;
-        // Hanya proses file lokal dari /api/uploads/
-        if (url.startsWith('/api/uploads/')) {
+        const zipPath = `${folderBagian}/${folderDesa}/${folderDusun}/${typeFolder}/${typePrefix}_${anggota.id}_${safeNama}.jpg`;
+
+        if (url.includes('/uploads/')) {
           const fileName = url.split('/').pop();
           if (fileName) {
             const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
             if (fs.existsSync(filePath)) {
-               const zipPath = `${folderBagian}/${folderDesa}/${folderDusun}/${typeFolder}/${typePrefix}_${anggota.id}_${safeNama}.jpg`;
                archive.file(filePath, { name: zipPath });
                hasFiles = true;
             }
           }
+        } else if (url.startsWith('http://') || url.startsWith('https://')) {
+          // Handle remote URLs (e.g. Google Drive)
+          try {
+            const response = await fetch(url);
+            if (response.ok && response.body) {
+              // Convert Web ReadableStream to Node Readable for archiver
+              const { Readable } = require('stream');
+              const nodeStream = Readable.fromWeb(response.body);
+              archive.append(nodeStream, { name: zipPath });
+              hasFiles = true;
+            }
+          } catch (err) {
+            console.error('Gagal mengunduh file eksternal:', url, err);
+          }
         }
       };
 
-      processFile(anggota.passFotoUrl, 'PASS FOTO', 'PASSFOTO');
-      processFile(anggota.fotoKtpUrl, 'FOTO KTP', 'KTP');
+      await processFile(anggota.passFotoUrl, 'PASS FOTO', 'PASSFOTO');
+      await processFile(anggota.fotoKtpUrl, 'FOTO KTP', 'KTP');
     }
 
     if (!hasFiles) {
