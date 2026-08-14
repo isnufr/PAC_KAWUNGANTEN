@@ -42,8 +42,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Tidak ada data anggota ditemukan dengan filter tersebut' }, { status: 404 });
     }
 
-    // Create archiver
-    const archive = archiver('zip', {
+    // Create archiver safely regardless of ESM/CommonJS import format
+    const createArchiver = typeof archiver === 'function' ? archiver : (archiver as any).default || (archiver as any).create;
+    const archive = createArchiver('zip', {
       zlib: { level: 5 } // tingkat kompresi moderate
     });
 
@@ -107,6 +108,7 @@ export async function GET(request: Request) {
 
   } catch (error) {
     console.error('Export error:', error);
-    return NextResponse.json({ error: 'Terjadi kesalahan pada server saat melakukan export' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: `Terjadi kesalahan pada server: ${errorMessage}` }, { status: 500 });
   }
 }
