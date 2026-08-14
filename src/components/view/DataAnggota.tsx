@@ -245,9 +245,17 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
     }
   };
 
+  const [page, setPage] = useState(1);
+  const limit = 30;
+
+  // Reset page ke 1 jika filter berubah
+  useEffect(() => {
+    setPage(1);
+  }, [search, bagian, jabatan, kecamatan, desa, dusun, filter]);
+
   // Fetch Data Anggota using React Query
-  const { data = [], isLoading, refetch: fetchData } = useQuery({
-    queryKey: ['anggota', search, bagian, jabatan, kecamatan, desa, dusun, filter],
+  const { data: queryData, isLoading, refetch: fetchData } = useQuery({
+    queryKey: ['anggota', search, bagian, jabatan, kecamatan, desa, dusun, filter, page],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
@@ -257,12 +265,17 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
       if (desa) params.append('desa', desa);
       if (dusun) params.append('dusun', dusun);
       if (filter) params.append('filter', filter);
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       
       const res = await fetch(`/api/anggota?${params.toString()}`);
       const json = await res.json();
-      return json.success ? json.data : [];
+      return json.success ? json : { data: [], meta: { totalPages: 1, total: 0 } };
     }
   });
+
+  const data = queryData?.data || [];
+  const meta = queryData?.meta || { totalPages: 1, total: 0 };
 
   const handleReset = () => {
     setSearch(''); setBagian(''); setJabatan(''); setKecamatan(''); setDesa(''); setDusun('');
@@ -560,6 +573,31 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                         </table>
                     </div>
                   )}
+
+                    {/* PAGINATION CONTROLS */}
+                    {meta.totalPages > 1 && (
+                        <div className="flex items-center justify-between p-4 sm:p-5 border-t border-red-50 bg-white">
+                            <button 
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-xs disabled:opacity-50 transition hover:bg-red-100 flex items-center gap-1"
+                            >
+                                <span className="material-icons text-sm">chevron_left</span> Sebelumnya
+                            </button>
+                            
+                            <span className="text-[10px] md:text-xs font-black text-red-800 bg-red-50 px-3 py-1 rounded-lg">
+                                Halaman {page} dari {meta.totalPages}
+                            </span>
+                            
+                            <button 
+                                onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                                disabled={page === meta.totalPages}
+                                className="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-xs disabled:opacity-50 transition hover:bg-red-100 flex items-center gap-1"
+                            >
+                                Selanjutnya <span className="material-icons text-sm">chevron_right</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         ) : (
@@ -641,6 +679,32 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             })}
                         </div>
                     )}
+                    
+                    {/* PAGINATION CONTROLS */}
+                    {meta.totalPages > 1 && (
+                        <div className="flex items-center justify-between mt-6 pt-5 border-t border-red-50">
+                            <button 
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-xs disabled:opacity-50 transition hover:bg-red-100 flex items-center gap-1"
+                            >
+                                <span className="material-icons text-sm">chevron_left</span> Sebelumnya
+                            </button>
+                            
+                            <span className="text-[10px] md:text-xs font-black text-red-800 bg-red-50 px-3 py-1 rounded-lg">
+                                Halaman {page} dari {meta.totalPages}
+                            </span>
+                            
+                            <button 
+                                onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                                disabled={page === meta.totalPages}
+                                className="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-xs disabled:opacity-50 transition hover:bg-red-100 flex items-center gap-1"
+                            >
+                                Selanjutnya <span className="material-icons text-sm">chevron_right</span>
+                            </button>
+                        </div>
+                    )}
+
                 </div>
             </div>
         )}
