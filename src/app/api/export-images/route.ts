@@ -47,13 +47,14 @@ export async function GET(request: Request) {
       zlib: { level: 5 } // tingkat kompresi moderate
     });
 
-    // Bridge Node Stream to Web Stream using TransformStream
-    const { readable, writable } = new TransformStream();
-    const writer = writable.getWriter();
-
-    archive.on('data', (chunk: any) => writer.write(chunk));
-    archive.on('end', () => writer.close());
-    archive.on('error', (err: any) => writer.abort(err));
+    // Bridge Node Stream to Web Stream using ReadableStream
+    const stream = new ReadableStream({
+      start(controller) {
+        archive.on('data', (chunk: any) => controller.enqueue(chunk));
+        archive.on('end', () => controller.close());
+        archive.on('error', (err: any) => controller.error(err));
+      }
+    });
 
     let hasFiles = false;
 
@@ -99,7 +100,7 @@ export async function GET(request: Request) {
     zipName += '.zip';
     zipName = zipName.replace(/\s+/g, '_');
 
-    return new NextResponse(readable, {
+    return new NextResponse(stream, {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipName}"`
