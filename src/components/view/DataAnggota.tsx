@@ -3,6 +3,8 @@ import { useAlert } from '../AlertProvider';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
+import SkeletonList from '../SkeletonList';
+import ImageCropper from '../ImageCropper';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -121,6 +123,9 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
   const [fileKtp, setFileKtp] = useState<File | null>(null);
   const [filePassFoto, setFilePassFoto] = useState<File | null>(null);
   const [ocrStatus, setOcrStatus] = useState('');
+  
+  // Crop State
+  const [cropTarget, setCropTarget] = useState<{ type: 'KTP' | 'PASSFOTO', src: string, aspect: number } | null>(null);
 
   const uploadFile = async (file: File, type: string, id: number, nama: string) => {
     const fd = new FormData();
@@ -132,14 +137,34 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
     return res.json();
   };
 
-  const handleKtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'KTP' | 'PASSFOTO') => {
     if (e.target.files && e.target.files[0]) {
-      setFileKtp(e.target.files[0]);
-      setOcrStatus('');
-    } else {
-      setFileKtp(null);
-      setOcrStatus('');
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setCropTarget({
+          type,
+          src: reader.result?.toString() || '',
+          aspect: type === 'KTP' ? 86 / 54 : 3 / 4
+        });
+      });
+      reader.readAsDataURL(file);
+      e.target.value = ''; // reset input
     }
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    if (cropTarget?.type === 'KTP') {
+      setFileKtp(croppedFile);
+      setOcrStatus('');
+    } else if (cropTarget?.type === 'PASSFOTO') {
+      setFilePassFoto(croppedFile);
+    }
+    setCropTarget(null);
+  };
+
+  const handleCropCancel = () => {
+    setCropTarget(null);
   };
 
   const handleScanKtp = async () => {
@@ -492,7 +517,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                 {/* Table View for Verifikasi */}
                 <div className="bg-white rounded-3xl shadow-sm border border-red-100 overflow-hidden theme-el">
                   {isLoading ? (
-                      <div className="p-8"><LoadingSpinner /></div>
+                      <div className="p-4 sm:p-5"><SkeletonList rows={4} /></div>
                   ) : data.length === 0 ? (
                       <p className="text-center text-slate-500 py-8 font-bold">Tidak ada data anggota yang perlu diverifikasi.</p>
                   ) : (
@@ -551,7 +576,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                     </div>
 
                     {isLoading ? (
-                        <LoadingSpinner />
+                        <div className="py-2"><SkeletonList rows={6} /></div>
                     ) : data.length === 0 ? (
                         <p className="text-center text-slate-500 py-8 font-bold">Tidak ada data anggota yang ditemukan.</p>
                     ) : (
@@ -762,7 +787,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <div className="border-2 border-dashed border-red-200 rounded-xl p-3 flex items-center gap-3">
                                 <label className="cursor-pointer bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition">
                                     Pilih File
-                                    <input type="file" accept="image/*" onChange={handleKtpChange} className="hidden" />
+                                    <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, 'KTP')} className="hidden" />
                                 </label>
                                 <span className="text-xs text-slate-400 font-medium">{fileKtp ? fileKtp.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
@@ -877,7 +902,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <div className="border-2 border-dashed border-red-200 rounded-xl p-3 flex items-center gap-3">
                                 <label className="cursor-pointer bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition">
                                     Pilih File
-                                    <input type="file" accept="image/*" onChange={(e) => { if(e.target.files) setFilePassFoto(e.target.files[0]) }} className="hidden" />
+                                    <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, 'PASSFOTO')} className="hidden" />
                                 </label>
                                 <span className="text-xs text-slate-400 font-medium">{filePassFoto ? filePassFoto.name : 'Tidak ada file yang dipilih'}</span>
                             </div>
@@ -1001,6 +1026,17 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                 <img src={fullScreenImage} alt="Fullscreen" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
             </div>
         , document.body)}
+
+        {/* CROPPER */}
+        {cropTarget && (
+            <ImageCropper
+                imageSrc={cropTarget.src}
+                aspect={cropTarget.aspect}
+                title={cropTarget.type === 'KTP' ? 'Sesuaikan Potongan KTP' : 'Sesuaikan Pass Foto'}
+                onCropComplete={handleCropComplete}
+                onCancel={handleCropCancel}
+            />
+        )}
     </div>
   );
 }

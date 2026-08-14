@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import LoadingSpinner from '../LoadingSpinner';
+import SkeletonList from '../SkeletonList';
 
 export default function LogAktivitasView() {
   const { data: logs = [], isLoading, refetch: fetchLogs } = useQuery({
@@ -40,7 +41,7 @@ export default function LogAktivitasView() {
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
                         {isLoading ? (
-                            <tr><td colSpan={4} className="p-0"><LoadingSpinner /></td></tr>
+                            <tr><td colSpan={4} className="p-0 bg-white"><div className="p-4"><SkeletonList rows={4} /></div></td></tr>
                         ) : logs.length === 0 ? (
                             <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Belum ada log aktivitas.</td></tr>
                         ) : logs.map((log: any) => (

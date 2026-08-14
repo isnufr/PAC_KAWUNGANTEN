@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAlert } from '../AlertProvider';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import LoadingSpinner from '../LoadingSpinner';
+import SkeletonList from '../SkeletonList';
 
 export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
   const { showAlert, showConfirm } = useAlert();
@@ -192,7 +192,7 @@ export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
                     </thead>
                     <tbody className="divide-y divide-red-50 bg-white">
                         {isLoading ? (
-                            <tr><td colSpan={7} className="p-0"><LoadingSpinner /></td></tr>
+                            <tr><td colSpan={7} className="p-0 bg-white"><div className="p-4"><SkeletonList rows={4} /></div></td></tr>
                         ) : data.length === 0 ? (
                             <tr><td colSpan={7} className="text-center py-6 text-red-400 font-bold">Tidak ada transaksi ditemukan.</td></tr>
                         ) : data.map((item: any) => (
