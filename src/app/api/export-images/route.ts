@@ -76,27 +76,46 @@ export async function GET(request: Request) {
            absoluteUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
         }
 
+        // Otomatis ubah link Google Drive ke format direct download
+        if (absoluteUrl.includes('drive.google.com/file/d/')) {
+           const fileId = absoluteUrl.split('/d/')[1]?.split('/')[0];
+           if (fileId) absoluteUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        } else if (absoluteUrl.includes('drive.google.com/uc') && !absoluteUrl.includes('export=download')) {
+           absoluteUrl = absoluteUrl.replace('uc?', 'uc?export=download&');
+        }
+
+        let fileProcessed = false;
+
         try {
           const response = await fetch(absoluteUrl);
           if (response.ok && response.body) {
-            const { Readable } = require('stream');
-            archive.append(Readable.fromWeb(response.body), { name: zipPath });
-            hasFiles = true;
-          } else if (url.includes('/uploads/')) {
-            // Fallback terakhir: Coba baca langsung dari disk jika fetch gagal (misal server tidak bisa panggil domain sendiri)
-            let fileName = url.split('/').pop() || '';
-            if (fileName.includes('?')) fileName = fileName.split('?')[0];
-            fileName = decodeURIComponent(fileName);
-            if (fileName) {
-              const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
-              if (fs.existsSync(filePath)) {
-                 archive.append(fs.createReadStream(filePath), { name: zipPath });
-                 hasFiles = true;
-              }
+            const contentType = response.headers.get('content-type') || '';
+            // Jangan masukkan file HTML ke dalam ZIP (biasanya error page dari Google Drive)
+            if (!contentType.includes('text/html')) {
+              const { Readable } = require('stream');
+              archive.append(Readable.fromWeb(response.body), { name: zipPath });
+              hasFiles = true;
+              fileProcessed = true;
+            } else {
+              console.warn('File eksternal dicegah masuk ZIP karena berupa halaman web (HTML):', absoluteUrl);
             }
           }
         } catch (err) {
           console.error('Gagal mengunduh file:', absoluteUrl, err);
+        }
+
+        // Fallback terakhir: Jika HTTP fetch gagal (atau di-block) dan ini adalah file lokal, baca langsung dari disk
+        if (!fileProcessed && url.includes('/uploads/')) {
+          let fileName = url.split('/').pop() || '';
+          if (fileName.includes('?')) fileName = fileName.split('?')[0];
+          fileName = decodeURIComponent(fileName);
+          if (fileName) {
+            const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+            if (fs.existsSync(filePath)) {
+               archive.append(fs.createReadStream(filePath), { name: zipPath });
+               hasFiles = true;
+            }
+          }
         }
       };
 
