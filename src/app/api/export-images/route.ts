@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+// @ts-ignore
 import archiver from 'archiver';
 import fs from 'fs';
 import path from 'path';
