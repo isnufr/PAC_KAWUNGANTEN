@@ -473,138 +473,162 @@ export default function LaporanView() {
   const hideKolomEkspor = format === 'EXCEL' && (bagian === 'RANTING' || bagian === 'ANAK RANTING');
   const showDusunFilter = bagian === 'ANAK RANTING' && desa;
 
+  const [activeMenu, setActiveMenu] = useState<'data' | 'foto' | null>(null);
+
   return (
-    <div id="menu-laporan" className="max-w-6xl mx-auto">
-        <div className="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-red-100 max-w-2xl mx-auto text-center">
-            <div className="mx-auto w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mb-3.5 border border-red-200">
-                <span className="material-icons text-red-600 text-2xl md:text-3xl">assignment_turned_in</span>
-            </div>
-            <h2 className="text-lg md:text-xl font-extrabold text-red-800 mb-1.5">Ekspor Laporan Data</h2>
-            <p className="text-red-400 text-xs md:text-sm mb-5 pb-5 border-b border-red-50">Pilih filter dan format file dokumen yang Anda butuhkan untuk diunduh ke perangkat Anda.</p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 mb-6 text-left">
-                <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center">Pilih Format Unduhan</label>
-                    <select value={format} onChange={e => setFormat(e.target.value)} className="w-full p-3.5 border-2 border-red-200 rounded-2xl bg-white outline-none text-xs md:text-sm font-bold text-red-700 focus:border-red-500 text-center cursor-pointer transition shadow-sm hover:shadow-md">
-                        <option value="EXCEL">Spreadsheet Excel (.xlsx)</option>
-                        <option value="PDF">Dokumen PDF (.pdf)</option>
-                        <option value="CSV">Data Mentah CSV (.csv)</option>
-                    </select>
+    <div id="menu-laporan" className="max-w-6xl mx-auto space-y-6">
+        
+        {/* TAB SELECTION */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto mb-8">
+            <button 
+                onClick={() => setActiveMenu(activeMenu === 'data' ? null : 'data')}
+                className={`p-6 rounded-[2rem] border-2 transition-all duration-300 flex flex-col items-center justify-center gap-3 ${activeMenu === 'data' ? 'bg-red-50 border-red-500 shadow-xl scale-[1.02]' : 'bg-white border-slate-100 hover:border-red-200 hover:bg-red-50/50 hover:shadow-md'}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 shadow-sm ${activeMenu === 'data' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-600'}`}>
+                    <span className="material-icons text-3xl">assignment_turned_in</span>
                 </div>
-
-                <div className="sm:col-span-2 pt-3 mt-1 border-t border-red-50"></div>
-
-                <div>
-                    <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Filter Bagian</label>
-                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800">
-                        <option value="">- Bagian -</option>
-                        <option value="PAC">PAC</option>
-                        <option value="RANTING">RANTING</option>
-                        <option value="ANAK RANTING">ANAK RANTING</option>
-                        <option value="SATGAS">SATGAS</option>
-                    </select>
+                <h3 className={`font-black text-lg ${activeMenu === 'data' ? 'text-red-800' : 'text-slate-700'}`}>Ekspor Laporan Data</h3>
+                <p className="text-xs text-slate-500 text-center px-4">Unduh data anggota dalam format Spreadsheet Excel, PDF, atau CSV terstruktur.</p>
+            </button>
+            
+            <button 
+                onClick={() => setActiveMenu(activeMenu === 'foto' ? null : 'foto')}
+                className={`p-6 rounded-[2rem] border-2 transition-all duration-300 flex flex-col items-center justify-center gap-3 ${activeMenu === 'foto' ? 'bg-red-50 border-red-500 shadow-xl scale-[1.02]' : 'bg-white border-slate-100 hover:border-red-200 hover:bg-red-50/50 hover:shadow-md'}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 shadow-sm ${activeMenu === 'foto' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-600'}`}>
+                    <span className="material-icons text-3xl">photo_library</span>
                 </div>
-
-                <div>
-                    <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Filter Desa</label>
-                    <select value={desa} onChange={e => { setDesa(e.target.value); setSelectedDusuns([]); }} className="p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 w-full text-xs">
-                        <option value="">- Desa -</option>
-                        {desaList.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                </div>
-
-                {showDusunFilter && (
-                    <div className="sm:col-span-2 mt-2">
-                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-2">Filter Dusun (Bisa Pilih Banyak)</label>
-                        <div className="grid grid-cols-2 gap-2 bg-red-50 p-3 rounded-xl border border-red-100">
-                            {dusunList.map(dsn => (
-                                <label key={dsn} className="flex items-center space-x-2 text-xs font-semibold text-red-800 cursor-pointer">
-                                    <input type="checkbox" checked={selectedDusuns.includes(dsn)} onChange={() => toggleDusun(dsn)} className="form-checkbox h-4 w-4 text-red-600 rounded border-red-300 focus:ring-red-500" />
-                                    <span>{dsn}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {!hideKolomEkspor && (
-                    <div className="sm:col-span-2 pt-3 mt-1 border-t border-red-50 transition-all duration-300">
-                        <label className="block text-xs font-bold text-red-800 uppercase tracking-wide mb-2.5 text-center">Pilih Kolom Ekspor</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                            {Object.entries(cols).map(([k, v]) => (
-                                <label key={k} className="flex items-center space-x-2 text-xs font-medium text-red-700 cursor-pointer">
-                                    <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-red-300 focus:ring-red-500" />
-                                    <span className="uppercase">{k.replace(/([A-Z])/g, ' $1').trim()}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <button onClick={handleExport} disabled={isExporting}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 md:py-4 rounded-full font-bold flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-500/30 transition transform active:scale-95 text-sm disabled:opacity-50">
-                <span className="material-icons">{isExporting ? 'hourglass_empty' : 'cloud_download'}</span>
-                <span>{isExporting ? 'MENYIAPKAN FILE...' : 'UNDUH SEKARANG'}</span>
+                <h3 className={`font-black text-lg ${activeMenu === 'foto' ? 'text-red-800' : 'text-slate-700'}`}>Ekspor Foto Anggota (ZIP)</h3>
+                <p className="text-xs text-slate-500 text-center px-4">Unduh massal Pass Foto dan KTP dalam folder ZIP yang tersusun rapi otomatis.</p>
             </button>
         </div>
 
-        {/* EXPORT FOTO MASSAL (ZIP) */}
-        <div className="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-red-100 max-w-2xl mx-auto mt-6 text-center">
-            <div className="mx-auto w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mb-3.5 border border-red-200">
-                <span className="material-icons text-red-600 text-2xl md:text-3xl">photo_library</span>
-            </div>
-            <h2 className="text-lg md:text-xl font-extrabold text-red-800 mb-1.5">Ekspor Foto Anggota (ZIP)</h2>
-            <p className="text-red-400 text-xs md:text-sm mb-5 pb-5 border-b border-red-50">Unduh massal Pass Foto dan Foto KTP. Sistem otomatis merapikan dalam folder sesuai struktur wilayah.</p>
+        {activeMenu === 'data' && (
+            <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] shadow-xl border border-red-100 max-w-2xl mx-auto text-center relative overflow-hidden transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                <h2 className="text-xl md:text-2xl font-extrabold text-red-800 mb-2">Form Ekspor Laporan Data</h2>
+                <p className="text-red-400 text-xs md:text-sm mb-6 pb-6 border-b border-red-50">Silakan atur filter di bawah ini untuk mengunduh laporan ke perangkat Anda.</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 mb-6 text-left">
-                <div className="sm:col-span-2">
-                    <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">1. Filter Bagian (Wajib)</label>
-                    <select value={photoBagian} onChange={e => { setPhotoBagian(e.target.value); setPhotoDesa(''); setPhotoDusun(''); }} className="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800">
-                        <option value="">- Pilih Bagian -</option>
-                        <option value="Semua">Semua Bagian</option>
-                        <option value="PAC">PAC</option>
-                        <option value="RANTING">RANTING</option>
-                        <option value="ANAK RANTING">ANAK RANTING</option>
-                        <option value="SATGAS">SATGAS</option>
-                    </select>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-8 text-left relative z-10">
+                    <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Pilih Format Unduhan</label>
+                        <select value={format} onChange={e => setFormat(e.target.value)} className="w-full p-4 border-2 border-red-200 rounded-2xl bg-white outline-none text-sm font-bold text-red-700 focus:border-red-500 text-center cursor-pointer transition shadow-sm hover:shadow-md">
+                            <option value="EXCEL">Spreadsheet Excel (.xlsx)</option>
+                            <option value="PDF">Dokumen PDF (.pdf)</option>
+                            <option value="CSV">Data Mentah CSV (.csv)</option>
+                        </select>
+                    </div>
 
-                {photoBagian && (
-                    <>
+                    <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100"></div>
+
                     <div>
-                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">2. Filter Desa (Opsional)</label>
-                        <select 
-                            disabled={photoBagian === 'PAC' || photoBagian === 'SATGAS'} 
-                            value={photoDesa} 
-                            onChange={e => { setPhotoDesa(e.target.value); setPhotoDusun(''); }} 
-                            className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
-                            <option value="">- Pilih Desa (Semua) -</option>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Bagian</label>
+                        <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full p-3.5 border border-red-200 rounded-xl bg-red-50 outline-none text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-bold text-red-800">
+                            <option value="">- Semua Bagian -</option>
+                            <option value="PAC">PAC</option>
+                            <option value="RANTING">RANTING</option>
+                            <option value="ANAK RANTING">ANAK RANTING</option>
+                            <option value="SATGAS">SATGAS</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Desa</label>
+                        <select value={desa} onChange={e => { setDesa(e.target.value); setSelectedDusuns([]); }} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                            <option value="">- Semua Desa -</option>
                             {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                         </select>
                     </div>
 
-                    <div>
-                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">3. Filter Dusun (Opsional)</label>
-                        <select 
-                            disabled={photoBagian !== 'ANAK RANTING' || !photoDesa} 
-                            value={photoDusun} 
-                            onChange={e => setPhotoDusun(e.target.value)} 
-                            className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
-                            <option value="">- Pilih Dusun (Semua) -</option>
-                            {photoDusunList.map(d => <option key={d} value={d}>{d}</option>)}
+                    {showDusunFilter && (
+                        <div className="sm:col-span-2 mt-2">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Dusun (Bisa Pilih Banyak)</label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                {dusunList.map(dsn => (
+                                    <label key={dsn} className="flex items-center space-x-3 text-xs font-bold text-slate-700 cursor-pointer p-2 hover:bg-slate-100 rounded-lg transition">
+                                        <input type="checkbox" checked={selectedDusuns.includes(dsn)} onChange={() => toggleDusun(dsn)} className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500 transition" />
+                                        <span>{dsn}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {!hideKolomEkspor && (
+                        <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100 transition-all duration-300">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Pilih Kolom Ekspor</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {Object.entries(cols).map(([k, v]) => (
+                                    <label key={k} className="flex items-center space-x-2 text-[11px] font-bold text-slate-600 cursor-pointer p-2 rounded-xl bg-white border border-slate-100 hover:border-slate-300 transition hover:bg-slate-50">
+                                        <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500" />
+                                        <span className="uppercase">{k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <button onClick={handleExport} disabled={isExporting}
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-black flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-600/30 transition-all transform active:scale-95 text-sm disabled:opacity-50 relative z-10">
+                    <span className="material-icons">{isExporting ? 'hourglass_empty' : 'cloud_download'}</span>
+                    <span>{isExporting ? 'MENYIAPKAN FILE...' : 'UNDUH SEKARANG'}</span>
+                </button>
+            </div>
+        )}
+
+        {/* EXPORT FOTO MASSAL (ZIP) */}
+        {activeMenu === 'foto' && (
+            <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] shadow-xl border border-red-100 max-w-2xl mx-auto text-center relative overflow-hidden transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                <h2 className="text-xl md:text-2xl font-extrabold text-red-800 mb-2">Form Ekspor Foto Anggota</h2>
+                <p className="text-red-400 text-xs md:text-sm mb-6 pb-6 border-b border-red-50">Unduh massal Pass Foto dan Foto KTP dalam bentuk ZIP.</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-8 text-left relative z-10">
+                    <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">1. Filter Bagian (Wajib)</label>
+                        <select value={photoBagian} onChange={e => { setPhotoBagian(e.target.value); setPhotoDesa(''); setPhotoDusun(''); }} className="w-full p-4 border border-red-200 rounded-2xl bg-red-50 outline-none text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-bold text-red-800">
+                            <option value="">- Pilih Bagian -</option>
+                            <option value="Semua">Semua Bagian</option>
+                            <option value="PAC">PAC</option>
+                            <option value="RANTING">RANTING</option>
+                            <option value="ANAK RANTING">ANAK RANTING</option>
+                            <option value="SATGAS">SATGAS</option>
                         </select>
                     </div>
-                    </>
-                )}
-            </div>
 
-            <button onClick={handleExportPhoto} disabled={isExportingPhoto}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 md:py-4 rounded-full font-bold flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-500/30 transition transform active:scale-95 text-sm disabled:opacity-50">
-                <span className="material-icons">{isExportingPhoto ? 'hourglass_empty' : 'archive'}</span>
-                <span>{isExportingPhoto ? 'MEMBUAT ZIP...' : 'UNDUH FOTO (ZIP)'}</span>
-            </button>
-        </div>
+                    {photoBagian && (
+                        <>
+                        <div>
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">2. Filter Desa (Opsional)</label>
+                            <select 
+                                disabled={photoBagian === 'PAC' || photoBagian === 'SATGAS'} 
+                                value={photoDesa} 
+                                onChange={e => { setPhotoDesa(e.target.value); setPhotoDusun(''); }} 
+                                className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm disabled:opacity-50 disabled:bg-slate-50">
+                                <option value="">- Pilih Desa (Semua) -</option>
+                                {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">3. Filter Dusun (Opsional)</label>
+                            <select 
+                                disabled={photoBagian !== 'ANAK RANTING' || !photoDesa} 
+                                value={photoDusun} 
+                                onChange={e => setPhotoDusun(e.target.value)} 
+                                className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm disabled:opacity-50 disabled:bg-slate-50">
+                                <option value="">- Pilih Dusun (Semua) -</option>
+                                {photoDusunList.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                        </div>
+                        </>
+                    )}
+                </div>
+
+                <button onClick={handleExportPhoto} disabled={isExportingPhoto}
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-black flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-600/30 transition-all transform active:scale-95 text-sm disabled:opacity-50 relative z-10">
+                    <span className="material-icons">{isExportingPhoto ? 'hourglass_empty' : 'archive'}</span>
+                    <span>{isExportingPhoto ? 'MEMBUAT ZIP...' : 'UNDUH FOTO (ZIP)'}</span>
+                </button>
+            </div>
+        )}
 
         {/* LOADING OVERLAY MODERN */}
         {mounted && (isExporting || isExportingPhoto) && createPortal(
