@@ -652,7 +652,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                 </div>
                                                 <div className="text-[8.5px] md:text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                                     <span className="material-icons text-[10px] md:text-[12px] text-red-400">location_on</span>
-                                                    <span className="truncate">{item.dusun ? `DUSUN ${item.dusun}, ` : ''}DESA {item.desa || '-'}</span>
+                                                    <span className="truncate">{item.dusun ? `${item.dusun}, ` : ''}{item.desa || '-'}</span>
                                                 </div>
                                             </div>
                                         </div>
