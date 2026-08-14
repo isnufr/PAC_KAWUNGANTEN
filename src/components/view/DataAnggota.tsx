@@ -428,12 +428,11 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         setFilePassFoto(null);
         setOcrStatus('');
         setEditId(null);
-        queryClient.invalidateQueries({ queryKey: ['anggota'] });
+        // Tunggu hingga data terbaru selesai di-fetch ulang dari server
+        await queryClient.invalidateQueries({ queryKey: ['anggota'] });
         
         setIsModalOpen(false); 
         setFormSuccess('');
-        
-        
         
       } else {
         setFormError(json.error || 'Gagal menyimpan data anggota');
