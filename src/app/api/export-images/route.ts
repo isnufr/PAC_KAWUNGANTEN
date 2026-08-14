@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-// @ts-ignore
-import archiver from 'archiver';
 import fs from 'fs';
 import path from 'path';
 
@@ -42,9 +40,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Tidak ada data anggota ditemukan dengan filter tersebut' }, { status: 404 });
     }
 
-    // Create archiver safely regardless of ESM/CommonJS import format
-    const createArchiver = typeof archiver === 'function' ? archiver : (archiver as any).default || (archiver as any).create;
-    const archive = createArchiver('zip', {
+    // Gunakan ZipArchive untuk archiver v8+
+    const archiverModule = require('archiver');
+    const ZipArchive = archiverModule.ZipArchive || archiverModule.default?.ZipArchive;
+    const archive = new ZipArchive({
       zlib: { level: 5 } // tingkat kompresi moderate
     });
 
