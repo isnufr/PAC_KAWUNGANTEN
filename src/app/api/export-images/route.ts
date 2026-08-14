@@ -47,14 +47,11 @@ export async function GET(request: Request) {
       zlib: { level: 5 } // tingkat kompresi moderate
     });
 
-    // Bridge Node Stream to Web Stream using ReadableStream
-    const stream = new ReadableStream({
-      start(controller) {
-        archive.on('data', (chunk: any) => controller.enqueue(chunk));
-        archive.on('end', () => controller.close());
-        archive.on('error', (err: any) => controller.error(err));
-      }
-    });
+    // Gunakan PassThrough untuk menghubungkan archiver ke Web Stream secara native
+    const { PassThrough } = require('stream');
+    const { Readable } = require('stream');
+    const passThrough = new PassThrough();
+    archive.pipe(passThrough);
 
     let hasFiles = false;
 
@@ -99,7 +96,9 @@ export async function GET(request: Request) {
     zipName += '.zip';
     zipName = zipName.replace(/\s+/g, '_');
 
-    return new NextResponse(stream, {
+    const webStream = Readable.toWeb(passThrough);
+
+    return new NextResponse(webStream as any, {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipName}"`

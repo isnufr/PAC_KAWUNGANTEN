@@ -6,7 +6,6 @@ import { jwtVerify } from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_super_kwt_2024';
 
 export async function middleware(request: NextRequest) {
-  // Bypass pengecekan untuk rute publik/statis
   const publicPaths = [
     '/login',
     '/api/auth/login',
