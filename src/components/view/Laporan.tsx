@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAlert } from '../AlertProvider';
 import { useQuery } from '@tanstack/react-query';
 import * as XLSX from 'xlsx-js-style';
@@ -19,6 +20,17 @@ export default function LaporanView() {
   const [desa, setDesa] = useState('');
   const [selectedDusuns, setSelectedDusuns] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // States for Photo Export
+  const [photoBagian, setPhotoBagian] = useState('');
+  const [photoDesa, setPhotoDesa] = useState('');
+  const [photoDusun, setPhotoDusun] = useState('');
+  const [isExportingPhoto, setIsExportingPhoto] = useState(false);
   const [cols, setCols] = useState({
     nik: true,
     nama: true,
@@ -51,6 +63,11 @@ export default function LaporanView() {
     if (desa) return Array.from(new Set(wilayahList.filter((w) => w.desa === desa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
     return [];
   }, [desa, wilayahList]);
+
+  const photoDusunList = useMemo(() => {
+    if (photoDesa) return Array.from(new Set(wilayahList.filter((w) => w.desa === photoDesa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
+    return [];
+  }, [photoDesa, wilayahList]);
 
   // We should clear selectedDusuns when desa changes. We can do this in the select onChange.
 
@@ -109,7 +126,9 @@ export default function LaporanView() {
 
       const filterLeftText = "DATA " + (filterArr.length > 0 ? filterArr.join(" | ") : "KESELURUHAN ANGGOTA");
       const summaryRightText = `Jumlah Data : ${rawData.length} | Laki-Laki : ${countL} | Perempuan : ${countP}`;
-      const fileName = `Laporan_Data_${bagian || 'Total'}_${new Date().getTime()}`;
+      let fileName = bagian ? bagian.toUpperCase() : "LAPORAN_DATA_KESELURUHAN";
+      if (selectedDusuns.length > 0) fileName += `_DUSUN ${selectedDusuns.join("_").toUpperCase()}`;
+      if (desa) fileName += `_DESA ${desa.toUpperCase()}`;
 
       // Build Headers
       const headers = ["NO"];
@@ -404,12 +423,51 @@ export default function LaporanView() {
             doc.save(`${fileName}.pdf`);
         }
       }
+      
+      showAlert('Laporan berhasil diekspor dan diunduh!', 'success');
     } catch (e) {
       console.error(e);
       showAlert('Gagal mengekspor data.', 'error');
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const handleExportPhoto = async () => {
+    if (!photoBagian) {
+      showAlert('Silakan pilih Bagian terlebih dahulu.', 'error');
+      return;
+    }
+    setIsExportingPhoto(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('bagian', photoBagian);
+      if (photoDesa) params.append('desa', photoDesa);
+      if (photoDusun) params.append('dusun', photoDusun);
+
+      const response = await fetch(`/api/export-images?${params.toString()}`);
+      if (!response.ok) {
+          const errJson = await response.json().catch(() => ({}));
+          showAlert(errJson.error || 'Gagal export foto.', 'error');
+      } else {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          let zipName = photoBagian && photoBagian !== 'Semua' ? photoBagian.toUpperCase() : "FOTO_KESELURUHAN";
+          if (photoDusun && photoDusun !== 'Semua') zipName += `_DUSUN ${photoDusun.toUpperCase()}`;
+          if (photoDesa && photoDesa !== 'Semua') zipName += `_DESA ${photoDesa.toUpperCase()}`;
+          a.download = `${zipName.replace(/\s+/g, '_')}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          showAlert('Export foto berhasil diunduh.', 'success');
+      }
+    } catch (e) {
+      showAlert('Gagal menghubungi server.', 'error');
+    }
+    setIsExportingPhoto(false);
   };
 
   const hideKolomEkspor = format === 'EXCEL' && (bagian === 'RANTING' || bagian === 'ANAK RANTING');
@@ -490,6 +548,76 @@ export default function LaporanView() {
                 <span>{isExporting ? 'MENYIAPKAN FILE...' : 'UNDUH SEKARANG'}</span>
             </button>
         </div>
+
+        {/* EXPORT FOTO MASSAL (ZIP) */}
+        <div className="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-red-100 max-w-2xl mx-auto mt-6 text-center">
+            <div className="mx-auto w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mb-3.5 border border-red-200">
+                <span className="material-icons text-red-600 text-2xl md:text-3xl">photo_library</span>
+            </div>
+            <h2 className="text-lg md:text-xl font-extrabold text-red-800 mb-1.5">Ekspor Foto Anggota (ZIP)</h2>
+            <p className="text-red-400 text-xs md:text-sm mb-5 pb-5 border-b border-red-50">Unduh massal Pass Foto dan Foto KTP. Sistem otomatis merapikan dalam folder sesuai struktur wilayah.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 md:gap-4 mb-6 text-left">
+                <div className="sm:col-span-2">
+                    <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">1. Filter Bagian (Wajib)</label>
+                    <select value={photoBagian} onChange={e => { setPhotoBagian(e.target.value); setPhotoDesa(''); setPhotoDusun(''); }} className="w-full p-2.5 md:p-3 border border-red-200 rounded-xl bg-red-50 outline-none text-xs md:text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-red-800">
+                        <option value="">- Pilih Bagian -</option>
+                        <option value="Semua">Semua Bagian</option>
+                        <option value="PAC">PAC</option>
+                        <option value="RANTING">RANTING</option>
+                        <option value="ANAK RANTING">ANAK RANTING</option>
+                        <option value="SATGAS">SATGAS</option>
+                    </select>
+                </div>
+
+                {photoBagian && (
+                    <>
+                    <div>
+                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">2. Filter Desa (Opsional)</label>
+                        <select value={photoDesa} onChange={e => { setPhotoDesa(e.target.value); setPhotoDusun(''); }} className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs">
+                            <option value="">- Pilih Desa (Semua) -</option>
+                            {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">3. Filter Dusun (Opsional)</label>
+                        <select disabled={!photoDesa} value={photoDusun} onChange={e => setPhotoDusun(e.target.value)} className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
+                            <option value="">- Pilih Dusun (Semua) -</option>
+                            {photoDusunList.map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                    </div>
+                    </>
+                )}
+            </div>
+
+            <button onClick={handleExportPhoto} disabled={isExportingPhoto}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 md:py-4 rounded-full font-bold flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-500/30 transition transform active:scale-95 text-sm disabled:opacity-50">
+                <span className="material-icons">{isExportingPhoto ? 'hourglass_empty' : 'archive'}</span>
+                <span>{isExportingPhoto ? 'MEMBUAT ZIP...' : 'UNDUH FOTO (ZIP)'}</span>
+            </button>
+        </div>
+
+        {/* LOADING OVERLAY MODERN */}
+        {mounted && (isExporting || isExportingPhoto) && createPortal(
+            <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-sm w-full animate-in zoom-in-95 duration-300 border border-slate-100">
+                    <div className="relative w-20 h-20 mb-6">
+                        <div className="absolute inset-0 border-4 border-red-100 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-red-600 rounded-full border-t-transparent animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="material-icons text-red-600 animate-pulse">cloud_download</span>
+                        </div>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-black text-slate-800 mb-2 uppercase tracking-tight">
+                        Mengunduh File...
+                    </h3>
+                    <p className="text-xs md:text-sm font-semibold text-slate-500 leading-relaxed">
+                        Mohon tunggu sebentar, sistem sedang memproses dan menyiapkan file yang Anda minta.
+                    </p>
+                </div>
+            </div>
+        , document.body)}
     </div>
   );
 }
