@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import SplashWrapper from "@/components/SplashWrapper";
 
 export const viewport: Viewport = {
   themeColor: "#dc2626",
@@ -38,7 +39,9 @@ export default function RootLayout({
       </head>
       <body>
         <Providers>
-          {children}
+          <SplashWrapper>
+            {children}
+          </SplashWrapper>
         </Providers>
       </body>
     </html>
