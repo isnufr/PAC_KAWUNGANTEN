@@ -99,82 +99,114 @@ export default function StrukturOrganisasiView() {
         </div>
 
         {/* Bagan Organisasi */}
-        <div className="p-4 sm:p-8 bg-white border border-slate-200 rounded-3xl min-h-[450px] relative overflow-hidden">
-            <h3 className="text-center text-sm font-black text-red-700 uppercase tracking-wider mb-6">
-                Struktur Kepengurusan {bagian} {desa ? `- ${desa}` : ''} {dusun ? `- ${dusun}` : ''}
-            </h3>
+        <div className="p-4 sm:p-10 bg-slate-50/80 border border-red-100 rounded-[2.5rem] min-h-[500px] relative overflow-hidden shadow-inner">
+            {/* Soft decorative blur circles */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-200/20 rounded-full blur-3xl z-0 mix-blend-multiply"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl z-0 mix-blend-multiply"></div>
+            
+            {/* Dotted pattern overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_2px,transparent_2px)] [background-size:24px_24px] opacity-50 z-0"></div>
 
-            {isLoading ? (
-                <LoadingSpinner />
-            ) : data.length === 0 ? (
-                <p className="text-center text-slate-400 font-medium py-12">Belum ada data pengurus untuk filter ini.</p>
-            ) : (
-                <div className="space-y-6">
-                    {/* KETUA */}
-                    {ketua.length > 0 && (
-                        <div className="flex justify-center">
-                            {ketua.map((k: any) => <OrgCard key={k.id} person={k} color="red" />)}
-                        </div>
-                    )}
+            <div className="relative z-10">
+                <h3 className="text-center text-xs sm:text-sm font-black text-red-800 uppercase tracking-widest mb-8 drop-shadow-sm">
+                    <span className="bg-white/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-red-100 shadow-sm inline-block">
+                        Struktur Kepengurusan {bagian} {desa ? `- ${desa}` : ''} {dusun ? `- ${dusun}` : ''}
+                    </span>
+                </h3>
 
-                    {/* CONNECTOR */}
-                    {(wakilKetua.length > 0 || sekretaris.length > 0 || bendahara.length > 0) && (
-                        <div className="flex justify-center"><div className="w-0.5 h-6 bg-red-200"></div></div>
-                    )}
-
-                    {/* WAKIL, SEKRETARIS, BENDAHARA */}
-                    <div className="flex flex-wrap justify-center gap-4">
-                        {wakilKetua.map((k: any) => <OrgCard key={k.id} person={k} color="orange" />)}
-                        {sekretaris.map((k: any) => <OrgCard key={k.id} person={k} color="blue" />)}
-                        {bendahara.map((k: any) => <OrgCard key={k.id} person={k} color="green" />)}
-                        {komandan.map((k: any) => <OrgCard key={k.id} person={k} color="purple" />)}
-                    </div>
-
-                    {/* CONNECTOR */}
-                    {anggota.length > 0 && (
-                        <div className="flex justify-center"><div className="w-0.5 h-6 bg-slate-200"></div></div>
-                    )}
-
-                    {/* ANGGOTA */}
-                    {anggota.length > 0 && (
-                        <div>
-                            <h4 className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Anggota ({anggota.length})</h4>
-                            <div className="flex flex-wrap justify-center gap-3">
-                                {anggota.map((k: any) => <OrgCard key={k.id} person={k} color="slate" small />)}
+                {isLoading ? (
+                    <LoadingSpinner />
+                ) : data.length === 0 ? (
+                    <p className="text-center text-slate-400 font-medium py-16 bg-white/50 rounded-3xl backdrop-blur-sm mx-auto max-w-md border border-white/60">Belum ada data pengurus untuk filter ini.</p>
+                ) : (
+                    <div className="space-y-4">
+                        {/* KETUA */}
+                        {ketua.length > 0 && (
+                            <div className="flex justify-center relative z-20">
+                                {ketua.map((k: any) => <OrgCard key={k.id} person={k} color="red" />)}
                             </div>
+                        )}
+
+                        {/* CONNECTOR */}
+                        {(wakilKetua.length > 0 || sekretaris.length > 0 || bendahara.length > 0) && (
+                            <div className="flex justify-center -my-3 relative z-10"><div className="w-1 h-12 bg-gradient-to-b from-red-300 via-red-200 to-red-300 rounded-full shadow-sm"></div></div>
+                        )}
+
+                        {/* WAKIL, SEKRETARIS, BENDAHARA */}
+                        <div className="flex flex-wrap justify-center gap-6 relative z-20">
+                            {wakilKetua.map((k: any) => <OrgCard key={k.id} person={k} color="orange" />)}
+                            {sekretaris.map((k: any) => <OrgCard key={k.id} person={k} color="blue" />)}
+                            {bendahara.map((k: any) => <OrgCard key={k.id} person={k} color="green" />)}
+                            {komandan.map((k: any) => <OrgCard key={k.id} person={k} color="purple" />)}
                         </div>
-                    )}
-                </div>
-            )}
+
+                        {/* CONNECTOR */}
+                        {anggota.length > 0 && (
+                            <div className="flex justify-center -my-3 relative z-10"><div className="w-1 h-12 bg-gradient-to-b from-slate-300 via-slate-200 to-slate-300 rounded-full shadow-sm"></div></div>
+                        )}
+
+                        {/* ANGGOTA */}
+                        {anggota.length > 0 && (
+                            <div className="relative z-20 pt-4">
+                                <h4 className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
+                                    <div className="h-[1px] w-12 bg-slate-200"></div>
+                                    Anggota ({anggota.length})
+                                    <div className="h-[1px] w-12 bg-slate-200"></div>
+                                </h4>
+                                <div className="flex flex-wrap justify-center gap-4">
+                                    {anggota.map((k: any) => <OrgCard key={k.id} person={k} color="slate" small />)}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     </div>
   );
 }
 
-const colorMap: Record<string, { bg: string; border: string; text: string; badge: string }> = {
-  red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', badge: 'bg-red-600 text-white' },
-  orange: { bg: 'bg-red-50/70', border: 'border-red-200', text: 'text-red-600', badge: 'bg-red-500 text-white' },
-  blue: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', badge: 'bg-rose-600 text-white' },
-  green: { bg: 'bg-red-50/50', border: 'border-red-100', text: 'text-red-600', badge: 'bg-red-500 text-white' },
-  purple: { bg: 'bg-red-50/60', border: 'border-red-200', text: 'text-red-800', badge: 'bg-red-700 text-white' },
-  slate: { bg: 'bg-white', border: 'border-red-100', text: 'text-red-600', badge: 'bg-red-400 text-white' },
+const colorMap: Record<string, { bg: string; bgGradient: string; badgeGradient: string }> = {
+  red: { bg: 'bg-red-600', bgGradient: 'bg-gradient-to-b from-red-500 to-transparent', badgeGradient: 'bg-gradient-to-r from-red-600 to-red-500' },
+  orange: { bg: 'bg-orange-500', bgGradient: 'bg-gradient-to-b from-orange-400 to-transparent', badgeGradient: 'bg-gradient-to-r from-orange-500 to-orange-400' },
+  blue: { bg: 'bg-blue-600', bgGradient: 'bg-gradient-to-b from-blue-500 to-transparent', badgeGradient: 'bg-gradient-to-r from-blue-600 to-blue-500' },
+  green: { bg: 'bg-emerald-600', bgGradient: 'bg-gradient-to-b from-emerald-500 to-transparent', badgeGradient: 'bg-gradient-to-r from-emerald-600 to-emerald-500' },
+  purple: { bg: 'bg-purple-600', bgGradient: 'bg-gradient-to-b from-purple-500 to-transparent', badgeGradient: 'bg-gradient-to-r from-purple-600 to-purple-500' },
+  slate: { bg: 'bg-slate-500', bgGradient: 'bg-gradient-to-b from-slate-400 to-transparent', badgeGradient: 'bg-gradient-to-r from-slate-500 to-slate-400' },
 };
 
 function OrgCard({ person, color, small = false }: { person: AnggotaItem; color: string; small?: boolean }) {
   const c = colorMap[color] || colorMap.slate;
   return (
-    <div className={`${c.bg} ${c.border} border rounded-2xl ${small ? 'p-3 w-36' : 'p-4 w-48'} text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5`}>
-      <div className={`mx-auto ${small ? 'w-10 h-10' : 'w-14 h-14'} rounded-full bg-white overflow-hidden border-2 ${c.border} shadow-sm mb-2`}>
-        {person.passFotoUrl ? (
-          <img src={getDirectImageUrl(person.passFotoUrl) || ''} alt={person.nama} className="w-full h-full object-cover"
-               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center ${c.bg} ${c.text}"><span class="material-icons text-sm">person</span></div>`; }} />
-        ) : (
-          <div className={`w-full h-full flex items-center justify-center ${c.bg} ${c.text}`}><span className="material-icons text-sm">person</span></div>
-        )}
+    <div className={`relative flex flex-col items-center bg-white rounded-[2rem] ${small ? 'w-36 pt-10 pb-4 px-3 mt-6' : 'w-52 pt-12 pb-6 px-4 mt-10'} text-center shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-100 group`}>
+      
+      {/* Decorative Gradient Background */}
+      <div className={`absolute top-0 left-0 w-full h-1/2 rounded-t-[2rem] ${c.bgGradient} opacity-10 transition-opacity duration-300 group-hover:opacity-20`}></div>
+
+      {/* Avatar (Overlapping Top) */}
+      <div className={`absolute ${small ? '-top-8 w-16 h-16' : '-top-10 w-24 h-24'} rounded-full bg-white p-1.5 shadow-xl shadow-red-900/10 group-hover:scale-105 group-hover:shadow-red-900/20 transition-all duration-300 z-10`}>
+        <div className={`w-full h-full rounded-full overflow-hidden ${c.bg} flex items-center justify-center`}>
+            {person.passFotoUrl ? (
+              <img src={getDirectImageUrl(person.passFotoUrl) || ''} alt={person.nama} className="w-full h-full object-cover"
+                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="material-icons text-white ${small ? 'text-xl' : 'text-3xl'}">person</span>`; }} />
+            ) : (
+              <span className={`material-icons text-white ${small ? 'text-xl' : 'text-3xl'}`}>person</span>
+            )}
+        </div>
       </div>
-      <p className={`${small ? 'text-[10px]' : 'text-xs'} font-bold ${c.text} truncate`}>{person.nama}</p>
-      <span className={`inline-block mt-1 ${c.badge} ${small ? 'text-[8px] px-1.5 py-0.5' : 'text-[9px] px-2 py-0.5'} rounded-full font-bold uppercase tracking-wider`}>{person.jabatan}</span>
-      {person.desa && <p className="text-[9px] text-slate-400 mt-1 truncate">{person.desa}</p>}
+      
+      <p className={`${small ? 'text-[11px]' : 'text-[13px]'} font-black text-slate-800 truncate w-full mb-1.5 relative z-10`}>{person.nama}</p>
+      
+      <span className={`relative z-10 inline-flex items-center justify-center ${c.badgeGradient} text-white ${small ? 'text-[8px] px-2 py-0.5' : 'text-[10px] px-3 py-1'} rounded-full font-bold uppercase tracking-widest shadow-md`}>
+        {person.jabatan}
+      </span>
+      
+      {person.desa && (
+        <div className="flex items-center justify-center gap-1 mt-2.5 text-slate-400 relative z-10">
+           <span className="material-icons text-[12px] text-red-400">location_on</span>
+           <p className="text-[9px] font-extrabold uppercase truncate">{person.desa}</p>
+        </div>
+      )}
     </div>
   );
 }
