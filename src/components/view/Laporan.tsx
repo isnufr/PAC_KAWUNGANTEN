@@ -574,7 +574,11 @@ export default function LaporanView() {
                     <>
                     <div>
                         <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">2. Filter Desa (Opsional)</label>
-                        <select value={photoDesa} onChange={e => { setPhotoDesa(e.target.value); setPhotoDusun(''); }} className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs">
+                        <select 
+                            disabled={photoBagian === 'PAC' || photoBagian === 'SATGAS'} 
+                            value={photoDesa} 
+                            onChange={e => { setPhotoDesa(e.target.value); setPhotoDusun(''); }} 
+                            className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
                             <option value="">- Pilih Desa (Semua) -</option>
                             {desaList.map(d => <option key={d} value={d}>{d}</option>)}
                         </select>
@@ -582,7 +586,11 @@ export default function LaporanView() {
 
                     <div>
                         <label className="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">3. Filter Dusun (Opsional)</label>
-                        <select disabled={!photoDesa} value={photoDusun} onChange={e => setPhotoDusun(e.target.value)} className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
+                        <select 
+                            disabled={photoBagian !== 'ANAK RANTING' || !photoDesa} 
+                            value={photoDusun} 
+                            onChange={e => setPhotoDusun(e.target.value)} 
+                            className="w-full p-3 border border-red-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-semibold text-slate-700 text-xs disabled:opacity-50 disabled:bg-slate-50">
                             <option value="">- Pilih Dusun (Semua) -</option>
                             {photoDusunList.map(d => <option key={d} value={d}>{d}</option>)}
                         </select>
