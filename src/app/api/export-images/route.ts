@@ -86,7 +86,6 @@ export async function GET(request: Request) {
     }
 
     if (!hasFiles) {
-       writer.close(); // Prevent hanging stream
        return NextResponse.json({ error: 'Tidak ada file gambar fisik yang ditemukan untuk diexport. (Mungkin data lama menggunakan Google Drive)' }, { status: 404 });
     }
 
