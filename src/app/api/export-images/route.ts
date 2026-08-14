@@ -68,12 +68,25 @@ export async function GET(request: Request) {
         const zipPath = `${folderBagian}/${folderDesa}/${folderDusun}/${typeFolder}/${typePrefix}_${anggota.id}_${safeNama}.jpg`;
 
         if (url.includes('/uploads/')) {
-          const fileName = url.split('/').pop();
+          let fileName = url.split('/').pop() || '';
+          if (fileName.includes('?')) fileName = fileName.split('?')[0];
+          fileName = decodeURIComponent(fileName);
+
           if (fileName) {
             const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
             if (fs.existsSync(filePath)) {
-               archive.file(filePath, { name: zipPath });
+               archive.append(fs.createReadStream(filePath), { name: zipPath });
                hasFiles = true;
+            } else if (url.startsWith('http')) {
+               // Fallback: if local file is missing but URL is absolute, try fetching it
+               try {
+                 const response = await fetch(url);
+                 if (response.ok && response.body) {
+                   const { Readable } = require('stream');
+                   archive.append(Readable.fromWeb(response.body), { name: zipPath });
+                   hasFiles = true;
+                 }
+               } catch (err) {}
             }
           }
         } else if (url.startsWith('http://') || url.startsWith('https://')) {
