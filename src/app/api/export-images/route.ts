@@ -50,9 +50,9 @@ export async function GET(request: Request) {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
-    archive.on('data', (chunk) => writer.write(chunk));
+    archive.on('data', (chunk: any) => writer.write(chunk));
     archive.on('end', () => writer.close());
-    archive.on('error', (err) => writer.abort(err));
+    archive.on('error', (err: any) => writer.abort(err));
 
     let hasFiles = false;
 
