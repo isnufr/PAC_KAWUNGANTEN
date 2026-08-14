@@ -62,47 +62,41 @@ export async function GET(request: Request) {
       const folderDesa = anggota.desa || 'TANPA_DESA';
       const folderDusun = anggota.dusun || 'TANPA_DUSUN';
       const safeNama = anggota.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'TanpaNama';
+      const protocol = request.headers.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https');
+      const host = request.headers.get('host') || 'localhost:3000';
+      const baseUrl = `${protocol}://${host}`;
 
       const processFile = async (url: string | null, typeFolder: string, typePrefix: string) => {
         if (!url) return;
         const zipPath = `${folderBagian}/${folderDesa}/${folderDusun}/${typeFolder}/${typePrefix}_${anggota.id}_${safeNama}.jpg`;
 
-        if (url.includes('/uploads/')) {
-          let fileName = url.split('/').pop() || '';
-          if (fileName.includes('?')) fileName = fileName.split('?')[0];
-          fileName = decodeURIComponent(fileName);
+        // Ubah semua URL menjadi absolute URL agar bisa di-fetch
+        let absoluteUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+           absoluteUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+        }
 
-          if (fileName) {
-            const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
-            if (fs.existsSync(filePath)) {
-               archive.append(fs.createReadStream(filePath), { name: zipPath });
-               hasFiles = true;
-            } else if (url.startsWith('http')) {
-               // Fallback: if local file is missing but URL is absolute, try fetching it
-               try {
-                 const response = await fetch(url);
-                 if (response.ok && response.body) {
-                   const { Readable } = require('stream');
-                   archive.append(Readable.fromWeb(response.body), { name: zipPath });
-                   hasFiles = true;
-                 }
-               } catch (err) {}
+        try {
+          const response = await fetch(absoluteUrl);
+          if (response.ok && response.body) {
+            const { Readable } = require('stream');
+            archive.append(Readable.fromWeb(response.body), { name: zipPath });
+            hasFiles = true;
+          } else if (url.includes('/uploads/')) {
+            // Fallback terakhir: Coba baca langsung dari disk jika fetch gagal (misal server tidak bisa panggil domain sendiri)
+            let fileName = url.split('/').pop() || '';
+            if (fileName.includes('?')) fileName = fileName.split('?')[0];
+            fileName = decodeURIComponent(fileName);
+            if (fileName) {
+              const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+              if (fs.existsSync(filePath)) {
+                 archive.append(fs.createReadStream(filePath), { name: zipPath });
+                 hasFiles = true;
+              }
             }
           }
-        } else if (url.startsWith('http://') || url.startsWith('https://')) {
-          // Handle remote URLs (e.g. Google Drive)
-          try {
-            const response = await fetch(url);
-            if (response.ok && response.body) {
-              // Convert Web ReadableStream to Node Readable for archiver
-              const { Readable } = require('stream');
-              const nodeStream = Readable.fromWeb(response.body);
-              archive.append(nodeStream, { name: zipPath });
-              hasFiles = true;
-            }
-          } catch (err) {
-            console.error('Gagal mengunduh file eksternal:', url, err);
-          }
+        } catch (err) {
+          console.error('Gagal mengunduh file:', absoluteUrl, err);
         }
       };
 
