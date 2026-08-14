@@ -637,11 +637,11 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                             
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                <div className="flex items-center gap-1.5 mb-1">
                                                     <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight truncate">{item.nama}</h4>
                                                     {isLengkap && <span className="material-icons text-emerald-500 !text-[12px] md:!text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
                                                 </div>
-                                                <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1">
+                                                <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1 mb-1">
                                                     <span className="text-red-500 whitespace-nowrap">{item.bagian || '-'}</span>
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-700 whitespace-nowrap">{item.jabatan || '-'}</span>
@@ -649,6 +649,10 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                     <span className="text-red-500 whitespace-nowrap">{jkShort}</span>
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-500 whitespace-nowrap">{item.umur ? `${item.umur} THN` : '-'}</span>
+                                                </div>
+                                                <div className="text-[8.5px] md:text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                                    <span className="material-icons text-[10px] md:text-[12px] text-red-400">location_on</span>
+                                                    <span className="truncate">{item.dusun ? `DUSUN ${item.dusun}, ` : ''}DESA {item.desa || '-'}</span>
                                                 </div>
                                             </div>
                                         </div>
