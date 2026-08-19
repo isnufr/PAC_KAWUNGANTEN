@@ -334,16 +334,16 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
       {/* MODAL TAMBAH AGENDA */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white w-full max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-full sm:max-h-[90vh] overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <h3 className="text-lg font-black text-slate-800">Tambah Agenda Baru</h3>
               <button onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
                 <span className="material-icons text-[20px]">close</span>
               </button>
             </div>
-            <div className="p-5 overflow-y-auto flex-1">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0">
               <form id="agendaForm" onSubmit={handleCreateAgenda} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Nama Acara <span className="text-red-500">*</span></label>
@@ -372,7 +372,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                 </div>
               </form>
             </div>
-            <div className="p-5 border-t border-slate-100 flex justify-end gap-2">
+            <div className="p-4 sm:p-5 border-t border-slate-100 flex justify-end gap-2 shrink-0">
               <button onClick={() => setShowAddModal(false)} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">Batal</button>
               <button form="agendaForm" type="submit" disabled={isSubmitting} className="px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 {isSubmitting ? 'Menyimpan...' : 'Simpan Agenda'}
@@ -384,10 +384,10 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
       {/* MODAL KELOLA KEHADIRAN */}
       {showKehadiranModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowKehadiranModal(false)}></div>
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-slate-100">
+          <div className="bg-white w-full max-w-2xl rounded-2xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-full sm:max-h-[90vh] overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-black text-slate-800">Kelola Kehadiran Anggota</h3>
                 <button onClick={() => setShowKehadiranModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
@@ -406,7 +406,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
               </div>
             </div>
             
-            <div className="p-5 overflow-y-auto flex-1 bg-slate-50/50">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0 bg-slate-50/50">
               {loadingAnggota ? (
                 <div className="flex justify-center py-10"><LoadingSpinner /></div>
               ) : (
@@ -434,9 +434,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                 </div>
               )}
             </div>
-            <div className="p-5 border-t border-slate-100 flex items-center justify-between">
+            <div className="p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between shrink-0">
               <span className="text-sm font-bold text-slate-600">
-                Terpilih: <span className="text-red-600">{selectedAnggotaIds.length}</span> Anggota
+                Terpilih: <span className="text-red-600">{selectedAnggotaIds.length}</span>
               </span>
               <div className="flex gap-2">
                 <button onClick={() => setShowKehadiranModal(false)} className="px-5 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">Batal</button>
