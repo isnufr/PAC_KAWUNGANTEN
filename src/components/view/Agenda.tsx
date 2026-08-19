@@ -334,9 +334,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
       {/* MODAL TAMBAH AGENDA */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="bg-white w-full max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-full sm:max-h-[90vh] overflow-hidden">
+          <div className="modal-content bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
             <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <h3 className="text-lg font-black text-slate-800">Tambah Agenda Baru</h3>
               <button onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
@@ -384,9 +384,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
       {/* MODAL KELOLA KEHADIRAN */}
       {showKehadiranModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowKehadiranModal(false)}></div>
-          <div className="bg-white w-full max-w-2xl rounded-2xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-full sm:max-h-[90vh] overflow-hidden">
+          <div className="modal-content bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
             <div className="p-4 sm:p-5 border-b border-slate-100 shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-black text-slate-800">Kelola Kehadiran Anggota</h3>
