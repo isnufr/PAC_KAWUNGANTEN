@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
       data: newAgenda
     }, { status: 201 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Agenda POST Error:', error);
-    return NextResponse.json({ error: 'Gagal membuat agenda' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || 'Gagal membuat agenda' }, { status: 500 });
   }
 }

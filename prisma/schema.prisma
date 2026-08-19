@@ -79,7 +79,7 @@ model Agenda {
   tempat      String
   waktu       DateTime
   deskripsi   String?  @db.Text
-  fotoUrl     String?
+  fotoUrl     String?  @db.LongText
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
