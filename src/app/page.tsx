@@ -13,6 +13,7 @@ import KasOrganisasiView from '@/components/view/KasOrganisasi';
 import LaporanView from '@/components/view/Laporan';
 import ManajemenAkunView from '@/components/view/ManajemenAkun';
 import LogAktivitasView from '@/components/view/LogAktivitas';
+import AgendaView from '@/components/view/Agenda';
 
 function isTokenExpired(token: string): boolean {
   try {
@@ -123,6 +124,7 @@ function DashboardContent() {
              {activeMenu === 'beranda' && <DashboardView />}
              {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" userRole={userRole} />}
              {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} userRole={userRole} />}
+             {activeMenu === 'agenda' && <AgendaView userRole={userRole} />}
              {activeMenu === 'struktur_organisasi' && <StrukturOrganisasiView />}
              {activeMenu === 'kas_organisasi' && <KasOrganisasiView userRole={userRole} />}
              {activeMenu === 'laporan' && <LaporanView />}

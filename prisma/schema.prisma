@@ -50,6 +50,8 @@ model Anggota {
   passFotoUrl   String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  kehadiran     KehadiranAgenda[]
 }
 
 model KasOrganisasi {
@@ -69,4 +71,28 @@ model LogAktivitas {
   pengguna  String
   aksi      String
   detail    String?
+}
+
+model Agenda {
+  id          Int      @id @default(autoincrement())
+  namaAcara   String
+  tempat      String
+  waktu       DateTime
+  deskripsi   String?  @db.Text
+  fotoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kehadiran   KehadiranAgenda[]
+}
+
+model KehadiranAgenda {
+  id          Int      @id @default(autoincrement())
+  agendaId    Int
+  agenda      Agenda   @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  anggotaId   Int
+  anggota     Anggota  @relation(fields: [anggotaId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([agendaId, anggotaId])
 }
