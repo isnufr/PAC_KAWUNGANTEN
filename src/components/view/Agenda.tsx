@@ -287,7 +287,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       doc.save(`Daftar_Hadir_${selectedAgenda.namaAcara.replace(/\s+/g, '_')}.pdf`);
     } catch (err) {
       console.error('Error generating PDF:', err);
-      showAlert('error', 'Gagal membuat file PDF.');
+      alert('Gagal membuat file PDF.');
     }
   };
 
