@@ -623,7 +623,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 const jk = item.jenisKelamin ? item.jenisKelamin.toUpperCase() : '';
                                 const jkShort = jk === 'LAKI-LAKI' ? 'L' : jk === 'PEREMPUAN' ? 'P' : item.jenisKelamin || '-';
                                 return (
-                                    <div key={item.id} className="flex items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group gap-2">
+                                    <div key={item.id} onClick={() => setSelectedAnggota(item)} className="flex items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group gap-2 cursor-pointer">
                                         <div className="flex items-center gap-3 flex-1 min-w-0">
                                             {/* Foto */}
                                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
@@ -661,28 +661,6 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                     <span className="truncate">{item.dusun ? `${item.dusun}, ` : ''}{item.desa || '-'}</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-0.5 shrink-0">
-                                            <button onClick={() => setSelectedAnggota(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-red-600 hover:bg-red-50 flex items-center justify-center transition" title="Lihat Detail">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                </svg>
-                                            </button>
-                                            {userRole !== 'Viewer' && (
-                                                <>
-                                                    <button onClick={() => handleEdit(item)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-amber-500 hover:bg-amber-50 flex items-center justify-center transition" title="Edit Data">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
-                                                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                        </svg>
-                                                    </button>
-                                                    <button onClick={() => handleDelete(item.id)} className="shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl text-red-600 hover:bg-red-50 flex items-center justify-center transition" title="Hapus Data">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]">
-                                                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                        </svg>
-                                                    </button>
-                                                </>
-                                            )}
                                         </div>
                                     </div>
                                 );
@@ -857,13 +835,28 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             )}
                         </div>
                         
-                        {/* CTA Buttons Row (Cetak KTA) */}
-                        <div className="flex mt-4 px-1">
+                        {/* CTA Buttons Row */}
+                        <div className="flex flex-col gap-2 mt-4 px-1">
                             <button onClick={() => setIsPrinting(true)} 
                                     className="w-full h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
                                 <span className="material-icons text-[16px] sm:text-[18px] shrink-0">badge</span> 
                                 <span className="truncate">KARTU DIGITAL</span>
                             </button>
+                            
+                            {userRole !== 'Viewer' && (
+                                <div className="flex gap-2 w-full mt-1">
+                                    <button onClick={() => { setSelectedAnggota(null); handleEdit(selectedAnggota); }} 
+                                            className="flex-1 h-10 sm:h-11 bg-amber-500 hover:bg-amber-600 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-amber-500/20 flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                        <span className="material-icons text-[16px] sm:text-[18px] shrink-0">edit</span> 
+                                        <span className="truncate">EDIT DATA</span>
+                                    </button>
+                                    <button onClick={() => { setSelectedAnggota(null); handleDelete(selectedAnggota.id); }} 
+                                            className="flex-1 h-10 sm:h-11 bg-slate-100 hover:bg-slate-200 text-red-600 border border-slate-200 rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-sm flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                        <span className="material-icons text-[16px] sm:text-[18px] shrink-0">delete</span> 
+                                        <span className="truncate">HAPUS</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
