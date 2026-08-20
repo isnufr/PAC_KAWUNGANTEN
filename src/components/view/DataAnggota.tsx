@@ -732,7 +732,15 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                         <div className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-200 overflow-hidden border-[4px] border-white shadow-xl group cursor-pointer mb-3" onClick={() => selectedAnggota.passFotoUrl && setFullScreenImage(getDirectImageUrl(selectedAnggota.passFotoUrl))}>
                             {selectedAnggota.passFotoUrl ? (
                                 <>
-                                <img src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} alt={selectedAnggota.nama} className="w-full h-full object-cover" />
+                                <img 
+                                    src={getDirectImageUrl(selectedAnggota.passFotoUrl) || ''} 
+                                    alt={selectedAnggota.nama} 
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { 
+                                        (e.target as HTMLImageElement).style.display = 'none'; 
+                                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-red-100 text-red-500"><span class="material-icons text-3xl">person</span></div>'; 
+                                    }}
+                                />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                     <span className="material-icons text-white text-3xl drop-shadow-md">zoom_in</span>
                                 </div>
@@ -811,7 +819,15 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 <div className="mt-2">
                                     <p className="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-1"><span className="material-icons text-[10px]">credit_card</span> FOTO KTP</p>
                                     <div className="relative group rounded-2xl border-2 border-dashed border-red-200 overflow-hidden bg-white p-1 cursor-pointer" onClick={() => setFullScreenImage(getDirectImageUrl(selectedAnggota.fotoKtpUrl) || null)}>
-                                        <img src={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} alt="Foto KTP" className="w-full rounded-xl object-cover" />
+                                        <img 
+                                            src={getDirectImageUrl(selectedAnggota.fotoKtpUrl) || ''} 
+                                            alt="Foto KTP" 
+                                            className="w-full rounded-xl object-cover"
+                                            onError={(e) => { 
+                                                (e.target as HTMLImageElement).style.display = 'none'; 
+                                                (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full py-8 flex flex-col items-center justify-center bg-red-50 text-red-400 rounded-xl"><span class="material-icons text-4xl mb-2">broken_image</span><span class="text-xs font-bold">Foto Tidak Ditemukan</span></div>'; 
+                                            }}
+                                        />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                             <span className="material-icons text-white text-4xl drop-shadow-md">zoom_in</span>
                                         </div>
