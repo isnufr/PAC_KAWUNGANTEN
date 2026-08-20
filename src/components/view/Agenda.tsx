@@ -701,6 +701,13 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {semuaAnggota
                     .filter(a => a.nama.toLowerCase().includes(searchAnggota.toLowerCase()) || a.nik.includes(searchAnggota))
+                    .sort((a, b) => {
+                      const aSelected = selectedAnggotaIds.includes(a.id);
+                      const bSelected = selectedAnggotaIds.includes(b.id);
+                      if (aSelected && !bSelected) return -1;
+                      if (!aSelected && bSelected) return 1;
+                      return a.nama.localeCompare(b.nama);
+                    })
                     .map(anggota => {
                       const isSelected = selectedAnggotaIds.includes(anggota.id);
                       return (
