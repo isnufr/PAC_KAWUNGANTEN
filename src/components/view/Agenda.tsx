@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import LoadingSpinner from '../LoadingSpinner';
 
+function getDirectImageUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    if (url.startsWith('/uploads/')) {
+        return `/api${url}`;
+    }
+    const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+    if (match && match[1]) {
+        return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    const match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (match2 && match2[1]) {
+        return `https://lh3.googleusercontent.com/d/${match2[1]}`;
+    }
+    return url;
+}
+
 export default function AgendaView({ userRole }: { userRole: string }) {
   const [agendas, setAgendas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -381,7 +397,15 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                                   <div key={k.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
                                     <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                                       {k.anggota.passFotoUrl ? (
-                                        <img src={k.anggota.passFotoUrl} alt={k.anggota.nama} className="w-full h-full object-cover" />
+                                        <img 
+                                          src={getDirectImageUrl(k.anggota.passFotoUrl) || ''} 
+                                          alt={k.anggota.nama} 
+                                          className="w-full h-full object-cover" 
+                                          onError={(e) => { 
+                                            (e.target as HTMLImageElement).style.display = 'none'; 
+                                            (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400"><span class="material-icons text-lg">person</span></div>'; 
+                                          }} 
+                                        />
                                       ) : (
                                         <span className="material-icons text-slate-400 text-lg">person</span>
                                       )}
