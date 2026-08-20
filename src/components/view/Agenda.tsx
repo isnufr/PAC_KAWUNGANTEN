@@ -423,7 +423,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                             });
                             setShowAddModal(true);
                           }}
-                          className="w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-white transition-colors"
+                          className="w-8 h-8 aspect-square flex-shrink-0 rounded-full bg-amber-500 shadow-md flex items-center justify-center text-white hover:bg-amber-600 transition-colors"
                           title="Edit Agenda"
                         >
                           <span className="material-icons text-[18px]">edit</span>
@@ -434,7 +434,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                             setAgendaToDelete(agenda);
                             setShowDeleteModal(true);
                           }}
-                          className="w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:text-red-600 hover:bg-white transition-colors"
+                          className="w-8 h-8 aspect-square flex-shrink-0 rounded-full bg-amber-500 shadow-md flex items-center justify-center text-white hover:bg-amber-600 transition-colors"
                           title="Hapus Agenda"
                         >
                           <span className="material-icons text-[18px]">delete</span>
