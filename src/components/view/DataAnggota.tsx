@@ -836,26 +836,26 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                         </div>
                         
                         {/* CTA Buttons Row */}
-                        <div className="flex flex-col gap-2 mt-4 px-1">
+                        <div className="flex gap-2 mt-4 px-1 items-center w-full">
                             <button onClick={() => setIsPrinting(true)} 
-                                    className="w-full h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
+                                    className="flex-1 h-10 sm:h-11 bg-gradient-to-tr from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-red-600/20 border border-red-500/50 flex justify-center items-center gap-1.5 transition transform active:scale-95">
                                 <span className="material-icons text-[16px] sm:text-[18px] shrink-0">badge</span> 
                                 <span className="truncate">KARTU DIGITAL</span>
                             </button>
                             
                             {userRole !== 'Viewer' && (
-                                <div className="flex gap-2 w-full mt-1">
+                                <>
                                     <button onClick={() => { setSelectedAnggota(null); handleEdit(selectedAnggota); }} 
-                                            className="flex-1 h-10 sm:h-11 bg-amber-500 hover:bg-amber-600 text-white rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md shadow-amber-500/20 flex justify-center items-center gap-1.5 transition transform active:scale-95">
-                                        <span className="material-icons text-[16px] sm:text-[18px] shrink-0">edit</span> 
-                                        <span className="truncate">EDIT DATA</span>
+                                            title="Edit Data"
+                                            className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-amber-500 hover:bg-amber-600 text-white rounded-full shadow-md shadow-amber-500/20 flex justify-center items-center transition transform active:scale-95">
+                                        <span className="material-icons text-[18px]">edit</span>
                                     </button>
                                     <button onClick={() => { setSelectedAnggota(null); handleDelete(selectedAnggota.id); }} 
-                                            className="flex-1 h-10 sm:h-11 bg-slate-100 hover:bg-slate-200 text-red-600 border border-slate-200 rounded-full font-bold text-[10px] sm:text-[11px] uppercase tracking-wider shadow-sm flex justify-center items-center gap-1.5 transition transform active:scale-95">
-                                        <span className="material-icons text-[16px] sm:text-[18px] shrink-0">delete</span> 
-                                        <span className="truncate">HAPUS</span>
+                                            title="Hapus Data"
+                                            className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-slate-100 hover:bg-slate-200 text-red-600 border border-slate-200 rounded-full shadow-sm flex justify-center items-center transition transform active:scale-95">
+                                        <span className="material-icons text-[18px]">delete</span>
                                     </button>
-                                </div>
+                                </>
                             )}
                         </div>
                     </div>
