@@ -224,15 +224,15 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           head: [['No', 'Nama', 'Nomor HP', 'Desa', 'Dusun', 'Paraf']],
           body: tableData,
           theme: 'grid',
-          styles: { fontSize: 11, cellPadding: 3, valign: 'middle' },
-          headStyles: { fillColor: [220, 38, 38], textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 11 },
+          styles: { fontSize: 9, cellPadding: 1.5, valign: 'middle' },
+          headStyles: { fillColor: [220, 38, 38], textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 9 },
           columnStyles: {
-            0: { halign: 'center', cellWidth: 10 },
+            0: { halign: 'center', cellWidth: 8 },
             1: { cellWidth: 50 },
-            2: { cellWidth: 35 },
-            3: { cellWidth: 32 },
-            4: { cellWidth: 25 },
-            5: { cellWidth: 30, valign: 'middle' },
+            2: { cellWidth: 28 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 35 },
+            5: { cellWidth: 26, valign: 'middle' },
           },
           didDrawPage: (data) => {
             currentY = data.cursor!.y;
