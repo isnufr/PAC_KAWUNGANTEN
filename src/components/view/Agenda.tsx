@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import LoadingSpinner from '../LoadingSpinner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -21,8 +22,17 @@ function getDirectImageUrl(url: string | null | undefined): string | null {
 }
 
 export default function AgendaView({ userRole }: { userRole: string }) {
-  const [agendas, setAgendas] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: agendas = [], isLoading: loading } = useQuery({
+    queryKey: ['agendas'],
+    queryFn: async () => {
+      const res = await fetch('/api/agenda');
+      const data = await res.json();
+      return data.success ? data.data : [];
+    }
+  });
+
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [view, setView] = useState<'list' | 'detail'>('list');
   const [selectedAgenda, setSelectedAgenda] = useState<any>(null);
   
@@ -52,25 +62,10 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
   useEffect(() => {
     setMounted(true);
-    fetchAgendas();
   }, []);
 
-  const fetchAgendas = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/agenda');
-      const data = await res.json();
-      if (data.success) {
-        setAgendas(data.data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    setLoading(false);
-  };
-
   const fetchAgendaDetail = async (id: number) => {
-    setLoading(true);
+    setIsDetailLoading(true);
     try {
       const res = await fetch(`/api/agenda/${id}`);
       const data = await res.json();
@@ -81,7 +76,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     } catch (error) {
       console.error(error);
     }
-    setLoading(false);
+    setIsDetailLoading(false);
   };
 
   const fetchSemuaAnggota = async () => {
@@ -155,7 +150,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
         setShowAddModal(false);
         setFormData({ namaAcara: '', tempat: '', waktu: '', deskripsi: '', fotoUrl: '' });
         setEditId(null);
-        fetchAgendas();
+        queryClient.invalidateQueries({ queryKey: ['agendas'] });
         if (editId && selectedAgenda?.id === editId) {
           fetchAgendaDetail(editId);
         }
@@ -294,7 +289,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       if (data.success) {
         setShowDeleteModal(false);
         setAgendaToDelete(null);
-        fetchAgendas();
+        queryClient.invalidateQueries({ queryKey: ['agendas'] });
         if (selectedAgenda?.id === agendaToDelete.id) {
           setView('list');
           setSelectedAgenda(null);
@@ -320,7 +315,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     });
   };
 
-  if (loading && view === 'list') return <LoadingSpinner />;
+  if ((loading && view === 'list') || isDetailLoading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -340,7 +335,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
         <div className="flex gap-2">
           {view === 'detail' && (
             <button 
-              onClick={() => { setView('list'); setSelectedAgenda(null); fetchAgendas(); }}
+              onClick={() => { setView('list'); setSelectedAgenda(null); }}
               className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all flex items-center gap-2"
             >
               <span className="material-icons text-[18px]">arrow_back</span> Kembali
