@@ -642,7 +642,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                     {isLengkap && <span className="material-icons text-emerald-500 !text-[12px] md:!text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
                                                     {item._count?.kehadiran > 0 && (
                                                         <div className="flex items-center text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md shrink-0 border border-amber-100 shadow-sm" title={`Telah mengikuti ${item._count.kehadiran} agenda/acara`}>
-                                                            <span className="material-icons text-[12px]">star</span>
+                                                            <span className="material-icons !text-[10px]">star</span>
                                                             <span className="text-[10px] font-black ml-0.5">{item._count.kehadiran}</span>
                                                         </div>
                                                     )}
