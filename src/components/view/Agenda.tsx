@@ -23,7 +23,7 @@ function getDirectImageUrl(url: string | null | undefined): string | null {
 
 export default function AgendaView({ userRole }: { userRole: string }) {
   const queryClient = useQueryClient();
-  const { data: agendas = [], isLoading: loading } = useQuery({
+  const { data: agendas = [], isLoading: loading } = useQuery<any[]>({
     queryKey: ['agendas'],
     queryFn: async () => {
       const res = await fetch('/api/agenda');
