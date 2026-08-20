@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import LoadingSpinner from '../LoadingSpinner';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
@@ -164,6 +166,129 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       console.error(error);
     }
     setIsSubmitting(false);
+  };
+
+  const handleExportPDF = async () => {
+    if (!selectedAgenda) return;
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      
+      // Fetch Ketua PAC
+      let namaKetua = '(...........................)';
+      try {
+        const res = await fetch('/api/anggota');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const ketua = json.data.find((a: any) => a.bagian?.toUpperCase().includes('PAC') && a.jabatan?.toUpperCase() === 'KETUA');
+          if (ketua) {
+            namaKetua = ketua.nama;
+          }
+        }
+      } catch (e) {
+        console.error('Gagal fetch ketua PAC:', e);
+      }
+
+      // PDF Content Generation
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PDIP PAC KAWUNGANTEN', 105, 15, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text(selectedAgenda.namaAcara.toUpperCase(), 105, 22, { align: 'center' });
+      
+      // Tanggal (Kanan)
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const tglStr = new Date(selectedAgenda.waktu).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      doc.text(tglStr, 195, 30, { align: 'right' });
+      
+      // Split Data
+      const pacMembers: any[] = [];
+      const nonPacMembers: any[] = [];
+      
+      selectedAgenda.kehadiran?.forEach((k: any) => {
+        const ag = k.anggota;
+        if (ag.bagian && ag.bagian.toUpperCase().includes('PAC')) {
+          pacMembers.push(ag);
+        } else {
+          nonPacMembers.push(ag);
+        }
+      });
+
+      let currentY = 35;
+
+      // Helper for table
+      const generateTable = (title: string, members: any[], startY: number) => {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, 14, startY);
+        
+        const tableData = members.map((m, i) => [
+          i + 1,
+          m.nama,
+          m.nomorHp || '-',
+          m.desa || '-',
+          m.dusun || '-',
+          i % 2 === 0 ? `${i + 1}. .........` : `      ${i + 1}. .........`
+        ]);
+
+        autoTable(doc, {
+          startY: startY + 5,
+          head: [['No', 'Nama', 'Nomor HP', 'Desa', 'Dusun', 'Paraf']],
+          body: tableData,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 2, valign: 'middle' },
+          headStyles: { fillColor: [220, 38, 38], textColor: 255, fontStyle: 'bold', halign: 'center' },
+          columnStyles: {
+            0: { halign: 'center', cellWidth: 10 },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 30 },
+            5: { cellWidth: 35, valign: 'middle' },
+          },
+          didDrawPage: (data) => {
+            currentY = data.cursor!.y;
+          }
+        });
+      };
+
+      if (pacMembers.length > 0) {
+        generateTable('TABEL KHUSUS PAC', pacMembers, currentY);
+        currentY += 10;
+      }
+
+      if (nonPacMembers.length > 0) {
+        if (currentY > 250) {
+          doc.addPage();
+          currentY = 20;
+        }
+        generateTable('SEMUA ANGGOTA YANG HADIR / NON PAC', nonPacMembers, currentY);
+        currentY += 10;
+      }
+
+      // Signature
+      if (currentY > 240) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      currentY += 10;
+      doc.setFont('helvetica', 'normal');
+      doc.text('Mengetahui,', 140, currentY);
+      currentY += 5;
+      doc.text('KETUA', 140, currentY);
+      currentY += 5;
+      doc.text('PAC KAWUNGANTEN', 140, currentY);
+      
+      currentY += 25; // Space for signature
+      doc.setFont('helvetica', 'bold');
+      doc.text(namaKetua.toUpperCase(), 140, currentY);
+      
+      doc.save(`Daftar_Hadir_${selectedAgenda.namaAcara.replace(/\s+/g, '_')}.pdf`);
+    } catch (err) {
+      console.error('Error generating PDF:', err);
+      showAlert('error', 'Gagal membuat file PDF.');
+    }
   };
 
   const handleDeleteAgenda = async () => {
@@ -358,14 +483,23 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-slate-800">Daftar Kehadiran ({selectedAgenda.kehadiran?.length || 0})</h3>
-                    {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                    <div className="flex items-center gap-2">
                       <button 
-                        onClick={openKehadiranModal}
-                        className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-1"
+                        onClick={handleExportPDF}
+                        className="px-3 py-1.5 bg-red-50 text-red-700 text-sm font-bold rounded-lg hover:bg-red-100 border border-red-200 transition-colors flex items-center gap-1"
+                        title="Ekspor PDF"
                       >
-                        <span className="material-icons text-[16px]">edit_document</span> Kelola Absensi
+                        <span className="material-icons text-[16px]">picture_as_pdf</span> Cetak PDF
                       </button>
-                    )}
+                      {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                        <button 
+                          onClick={openKehadiranModal}
+                          className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-1"
+                        >
+                          <span className="material-icons text-[16px]">edit_document</span> Kelola Absensi
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
                   {selectedAgenda.kehadiran?.length === 0 ? (
