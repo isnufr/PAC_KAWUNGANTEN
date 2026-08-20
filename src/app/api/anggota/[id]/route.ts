@@ -65,7 +65,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
           const { join } = await import('path');
           const oldFileName = oldUrl.split('/').pop();
           if (oldFileName) {
-            const oldFilePath = join(process.cwd(), 'public', 'uploads', oldFileName);
+            const baseDir = process.env.UPLOAD_DIR || join(process.cwd(), 'public', 'uploads');
+            const oldFilePath = join(baseDir, oldFileName);
             await unlink(oldFilePath);
           }
         } catch (err) {

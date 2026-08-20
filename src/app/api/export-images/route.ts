@@ -110,7 +110,8 @@ export async function GET(request: Request) {
           if (fileName.includes('?')) fileName = fileName.split('?')[0];
           fileName = decodeURIComponent(fileName);
           if (fileName) {
-            const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+            const baseDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'public', 'uploads');
+            const filePath = path.join(baseDir, fileName);
             if (fs.existsSync(filePath)) {
                archive.append(fs.createReadStream(filePath), { name: zipPath });
                hasFiles = true;

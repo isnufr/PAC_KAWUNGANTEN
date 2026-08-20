@@ -8,7 +8,8 @@ export async function GET(request: Request, { params }: { params: { file: string
     const filename = params.file.join('/');
     
     // Check in public/uploads (where the upload API saves them)
-    const filePath = join(process.cwd(), 'public', 'uploads', filename);
+    const baseDir = process.env.UPLOAD_DIR || join(process.cwd(), 'public', 'uploads');
+    const filePath = join(baseDir, filename);
 
     if (!existsSync(filePath)) {
       return new NextResponse('File not found', { status: 404 });

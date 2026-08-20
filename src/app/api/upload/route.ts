@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const fileName = `${type.toUpperCase()}_${id}_${namaDepan}_${timestamp}.${extension}`;
     
     // Pastikan folder public/uploads ada
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    const uploadDir = process.env.UPLOAD_DIR || join(process.cwd(), 'public', 'uploads');
     try {
       await mkdir(uploadDir, { recursive: true });
     } catch (err) {
@@ -69,7 +69,8 @@ export async function POST(request: Request) {
       try {
         const oldFileName = oldUrl.split('/').pop();
         if (oldFileName) {
-          const oldFilePath = join(process.cwd(), 'public', 'uploads', oldFileName);
+          const baseDir = process.env.UPLOAD_DIR || join(process.cwd(), 'public', 'uploads');
+          const oldFilePath = join(baseDir, oldFileName);
           await unlink(oldFilePath);
         }
       } catch (err) {
