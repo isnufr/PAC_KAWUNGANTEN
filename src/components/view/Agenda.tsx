@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import LoadingSpinner from '../LoadingSpinner';
 
 export default function AgendaView({ userRole }: { userRole: string }) {
@@ -26,8 +27,10 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     fotoUrl: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     fetchAgendas();
   }, []);
 
@@ -333,7 +336,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       )}
 
       {/* MODAL TAMBAH AGENDA */}
-      {showAddModal && (
+      {mounted && showAddModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
           <div className="modal-content bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
@@ -379,11 +382,12 @@ export default function AgendaView({ userRole }: { userRole: string }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* MODAL KELOLA KEHADIRAN */}
-      {showKehadiranModal && (
+      {mounted && showKehadiranModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowKehadiranModal(false)}></div>
           <div className="modal-content bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
@@ -452,7 +456,8 @@ export default function AgendaView({ userRole }: { userRole: string }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
