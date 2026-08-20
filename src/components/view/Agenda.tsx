@@ -10,6 +10,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
   
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [agendaToDelete, setAgendaToDelete] = useState<any>(null);
+  const [editId, setEditId] = useState<number | null>(null);
   const [showKehadiranModal, setShowKehadiranModal] = useState(false);
   
   // Data for Kehadiran
@@ -118,12 +121,14 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     }
   };
 
-  const handleCreateAgenda = async (e: React.FormEvent) => {
+  const handleSaveAgenda = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/agenda', {
-        method: 'POST',
+      const url = editId ? `/api/agenda/${editId}` : '/api/agenda';
+      const method = editId ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
@@ -131,7 +136,34 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       if (data.success) {
         setShowAddModal(false);
         setFormData({ namaAcara: '', tempat: '', waktu: '', deskripsi: '', fotoUrl: '' });
+        setEditId(null);
         fetchAgendas();
+        if (editId && selectedAgenda?.id === editId) {
+          fetchAgendaDetail(editId);
+        }
+      } else {
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteAgenda = async () => {
+    if (!agendaToDelete) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/agenda/${agendaToDelete.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setShowDeleteModal(false);
+        setAgendaToDelete(null);
+        fetchAgendas();
+        if (selectedAgenda?.id === agendaToDelete.id) {
+          setView('list');
+          setSelectedAgenda(null);
+        }
       } else {
         alert(data.error);
       }
@@ -181,7 +213,11 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           )}
           {view === 'list' && (userRole === 'Super Admin' || userRole === 'Admin') && (
             <button 
-              onClick={() => setShowAddModal(true)}
+              onClick={() => {
+                setEditId(null);
+                setFormData({ namaAcara: '', tempat: '', waktu: '', deskripsi: '', fotoUrl: '' });
+                setShowAddModal(true);
+              }}
               className="px-4 py-2 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95 flex items-center gap-2"
             >
               <span className="material-icons text-[18px]">add</span> Tambah Agenda
@@ -212,11 +248,48 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                         <span className="material-icons text-6xl text-slate-300">event_note</span>
                       </div>
                     )}
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${isPast ? 'bg-slate-800/80 text-white' : 'bg-red-600/90 text-white'}`}>
                         {isPast ? 'Selesai' : 'Akan Datang'}
                       </span>
                     </div>
+                    {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditId(agenda.id);
+                            const dt = new Date(agenda.waktu);
+                            const offset = dt.getTimezoneOffset() * 60000;
+                            const localISOTime = (new Date(dt.getTime() - offset)).toISOString().slice(0, 16);
+                            
+                            setFormData({
+                              namaAcara: agenda.namaAcara,
+                              tempat: agenda.tempat,
+                              waktu: localISOTime,
+                              deskripsi: agenda.deskripsi || '',
+                              fotoUrl: agenda.fotoUrl || ''
+                            });
+                            setShowAddModal(true);
+                          }}
+                          className="w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-white transition-colors"
+                          title="Edit Agenda"
+                        >
+                          <span className="material-icons text-[18px]">edit</span>
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAgendaToDelete(agenda);
+                            setShowDeleteModal(true);
+                          }}
+                          className="w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center text-slate-700 hover:text-red-600 hover:bg-white transition-colors"
+                          title="Hapus Agenda"
+                        >
+                          <span className="material-icons text-[18px]">delete</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="p-5 flex-1 flex flex-col">
                     <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-2">{agenda.namaAcara}</h3>
@@ -284,23 +357,54 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                       Belum ada data kehadiran untuk acara ini.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {selectedAgenda.kehadiran.map((k: any) => (
-                        <div key={k.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {k.anggota.passFotoUrl ? (
-                              <img src={k.anggota.passFotoUrl} alt={k.anggota.nama} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="material-icons text-slate-400 text-lg">person</span>
-                            )}
-                          </div>
-                          <div className="overflow-hidden">
-                            <p className="text-sm font-bold text-slate-800 truncate">{k.anggota.nama}</p>
-                            <p className="text-xs text-slate-500 truncate">{k.anggota.nik}</p>
-                          </div>
+                    (() => {
+                      const groups: Record<string, any[]> = {};
+                      selectedAgenda.kehadiran.forEach((k: any) => {
+                        const ag = k.anggota;
+                        let groupName = ag.desa || 'Lainnya';
+                        if (ag.bagian && ag.bagian.toUpperCase().includes('PAC')) {
+                          groupName = 'PENGURUS PAC';
+                        }
+                        if (!groups[groupName]) groups[groupName] = [];
+                        groups[groupName].push(k);
+                      });
+                      
+                      return (
+                        <div className="space-y-6">
+                          {Object.entries(groups).map(([groupName, items]) => (
+                            <div key={groupName}>
+                              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> {groupName} ({items.length})
+                              </h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {items.map((k: any) => (
+                                  <div key={k.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                      {k.anggota.passFotoUrl ? (
+                                        <img src={k.anggota.passFotoUrl} alt={k.anggota.nama} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <span className="material-icons text-slate-400 text-lg">person</span>
+                                      )}
+                                    </div>
+                                    <div className="overflow-hidden flex-1">
+                                      <p className="text-sm font-bold text-slate-800 truncate">{k.anggota.nama}</p>
+                                      <div className="flex flex-col mt-0.5">
+                                        <p className="text-[11px] text-slate-500 truncate">{k.anggota.nik}</p>
+                                        <p className="text-[10px] font-medium text-slate-500 truncate mt-1">
+                                          <span className="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                            {k.anggota.dusun || '-'} - {k.anggota.bagian || '-'} - {k.anggota.jabatan || '-'}
+                                          </span>
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })()
                   )}
                 </div>
               </div>
@@ -341,13 +445,13 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
           <div className="modal-content bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
             <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
-              <h3 className="text-lg font-black text-slate-800">Tambah Agenda Baru</h3>
+              <h3 className="text-lg font-black text-slate-800">{editId ? 'Edit Agenda' : 'Tambah Agenda Baru'}</h3>
               <button onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
                 <span className="material-icons text-[20px]">close</span>
               </button>
             </div>
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0">
-              <form id="agendaForm" onSubmit={handleCreateAgenda} className="space-y-4">
+              <form id="agendaForm" onSubmit={handleSaveAgenda} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Nama Acara <span className="text-red-500">*</span></label>
                   <input type="text" required value={formData.namaAcara} onChange={(e) => setFormData({...formData, namaAcara: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all" placeholder="Contoh: Pertemuan Rutin..." />
@@ -378,7 +482,39 @@ export default function AgendaView({ userRole }: { userRole: string }) {
             <div className="p-4 sm:p-5 border-t border-slate-100 flex justify-end gap-2 shrink-0">
               <button onClick={() => setShowAddModal(false)} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">Batal</button>
               <button form="agendaForm" type="submit" disabled={isSubmitting} className="px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                {isSubmitting ? 'Menyimpan...' : 'Simpan Agenda'}
+                {isSubmitting ? 'Menyimpan...' : (editId ? 'Simpan Perubahan' : 'Simpan Agenda')}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* MODAL HAPUS AGENDA */}
+      {mounted && showDeleteModal && agendaToDelete && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)}></div>
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full relative z-10 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <span className="material-icons text-red-600 text-3xl">delete_outline</span>
+            </div>
+            <h3 className="text-xl font-black text-slate-800 mb-2">Hapus Agenda?</h3>
+            <p className="text-sm text-slate-500 mb-6">
+              Apakah Anda yakin ingin menghapus agenda <span className="font-bold text-slate-700">"{agendaToDelete.namaAcara}"</span>? Data kehadiran anggota pada agenda ini juga akan terhapus secara permanen.
+            </p>
+            <div className="flex gap-3 w-full">
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleDeleteAgenda}
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 shadow-md shadow-red-200 transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? 'Menghapus...' : 'Hapus'}
               </button>
             </div>
           </div>
@@ -430,7 +566,14 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                           </div>
                           <div className="overflow-hidden">
                             <p className={`text-sm font-bold truncate ${isSelected ? 'text-red-900' : 'text-slate-700'}`}>{anggota.nama}</p>
-                            <p className={`text-[11px] truncate ${isSelected ? 'text-red-600/70' : 'text-slate-500'}`}>{anggota.nik}</p>
+                            <div className="flex flex-col gap-0.5 mt-0.5">
+                              <p className={`text-[11px] truncate ${isSelected ? 'text-red-600/70' : 'text-slate-500'}`}>{anggota.nik}</p>
+                              {(anggota.dusun || anggota.desa) && (
+                                <p className={`text-[10px] truncate ${isSelected ? 'text-red-500/80' : 'text-slate-400'}`}>
+                                  {anggota.dusun || '-'} - {anggota.desa || '-'}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
