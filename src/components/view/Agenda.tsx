@@ -173,30 +173,16 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     try {
       const doc = new jsPDF('p', 'mm', 'a4');
       
-      // Fetch Ketua PAC
-      let namaKetua = '(...........................)';
-      try {
-        const res = await fetch('/api/anggota');
-        const json = await res.json();
-        if (json.success && Array.isArray(json.data)) {
-          const ketua = json.data.find((a: any) => a.bagian?.toUpperCase().includes('PAC') && a.jabatan?.toUpperCase() === 'KETUA');
-          if (ketua) {
-            namaKetua = ketua.nama;
-          }
-        }
-      } catch (e) {
-        console.error('Gagal fetch ketua PAC:', e);
-      }
+      const namaKetua = 'TURIJAN';
 
       // PDF Content Generation
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text('PDIP PAC KAWUNGANTEN', 105, 15, { align: 'center' });
-      doc.setFontSize(12);
       doc.text(selectedAgenda.namaAcara.toUpperCase(), 105, 22, { align: 'center' });
       
       // Tanggal (Kanan)
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
       const tglStr = new Date(selectedAgenda.waktu).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       doc.text(tglStr, 195, 30, { align: 'right' });
@@ -213,12 +199,19 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           nonPacMembers.push(ag);
         }
       });
+      
+      // Urutkan Ranting dan Anak Ranting berdasarkan Desa
+      nonPacMembers.sort((a, b) => {
+        const desaA = a.desa || '';
+        const desaB = b.desa || '';
+        return desaA.localeCompare(desaB);
+      });
 
       let currentY = 35;
 
       // Helper for table
       const generateTable = (title: string, members: any[], startY: number) => {
-        doc.setFontSize(11);
+        doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.text(title, 14, startY);
         
@@ -236,15 +229,15 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           head: [['No', 'Nama', 'Nomor HP', 'Desa', 'Dusun', 'Paraf']],
           body: tableData,
           theme: 'grid',
-          styles: { fontSize: 9, cellPadding: 2, valign: 'middle' },
+          styles: { fontSize: 12, cellPadding: 2, valign: 'middle' },
           headStyles: { fillColor: [220, 38, 38], textColor: 255, fontStyle: 'bold', halign: 'center' },
           columnStyles: {
-            0: { halign: 'center', cellWidth: 10 },
+            0: { halign: 'center', cellWidth: 12 },
             1: { cellWidth: 50 },
-            2: { cellWidth: 30 },
+            2: { cellWidth: 35 },
             3: { cellWidth: 30 },
-            4: { cellWidth: 30 },
-            5: { cellWidth: 35, valign: 'middle' },
+            4: { cellWidth: 25 },
+            5: { cellWidth: 30, valign: 'middle' },
           },
           didDrawPage: (data) => {
             currentY = data.cursor!.y;
@@ -253,7 +246,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       };
 
       if (pacMembers.length > 0) {
-        generateTable('TABEL KHUSUS PAC', pacMembers, currentY);
+        generateTable('PAC', pacMembers, currentY);
         currentY += 10;
       }
 
@@ -262,7 +255,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           doc.addPage();
           currentY = 20;
         }
-        generateTable('SEMUA ANGGOTA YANG HADIR / NON PAC', nonPacMembers, currentY);
+        generateTable('RANTING dan ANAK RANTING', nonPacMembers, currentY);
         currentY += 10;
       }
 
@@ -273,16 +266,17 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       }
 
       currentY += 10;
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text('Mengetahui,', 140, currentY);
-      currentY += 5;
-      doc.text('KETUA', 140, currentY);
-      currentY += 5;
-      doc.text('PAC KAWUNGANTEN', 140, currentY);
+      doc.text('Mengetahui,', 145, currentY);
+      currentY += 6;
+      doc.text('KETUA', 145, currentY);
+      currentY += 6;
+      doc.text('PAC KAWUNGANTEN', 145, currentY);
       
       currentY += 25; // Space for signature
       doc.setFont('helvetica', 'bold');
-      doc.text(namaKetua.toUpperCase(), 140, currentY);
+      doc.text(namaKetua.toUpperCase(), 145, currentY);
       
       doc.save(`Daftar_Hadir_${selectedAgenda.namaAcara.replace(/\s+/g, '_')}.pdf`);
     } catch (err) {
@@ -486,17 +480,18 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={handleExportPDF}
-                        className="px-3 py-1.5 bg-red-50 text-red-700 text-sm font-bold rounded-lg hover:bg-red-100 border border-red-200 transition-colors flex items-center gap-1"
+                        className="w-9 h-9 flex items-center justify-center bg-red-50 text-red-700 rounded-lg hover:bg-red-100 border border-red-200 transition-colors"
                         title="Ekspor PDF"
                       >
-                        <span className="material-icons text-[16px]">picture_as_pdf</span> Cetak PDF
+                        <span className="material-icons text-[20px]">picture_as_pdf</span>
                       </button>
                       {(userRole === 'Super Admin' || userRole === 'Admin') && (
                         <button 
                           onClick={openKehadiranModal}
-                          className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-1"
+                          className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors border border-slate-200"
+                          title="Kelola Absensi"
                         >
-                          <span className="material-icons text-[16px]">edit_document</span> Kelola Absensi
+                          <span className="material-icons text-[20px]">edit_document</span>
                         </button>
                       )}
                     </div>
