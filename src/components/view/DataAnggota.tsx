@@ -640,6 +640,12 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                 <div className="flex items-center gap-1.5 mb-1">
                                                     <h4 className="text-xs md:text-sm font-black text-red-900 tracking-tight truncate">{item.nama}</h4>
                                                     {isLengkap && <span className="material-icons text-emerald-500 !text-[12px] md:!text-[14px] flex-shrink-0" title="Data Lengkap">verified</span>}
+                                                    {item._count?.kehadiran > 0 && (
+                                                        <div className="flex items-center text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md shrink-0 border border-amber-100 shadow-sm" title={`Telah mengikuti ${item._count.kehadiran} agenda/acara`}>
+                                                            <span className="material-icons text-[12px]">star</span>
+                                                            <span className="text-[10px] font-black ml-0.5">{item._count.kehadiran}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1 mb-1">
                                                     <span className="text-red-500 whitespace-nowrap">{item.bagian || '-'}</span>
@@ -764,6 +770,21 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                     <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-5 scrollbar-hide">
                         {/* Details Grid */}
                         <div className="space-y-2 mb-2">
+                            {/* Card 0: Partisipasi */}
+                            {selectedAnggota._count?.kehadiran > 0 && (
+                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shadow-sm">
+                                            <span className="material-icons text-xl">emoji_events</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-0.5">TINGKAT PARTISIPASI</p>
+                                            <p className="font-black text-slate-800 text-sm">Telah hadir di <span className="text-amber-600">{selectedAnggota._count.kehadiran} Agenda</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Card 1: ID & NIK */}
                             <div className="flex gap-2">
                                 <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm flex-1">

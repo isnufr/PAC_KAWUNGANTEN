@@ -56,7 +56,12 @@ export async function GET(req: NextRequest) {
         where: whereClause,
         orderBy: { id: 'asc' },
         skip,
-        take: limit
+        take: limit,
+        include: {
+          _count: {
+            select: { kehadiran: true }
+          }
+        }
       }),
       prisma.anggota.count({ where: whereClause })
     ]);
