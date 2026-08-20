@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import LoadingSpinner from '../LoadingSpinner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAlert } from '../AlertProvider';
 
 function getDirectImageUrl(url: string | null | undefined): string | null {
     if (!url) return null;
@@ -23,6 +24,7 @@ function getDirectImageUrl(url: string | null | undefined): string | null {
 
 export default function AgendaView({ userRole }: { userRole: string }) {
   const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
   const { data: agendas = [], isLoading: loading } = useQuery<any[]>({
     queryKey: ['agendas'],
     queryFn: async () => {
@@ -113,12 +115,13 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       if (data.success) {
         setShowKehadiranModal(false);
         fetchAgendaDetail(selectedAgenda.id); // Refresh detail
+        showAlert('Kehadiran berhasil disimpan!', 'success');
       } else {
-        alert(data.error);
+        showAlert(data.error || 'Gagal menyimpan kehadiran', 'error');
       }
     } catch (error) {
       console.error(error);
-      alert('Terjadi kesalahan saat menyimpan kehadiran.');
+      showAlert('Terjadi kesalahan saat menyimpan kehadiran.', 'error');
     }
     setIsSubmitting(false);
   };
@@ -154,8 +157,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
         if (editId && selectedAgenda?.id === editId) {
           fetchAgendaDetail(editId);
         }
+        showAlert(editId ? 'Agenda berhasil diperbarui!' : 'Agenda berhasil ditambahkan!', 'success');
       } else {
-        alert(data.error);
+        showAlert(data.error || 'Gagal menyimpan agenda', 'error');
       }
     } catch (error) {
       console.error(error);
@@ -274,9 +278,10 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       doc.text(namaKetua.toUpperCase(), 145, currentY);
       
       doc.save(`Daftar_Hadir_${selectedAgenda.namaAcara.replace(/\s+/g, '_')}.pdf`);
+      showAlert('PDF berhasil diunduh!', 'success');
     } catch (err) {
       console.error('Error generating PDF:', err);
-      alert('Gagal membuat file PDF.');
+      showAlert('Gagal membuat file PDF.', 'error');
     }
   };
 
@@ -294,8 +299,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
           setView('list');
           setSelectedAgenda(null);
         }
+        showAlert('Agenda berhasil dihapus!', 'success');
       } else {
-        alert(data.error);
+        showAlert(data.error || 'Gagal menghapus agenda', 'error');
       }
     } catch (error) {
       console.error(error);

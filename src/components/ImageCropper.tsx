@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../utils/cropImage';
 import { createPortal } from 'react-dom';
+import { useAlert } from './AlertProvider';
 
 interface ImageCropperProps {
   imageSrc: string;
@@ -12,6 +13,7 @@ interface ImageCropperProps {
 }
 
 export default function ImageCropper({ imageSrc, aspect, onCropComplete, onCancel, title = "Potong Gambar" }: ImageCropperProps) {
+  const { showAlert } = useAlert();
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
@@ -31,7 +33,7 @@ export default function ImageCropper({ imageSrc, aspect, onCropComplete, onCance
       }
     } catch (e) {
       console.error(e);
-      alert('Gagal memotong gambar');
+      showAlert('Gagal memotong gambar', 'error');
     }
     setIsProcessing(false);
   };
