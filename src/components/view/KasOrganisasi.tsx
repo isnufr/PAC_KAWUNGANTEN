@@ -197,7 +197,7 @@ export default function KasOrganisasiView({ userRole }: { userRole?: string }) {
                             <tr><td colSpan={7} className="text-center py-6 text-red-400 font-bold">Tidak ada transaksi ditemukan.</td></tr>
                         ) : data.map((item: any) => (
                             <tr key={item.id} className="hover:bg-red-50/30 transition">
-                                <td className="p-3">{new Date(item.tanggal).toLocaleDateString('id-ID')}</td>
+                                <td className="p-3">{new Date(item.tanggal).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })}</td>
                                 <td className="p-3 font-bold text-[10px] md:text-xs">
                                     <span className={item.tipe === 'PEMASUKAN' ? 'text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100' : 'text-rose-600 bg-rose-50 px-2 py-1 rounded-md border border-rose-100'}>{item.tipe}</span>
                                 </td>

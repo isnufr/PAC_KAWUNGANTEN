@@ -143,10 +143,17 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     try {
       const url = editId ? `/api/agenda/${editId}` : '/api/agenda';
       const method = editId ? 'PUT' : 'POST';
+      
+      // Force the input time to be treated as WIB (UTC+7)
+      const payload = { ...formData };
+      if (payload.waktu && payload.waktu.length === 16) {
+        payload.waktu = `${payload.waktu}:00+07:00`;
+      }
+      
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) {
@@ -183,7 +190,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       // Tanggal (Kanan)
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      const tglStr = new Date(selectedAgenda.waktu).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const tglStr = new Date(selectedAgenda.waktu).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       doc.text(tglStr, 195, 30, { align: 'right' });
       
       // Split Data
@@ -317,8 +324,9 @@ export default function AgendaView({ userRole }: { userRole: string }) {
 
   const formatTanggal = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta',
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+    }) + ' WIB';
   };
 
   if ((loading && view === 'list') || isDetailLoading) return <LoadingSpinner />;
@@ -395,9 +403,16 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditId(agenda.id);
+                            
+                            // Convert UTC date to WIB for input field
                             const dt = new Date(agenda.waktu);
-                            const offset = dt.getTimezoneOffset() * 60000;
-                            const localISOTime = (new Date(dt.getTime() - offset)).toISOString().slice(0, 16);
+                            const wibTime = new Date(dt.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+                            const year = wibTime.getFullYear();
+                            const month = String(wibTime.getMonth() + 1).padStart(2, '0');
+                            const day = String(wibTime.getDate()).padStart(2, '0');
+                            const hours = String(wibTime.getHours()).padStart(2, '0');
+                            const minutes = String(wibTime.getMinutes()).padStart(2, '0');
+                            const localISOTime = `${year}-${month}-${day}T${hours}:${minutes}`;
                             
                             setFormData({
                               namaAcara: agenda.namaAcara,

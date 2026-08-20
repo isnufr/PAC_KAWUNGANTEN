@@ -46,7 +46,7 @@ export default function LogAktivitasView() {
                             <tr><td colSpan={4} className="text-center py-6 text-red-400 font-bold">Belum ada log aktivitas.</td></tr>
                         ) : logs.map((log: any) => (
                             <tr key={log.id} className="hover:bg-red-50/30 transition">
-                                <td className="p-3 sm:p-4 text-slate-500 whitespace-nowrap">{new Date(log.waktu).toLocaleString('id-ID')}</td>
+                                <td className="p-3 sm:p-4 text-slate-500 whitespace-nowrap">{new Date(log.waktu).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB</td>
                                 <td className="p-3 sm:p-4 font-bold">{log.pengguna}</td>
                                 <td className="p-3 sm:p-4">
                                     <span className="bg-red-50 text-red-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-red-100">{log.aksi}</span>

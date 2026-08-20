@@ -13,15 +13,13 @@ export default function TopHeader({ isSidebarOpen, setIsSidebarOpen, activeMenu,
   useEffect(() => {
     const formatDate = () => {
       const now = new Date();
-      const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-      
-      const dayName = days[now.getDay()];
-      const date = now.getDate();
-      const monthName = months[now.getMonth()];
-      const year = now.getFullYear();
-      
-      return `${dayName}, ${date} ${monthName} ${year}`;
+      return now.toLocaleDateString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
     };
 
     setCurrentDate(formatDate());
