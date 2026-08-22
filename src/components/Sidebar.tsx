@@ -8,10 +8,11 @@ interface SidebarProps {
   setActiveMenu: (menu: string) => void;
   userRole: string;
   userName: string;
+  userPhoto?: string | null;
   onClose: () => void;
 }
 
-export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, userName, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, userName, userPhoto, onClose }: SidebarProps) {
   const router = useRouter();
   const [verificationCount, setVerificationCount] = useState(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -67,6 +68,22 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
       case 'Editor': return 'bg-blue-500 text-white';
       default: return 'bg-slate-400 text-white';
     }
+  };
+
+  const getDirectImageUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    if (url.startsWith('/uploads/')) {
+        return `/api${url}`;
+    }
+    const match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+    if (match && match[1]) {
+        return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    const match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (match2 && match2[1]) {
+        return `https://lh3.googleusercontent.com/d/${match2[1]}`;
+    }
+    return url;
   };
 
   return (
@@ -180,8 +197,12 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
               <div className="flex items-center gap-3">
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-200">
-                    {userInitial}
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-200 overflow-hidden border-2 border-white">
+                    {userPhoto ? (
+                      <img src={getDirectImageUrl(userPhoto) || ''} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      userInitial
+                    )}
                   </div>
                   {/* Online indicator */}
                   <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white shadow-sm"></div>

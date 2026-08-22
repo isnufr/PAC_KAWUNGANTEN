@@ -11,7 +11,14 @@ export async function GET() {
       select: {
         id: true,
         username: true,
-        role: true
+        role: true,
+        anggotaId: true,
+        anggota: {
+          select: {
+            nama: true,
+            passFotoUrl: true
+          }
+        }
       }
     });
 
@@ -28,7 +35,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password, role } = await req.json();
+    const { username, password, role, anggotaId } = await req.json();
     
     // Cek duplikasi
     const existing = await prisma.user.findUnique({
@@ -46,7 +53,8 @@ export async function POST(req: NextRequest) {
       data: {
         username,
         password: hashedPassword,
-        role
+        role,
+        anggotaId: anggotaId || null
       },
       select: {
         id: true,

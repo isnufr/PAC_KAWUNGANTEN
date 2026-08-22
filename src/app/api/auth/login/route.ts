@@ -16,7 +16,15 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { username }
+      where: { username },
+      include: {
+        anggota: {
+          select: {
+            nama: true,
+            passFotoUrl: true
+          }
+        }
+      }
     });
 
     if (!user) {
@@ -31,7 +39,12 @@ export async function POST(req: NextRequest) {
 
     // Buat JWT Token
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { 
+        id: user.id, 
+        username: user.username, 
+        role: user.role,
+        anggotaId: user.anggotaId 
+      },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -43,7 +56,10 @@ export async function POST(req: NextRequest) {
       token: token,
       user: {
         username: user.username,
-        role: user.role
+        role: user.role,
+        anggotaId: user.anggotaId,
+        userPhoto: user.anggota?.passFotoUrl || null,
+        nama: user.anggota?.nama || null
       }
     });
 

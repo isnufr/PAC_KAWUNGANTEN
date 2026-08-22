@@ -22,7 +22,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       select: {
         id: true,
         username: true,
-        role: true
+        role: true,
+        anggotaId: true,
+        anggota: {
+          select: {
+            nama: true,
+            passFotoUrl: true
+          }
+        }
       }
     });
 

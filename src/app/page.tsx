@@ -31,6 +31,7 @@ function DashboardContent() {
   const [activeMenu, setActiveMenu] = useState(initialMenu);
   const [userRole, setUserRole] = useState('Viewer');
   const [userName, setUserName] = useState('');
+  const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
 
@@ -53,6 +54,9 @@ function DashboardContent() {
         }
         if (user && user.username) {
           setUserName(user.username);
+        }
+        if (user && user.userPhoto) {
+          setUserPhoto(user.userPhoto);
         }
       } catch (e) {}
       setIsReady(true);
@@ -107,6 +111,7 @@ function DashboardContent() {
         setActiveMenu={setActiveMenu} 
         userRole={userRole}
         userName={userName}
+        userPhoto={userPhoto}
         onClose={closeSidebar}
       />
 

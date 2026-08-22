@@ -8,10 +8,12 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
-  role     String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String
+  anggotaId Int?     @unique
+  anggota   Anggota? @relation(fields: [anggotaId], references: [id])
 }
 
 model Wilayah {
@@ -52,6 +54,7 @@ model Anggota {
   updatedAt     DateTime @updatedAt
   
   kehadiran     KehadiranAgenda[]
+  user          User?
 }
 
 model KasOrganisasi {
