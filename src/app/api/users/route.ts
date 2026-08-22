@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -62,6 +63,8 @@ export async function POST(req: NextRequest) {
         role: true
       }
     });
+
+    await logAktivitas(req, 'CREATE_USER', `Menambahkan akun pengguna baru: ${username} (${role})`);
 
     return NextResponse.json({
       success: true,

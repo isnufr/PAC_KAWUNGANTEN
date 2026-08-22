@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -38,6 +39,8 @@ export async function POST(req: NextRequest) {
         fotoUrl: body.fotoUrl || null,
       }
     });
+
+    await logAktivitas(req, 'CREATE_AGENDA', `Membuat agenda baru: ${newAgenda.namaAcara}`);
 
     return NextResponse.json({
       success: true,

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_super_kwt_2024';
@@ -62,6 +63,9 @@ export async function POST(req: NextRequest) {
         nama: user.anggota?.nama || null
       }
     });
+
+    // Catat log aktivitas
+    await logAktivitas(req, 'LOGIN', 'Berhasil masuk ke dalam aplikasi PAC Kawunganten', user.username);
 
     response.cookies.set({
       name: 'auth_token',

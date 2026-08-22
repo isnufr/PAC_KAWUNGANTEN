@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -33,6 +34,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       }
     });
 
+    await logAktivitas(req, 'UPDATE_USER', `Mengubah profil pengguna: ${updatedUser.username} (ID: ${id})`);
+
     return NextResponse.json({
       success: true,
       message: 'Data pengguna berhasil diperbarui',
@@ -49,9 +52,20 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     try {
       const id = parseInt(params.id);
       
+      const currentUser = await prisma.user.findUnique({
+        where: { id },
+        select: { username: true }
+      });
+
       await prisma.user.delete({
         where: { id }
       });
+
+      if (currentUser) {
+        await logAktivitas(req, 'DELETE_USER', `Menghapus akun pengguna: ${currentUser.username} (ID: ${id})`);
+      } else {
+        await logAktivitas(req, 'DELETE_USER', `Menghapus akun pengguna (ID: ${id})`);
+      }
   
       return NextResponse.json({
         success: true,

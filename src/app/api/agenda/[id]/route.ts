@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -63,6 +64,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       data: updateData
     });
 
+    await logAktivitas(req, 'UPDATE_AGENDA', `Mengubah rincian agenda: ${updatedAgenda.namaAcara}`);
+
     return NextResponse.json({
       success: true,
       message: 'Agenda berhasil diperbarui',
@@ -84,9 +87,20 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 });
     }
 
+    const currentAgenda = await prisma.agenda.findUnique({
+      where: { id: agendaId },
+      select: { namaAcara: true }
+    });
+
     await prisma.agenda.delete({
       where: { id: agendaId }
     });
+
+    if (currentAgenda) {
+      await logAktivitas(req, 'DELETE_AGENDA', `Menghapus agenda: ${currentAgenda.namaAcara}`);
+    } else {
+      await logAktivitas(req, 'DELETE_AGENDA', `Menghapus agenda (ID: ${agendaId})`);
+    }
 
     return NextResponse.json({
       success: true,

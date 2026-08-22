@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -59,6 +60,8 @@ export async function POST(req: NextRequest) {
         operator: body.operator || null
       }
     });
+
+    await logAktivitas(req, 'CREATE_KAS', `Mencatat ${body.tipe} kas: Rp ${body.nominal.toLocaleString('id-ID')} (${body.keterangan || '-'})`);
 
     return NextResponse.json({
       success: true,

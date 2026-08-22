@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logAktivitas } from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -116,6 +117,8 @@ export async function POST(req: NextRequest) {
     const newAnggota = await prisma.anggota.create({
       data: body
     });
+
+    await logAktivitas(req, 'CREATE_ANGGOTA', `Menambahkan data anggota baru: ${newAnggota.nama} (NIK: ${newAnggota.nik})`);
 
     return NextResponse.json({
       success: true,
