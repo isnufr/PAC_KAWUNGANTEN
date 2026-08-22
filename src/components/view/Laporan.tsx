@@ -39,6 +39,11 @@ export default function LaporanView() {
   const [docWaktu, setDocWaktu] = useState('');
   const [docTempat, setDocTempat] = useState('');
   const [docAgenda, setDocAgenda] = useState('');
+  const [docKeperluan, setDocKeperluan] = useState('');
+  const [docTargetNama, setDocTargetNama] = useState('');
+  const [docKetua, setDocKetua] = useState('');
+  const [docSekretaris, setDocSekretaris] = useState('');
+  const [docBendahara, setDocBendahara] = useState('');
   const [docFilterBagian, setDocFilterBagian] = useState('');
   const [docFilterDesa, setDocFilterDesa] = useState('');
   const [isExportingDoc, setIsExportingDoc] = useState(false);
@@ -666,7 +671,196 @@ export default function LaporanView() {
               doc.text("KETUA", 50, currentY, { align: "center" });
               doc.text("SEKRETARIS", pageWidth - 50, currentY, { align: "center" });
               
-              doc.save('Surat_Undangan.pdf');
+          } else if (docType === 'SURAT_TUGAS') {
+              let currentY = 45;
+              drawHeader(doc);
+              
+              doc.setFontSize(14);
+              doc.setFont("helvetica", "bold");
+              doc.text("SURAT TUGAS / MANDAT", pageWidth / 2, currentY, { align: "center" });
+              doc.setLineWidth(0.3);
+              doc.line(pageWidth / 2 - 25, currentY + 1, pageWidth / 2 + 25, currentY + 1);
+              currentY += 6;
+              doc.setFontSize(11);
+              doc.setFont("helvetica", "normal");
+              doc.text(`Nomor : ...... /ST/PAC-KWG/VIII/2026`, pageWidth / 2, currentY, { align: "center" });
+              currentY += 15;
+              
+              const introText = `Pimpinan Anak Cabang Partai Demokrasi Indonesia Perjuangan (PAC PDI Perjuangan) Kecamatan Kawunganten, dengan ini memberikan tugas / mandat kepada:`;
+              const splitIntro = doc.splitTextToSize(introText, pageWidth - 28);
+              doc.text(splitIntro, 14, currentY);
+              currentY += (splitIntro.length * 6) + 5;
+              
+              let finalRows: any[] = [];
+              let rowIndex = 1;
+              
+              rawData.forEach((d: any) => {
+                  finalRows.push([
+                      rowIndex++,
+                      d.nama || '-',
+                      d.nik || '-',
+                      d.jabatan || '-',
+                      d.desa || '-'
+                  ]);
+              });
+              
+              autoTable(doc, {
+                  startY: currentY,
+                  head: [["NO", "NAMA", "NIK", "JABATAN", "DESA"]],
+                  body: finalRows,
+                  headStyles: { fillColor: [220, 38, 38], textColor: 255 },
+                  styles: { fontSize: 9, cellPadding: 3 },
+                  columnStyles: {
+                      0: { cellWidth: 10, halign: 'center' },
+                      1: { cellWidth: 50 },
+                      2: { cellWidth: 40 },
+                      3: { cellWidth: 40 },
+                      4: { cellWidth: 40 }
+                  }
+              });
+              
+              currentY = (doc as any).lastAutoTable.finalY + 10;
+              
+              const descText = `Untuk melaksanakan tugas: ${docKeperluan || '.......................................................................'}.`;
+              const splitDesc = doc.splitTextToSize(descText, pageWidth - 28);
+              doc.text(splitDesc, 14, currentY);
+              currentY += (splitDesc.length * 6) + 15;
+              
+              doc.text(`Kawunganten, .......................`, pageWidth - 14, currentY, { align: "right" }); currentY += 6;
+              doc.setFont("helvetica", "bold");
+              doc.text("PIMPINAN ANAK CABANG", pageWidth / 2, currentY, { align: "center" }); currentY += 6;
+              doc.text("PDI PERJUANGAN KEC. KAWUNGANTEN", pageWidth / 2, currentY, { align: "center" }); currentY += 30;
+              
+              doc.text("KETUA", 50, currentY, { align: "center" });
+              doc.text("SEKRETARIS", pageWidth - 50, currentY, { align: "center" });
+              
+              doc.save('Surat_Tugas.pdf');
+          } else if (docType === 'SURAT_KETERANGAN') {
+              let targetUser = rawData.find((d: any) => d.nama?.toLowerCase().includes(docTargetNama.toLowerCase()));
+              if (!targetUser && docTargetNama) {
+                  showAlert(`Anggota dengan nama "${docTargetNama}" tidak ditemukan dalam filter.`, 'error');
+                  setIsExportingDoc(false);
+                  return;
+              }
+              if (!targetUser) targetUser = rawData[0]; // Fallback to first user
+              
+              let currentY = 45;
+              drawHeader(doc);
+              
+              doc.setFontSize(14);
+              doc.setFont("helvetica", "bold");
+              doc.text("SURAT KETERANGAN AKTIF", pageWidth / 2, currentY, { align: "center" });
+              doc.setLineWidth(0.3);
+              doc.line(pageWidth / 2 - 35, currentY + 1, pageWidth / 2 + 35, currentY + 1);
+              currentY += 6;
+              doc.setFontSize(11);
+              doc.setFont("helvetica", "normal");
+              doc.text(`Nomor : ...... /SK/PAC-KWG/VIII/2026`, pageWidth / 2, currentY, { align: "center" });
+              currentY += 15;
+              
+              const introText = `Yang bertanda tangan di bawah ini, Ketua Pimpinan Anak Cabang Partai Demokrasi Indonesia Perjuangan (PAC PDI Perjuangan) Kecamatan Kawunganten, menerangkan dengan sesungguhnya bahwa:`;
+              const splitIntro = doc.splitTextToSize(introText, pageWidth - 28);
+              doc.text(splitIntro, 14, currentY);
+              currentY += (splitIntro.length * 6) + 5;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text(`Nama Lengkap   : ${targetUser.nama || '-'}`, 25, currentY); currentY += 7;
+              doc.setFont("helvetica", "normal");
+              doc.text(`NIK            : ${targetUser.nik || '-'}`, 25, currentY); currentY += 7;
+              doc.text(`Tempat, Tgl Lahir: ${targetUser.tempat_lahir || '-'}, ${targetUser.tgl_lahir || '-'}`, 25, currentY); currentY += 7;
+              doc.text(`Alamat         : ${targetUser.alamat || '-'}, Desa ${targetUser.desa || '-'}`, 25, currentY); currentY += 7;
+              doc.text(`Jabatan        : ${targetUser.jabatan || '-'}`, 25, currentY); currentY += 12;
+              
+              const closingText = `Adalah benar-benar anggota dan pengurus aktif PDI Perjuangan di Kecamatan Kawunganten. Surat keterangan ini dibuat untuk keperluan: ${docKeperluan || 'Administrasi'}.`;
+              const splitClosing = doc.splitTextToSize(closingText, pageWidth - 28);
+              doc.text(splitClosing, 14, currentY);
+              currentY += (splitClosing.length * 6) + 5;
+              
+              const closingText2 = `Demikian surat keterangan ini dibuat agar dapat dipergunakan sebagaimana mestinya.`;
+              const splitClosing2 = doc.splitTextToSize(closingText2, pageWidth - 28);
+              doc.text(splitClosing2, 14, currentY);
+              currentY += (splitClosing2.length * 6) + 15;
+              
+              doc.text(`Kawunganten, .......................`, pageWidth - 14, currentY, { align: "right" }); currentY += 6;
+              doc.setFont("helvetica", "bold");
+              doc.text("KETUA PAC PDI PERJUANGAN", pageWidth - 14, currentY, { align: "right" }); currentY += 6;
+              doc.text("KEC. KAWUNGANTEN", pageWidth - 14, currentY, { align: "right" }); currentY += 25;
+              doc.text("( ................................. )", pageWidth - 14, currentY, { align: "right" });
+              
+              doc.save(`Surat_Keterangan_${targetUser.nama?.replace(/\s/g, '_') || 'Anggota'}.pdf`);
+          } else if (docType === 'SK_PANITIA') {
+              let currentY = 45;
+              drawHeader(doc);
+              
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "bold");
+              doc.text("SURAT KEPUTUSAN", pageWidth / 2, currentY, { align: "center" });
+              currentY += 6;
+              doc.setFontSize(10);
+              doc.setFont("helvetica", "normal");
+              doc.text(`Nomor : ...... /SK/PAC-KWG/VIII/2026`, pageWidth / 2, currentY, { align: "center" });
+              currentY += 6;
+              doc.text(`TENTANG`, pageWidth / 2, currentY, { align: "center" });
+              currentY += 6;
+              doc.setFont("helvetica", "bold");
+              doc.text(`SUSUNAN PANITIA ${docNamaAcara?.toUpperCase() || 'KEGIATAN'}`, pageWidth / 2, currentY, { align: "center" });
+              doc.text(`PAC PDI PERJUANGAN KEC. KAWUNGANTEN`, pageWidth / 2, currentY + 6, { align: "center" });
+              currentY += 15;
+              
+              doc.setFontSize(10);
+              doc.setFont("helvetica", "normal");
+              doc.text(`Menimbang   : a. Bahwa untuk kelancaran pelaksanaan acara ${docNamaAcara || 'tersebut'}, dipandang perlu dibentuk Panitia Pelaksana.`, 14, currentY); currentY += 6;
+              doc.text(`              b. Bahwa nama-nama yang tercantum di bawah ini dianggap mampu.`, 14, currentY); currentY += 10;
+              
+              doc.text(`Mengingat   : a. AD/ART PDI Perjuangan`, 14, currentY); currentY += 6;
+              doc.text(`              b. Hasil Rapat Pleno PAC PDI Perjuangan Kec. Kawunganten`, 14, currentY); currentY += 15;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text(`MEMUTUSKAN`, pageWidth / 2, currentY, { align: "center" });
+              currentY += 10;
+              
+              doc.setFont("helvetica", "normal");
+              doc.text(`Menetapkan  :`, 14, currentY); currentY += 6;
+              doc.text(`Pertama     : Mengesahkan Susunan Panitia ${docNamaAcara || 'Kegiatan'}.`, 14, currentY); currentY += 6;
+              doc.text(`Kedua       : Panitia bertugas melaksanakan tugasnya dengan penuh tanggung jawab.`, 14, currentY); currentY += 6;
+              doc.text(`Ketiga      : Surat Keputusan ini berlaku sejak tanggal ditetapkan.`, 14, currentY); currentY += 15;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text(`SUSUNAN PANITIA:`, 14, currentY); currentY += 8;
+              
+              doc.setFont("helvetica", "normal");
+              doc.text(`Ketua       : ${docKetua || '...........................................'}`, 25, currentY); currentY += 6;
+              doc.text(`Sekretaris  : ${docSekretaris || '...........................................'}`, 25, currentY); currentY += 6;
+              doc.text(`Bendahara   : ${docBendahara || '...........................................'}`, 25, currentY); currentY += 10;
+              
+              doc.text(`Anggota / Seksi-seksi:`, 25, currentY); currentY += 6;
+              
+              let finalRows: any[] = [];
+              let rowIndex = 1;
+              rawData.forEach((d: any) => {
+                  finalRows.push([rowIndex++, d.nama || '-', d.jabatan || '-', d.desa || '-']);
+              });
+              
+              autoTable(doc, {
+                  startY: currentY,
+                  head: [["NO", "NAMA", "JABATAN", "DESA"]],
+                  body: finalRows,
+                  headStyles: { fillColor: [220, 38, 38], textColor: 255 },
+                  styles: { fontSize: 9, cellPadding: 2 },
+                  margin: { left: 25, right: 14 }
+              });
+              
+              currentY = (doc as any).lastAutoTable.finalY + 15;
+              
+              doc.text(`Ditetapkan di : Kawunganten`, pageWidth - 14, currentY, { align: "right" }); currentY += 6;
+              doc.text(`Pada Tanggal  : .......................`, pageWidth - 14, currentY, { align: "right" }); currentY += 10;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text("PIMPINAN ANAK CABANG", pageWidth - 14, currentY, { align: "right" }); currentY += 6;
+              doc.text("PDI PERJUANGAN KEC. KAWUNGANTEN", pageWidth - 14, currentY, { align: "right" }); currentY += 25;
+              doc.text("KETUA PAC", pageWidth - 14, currentY, { align: "right" });
+              
+              doc.save('SK_Panitia.pdf');
           }
           
           showAlert('Dokumen berhasil dicetak!', 'success');
@@ -863,23 +1057,32 @@ export default function LaporanView() {
                         <select value={docType} onChange={e => setDocType(e.target.value)} className="w-full p-4 border-2 border-red-200 rounded-2xl bg-white outline-none text-sm font-bold text-red-700 focus:border-red-500 transition shadow-sm hover:shadow-md cursor-pointer">
                             <option value="DAFTAR_HADIR">Daftar Hadir (Tabel Otomatis)</option>
                             <option value="UNDANGAN">Surat Undangan Kegiatan</option>
+                            <option value="SURAT_TUGAS">Surat Tugas / Mandat</option>
+                            <option value="SURAT_KETERANGAN">Surat Keterangan Aktif</option>
+                            <option value="SK_PANITIA">SK Susunan Kepanitiaan</option>
                         </select>
                     </div>
 
-                    <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Acara / Kegiatan</label>
-                        <input type="text" value={docNamaAcara} onChange={e => setDocNamaAcara(e.target.value)} placeholder="Contoh: Rapat Kerja Cabang PAC Kawunganten" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
-                    </div>
+                    {(docType === 'DAFTAR_HADIR' || docType === 'UNDANGAN' || docType === 'SK_PANITIA') && (
+                        <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Acara / Kegiatan</label>
+                            <input type="text" value={docNamaAcara} onChange={e => setDocNamaAcara(e.target.value)} placeholder="Contoh: Rapat Kerja Cabang PAC Kawunganten" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                        </div>
+                    )}
 
-                    <div>
-                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal</label>
-                        <input type="text" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} placeholder="Contoh: Minggu, 24 Agustus 2026" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
-                    </div>
+                    {docType !== 'SURAT_KETERANGAN' && (
+                        <>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal</label>
+                                <input type="text" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} placeholder="Contoh: Minggu, 24 Agustus 2026" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
 
-                    <div>
-                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Tempat</label>
-                        <input type="text" value={docTempat} onChange={e => setDocTempat(e.target.value)} placeholder="Contoh: Kantor PAC" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
-                    </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Tempat</label>
+                                <input type="text" value={docTempat} onChange={e => setDocTempat(e.target.value)} placeholder="Contoh: Kantor PAC" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                        </>
+                    )}
 
                     {docType === 'UNDANGAN' && (
                         <>
@@ -894,27 +1097,62 @@ export default function LaporanView() {
                         </>
                     )}
 
-                    <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100">
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Pilih Data Anggota yang Dimasukkan</h4>
-                    </div>
+                    {(docType === 'SURAT_TUGAS' || docType === 'SURAT_KETERANGAN') && (
+                        <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Keperluan / Tujuan Penugasan</label>
+                            <textarea value={docKeperluan} onChange={e => setDocKeperluan(e.target.value)} placeholder={docType === 'SURAT_TUGAS' ? "Contoh: Mengikuti pelatihan kader tingkat cabang..." : "Contoh: Sebagai syarat administrasi pencalonan legislatif..."} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold min-h-[80px]" />
+                        </div>
+                    )}
 
-                    <div>
-                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Bagian (Opsional)</label>
-                        <select value={docFilterBagian} onChange={e => setDocFilterBagian(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
-                            <option value="">- Semua Bagian -</option>
-                            <option value="PAC">PAC</option>
-                            <option value="RANTING">RANTING</option>
-                            <option value="ANAK RANTING">ANAK RANTING</option>
-                        </select>
-                    </div>
+                    {docType === 'SK_PANITIA' && (
+                        <>
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Ketua Panitia</label>
+                                <input type="text" value={docKetua} onChange={e => setDocKetua(e.target.value)} placeholder="Ketik nama lengkap..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Sekretaris Panitia</label>
+                                <input type="text" value={docSekretaris} onChange={e => setDocSekretaris(e.target.value)} placeholder="Ketik nama lengkap..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Bendahara Panitia</label>
+                                <input type="text" value={docBendahara} onChange={e => setDocBendahara(e.target.value)} placeholder="Ketik nama lengkap..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                        </>
+                    )}
 
-                    <div>
-                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Desa (Opsional)</label>
-                        <select value={docFilterDesa} onChange={e => setDocFilterDesa(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
-                            <option value="">- Semua Desa -</option>
-                            {desaList.map(d => <option key={d} value={d}>{d}</option>)}
-                        </select>
-                    </div>
+                    {docType === 'SURAT_KETERANGAN' ? (
+                        <>
+                            <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100">
+                                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Cari Nama Anggota</h4>
+                            </div>
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Persis (Sesuai Data)</label>
+                                <input type="text" value={docTargetNama} onChange={e => setDocTargetNama(e.target.value)} placeholder="Ketik nama anggota yang akan dibuatkan surat..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-red-500 transition font-bold text-slate-700 text-sm" />
+                                <p className="text-xs text-red-500 mt-2">*Hanya anggota dengan nama yang cocok yang akan dicetakkan surat.</p>
+                            </div>
+                        </>
+                    ) : docType !== 'SK_PANITIA' && (
+                        <>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Bagian (Opsional)</label>
+                                <select value={docFilterBagian} onChange={e => setDocFilterBagian(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                                    <option value="">- Semua Bagian -</option>
+                                    <option value="PAC">PAC</option>
+                                    <option value="RANTING">RANTING</option>
+                                    <option value="ANAK RANTING">ANAK RANTING</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Desa (Opsional)</label>
+                                <select value={docFilterDesa} onChange={e => setDocFilterDesa(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                                    <option value="">- Semua Desa -</option>
+                                    {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                                </select>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 <button onClick={handleExportDokumen} disabled={isExportingDoc}
