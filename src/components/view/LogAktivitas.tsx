@@ -7,7 +7,7 @@ export default function LogAktivitasView() {
   const { data: logs = [], isLoading, refetch: fetchLogs } = useQuery({
     queryKey: ['logAktivitas'],
     queryFn: async () => {
-      const res = await fetch('/api/log-aktivitas');
+      const res = await fetch(`/api/log-aktivitas?t=${Date.now()}`, { cache: 'no-store' });
       const json = await res.json();
       return json.success ? json.data : [];
     }
