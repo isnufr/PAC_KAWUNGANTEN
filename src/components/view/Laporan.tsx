@@ -31,6 +31,18 @@ export default function LaporanView() {
   const [photoDesa, setPhotoDesa] = useState('');
   const [photoDusun, setPhotoDusun] = useState('');
   const [isExportingPhoto, setIsExportingPhoto] = useState(false);
+
+  // States for Dokumen (Ajaib) Export
+  const [docType, setDocType] = useState('DAFTAR_HADIR');
+  const [docNamaAcara, setDocNamaAcara] = useState('');
+  const [docHariTanggal, setDocHariTanggal] = useState('');
+  const [docWaktu, setDocWaktu] = useState('');
+  const [docTempat, setDocTempat] = useState('');
+  const [docAgenda, setDocAgenda] = useState('');
+  const [docFilterBagian, setDocFilterBagian] = useState('');
+  const [docFilterDesa, setDocFilterDesa] = useState('');
+  const [isExportingDoc, setIsExportingDoc] = useState(false);
+
   const [cols, setCols] = useState({
     nik: true,
     nama: true,
@@ -470,10 +482,206 @@ export default function LaporanView() {
     setIsExportingPhoto(false);
   };
 
+  const handleExportDokumen = async () => {
+      setIsExportingDoc(true);
+      try {
+          const params = new URLSearchParams();
+          if (docFilterBagian) params.append('bagian', docFilterBagian);
+          if (docFilterDesa) params.append('desa', docFilterDesa);
+          params.append('limit', '5000');
+
+          const res = await fetch(`/api/anggota?${params.toString()}`);
+          const json = await res.json();
+          if (!json.success || !json.data.length) {
+              showAlert('Tidak ada data anggota untuk filter tersebut.', 'error');
+              setIsExportingDoc(false);
+              return;
+          }
+
+          let rawData = json.data;
+
+          const doc = new jsPDF('portrait');
+          const pageWidth = doc.internal.pageSize.getWidth();
+
+          const drawHeader = (d: jsPDF) => {
+              d.setFont("helvetica", "bold");
+              d.setFontSize(14);
+              d.text("PIMPINAN ANAK CABANG", pageWidth / 2, 15, { align: "center" });
+              d.text("PARTAI DEMOKRASI INDONESIA PERJUANGAN", pageWidth / 2, 21, { align: "center" });
+              d.text("KECAMATAN KAWUNGANTEN", pageWidth / 2, 27, { align: "center" });
+              d.setLineWidth(0.5);
+              d.line(14, 32, pageWidth - 14, 32);
+              d.setLineWidth(1.5);
+              d.line(14, 33.5, pageWidth - 14, 33.5);
+          };
+
+          if (docType === 'DAFTAR_HADIR') {
+              let currentY = 45;
+              drawHeader(doc);
+              
+              doc.setFontSize(12);
+              doc.text("DAFTAR HADIR", pageWidth / 2, currentY, { align: "center" });
+              currentY += 8;
+              
+              doc.setFontSize(10);
+              doc.setFont("helvetica", "normal");
+              doc.text(`Acara: ${docNamaAcara || '...........................................'}`, 14, currentY); currentY += 5;
+              doc.text(`Hari/Tanggal: ${docHariTanggal || '...........................................'}`, 14, currentY); currentY += 5;
+              doc.text(`Tempat: ${docTempat || '...........................................'}`, 14, currentY); currentY += 10;
+
+              // Pisahkan PAC dari Ranting/Anak Ranting
+              const dataPAC = rawData.filter((d: any) => d.bagian === 'PAC');
+              const dataLain = rawData.filter((d: any) => d.bagian !== 'PAC');
+
+              // Urutkan data berdasarkan Desa, lalu Nama
+              dataLain.sort((a: any, b: any) => {
+                  if ((a.desa || '') < (b.desa || '')) return -1;
+                  if ((a.desa || '') > (b.desa || '')) return 1;
+                  if ((a.nama || '') < (b.nama || '')) return -1;
+                  if ((a.nama || '') > (b.nama || '')) return 1;
+                  return 0;
+              });
+              
+              let finalRows: any[] = [];
+              let currentDesa = '';
+              let rowIndex = 1;
+
+              // Generate Rows untuk PAC
+              if (dataPAC.length > 0) {
+                  finalRows.push([{ content: 'PENGURUS PAC KAWUNGANTEN', colSpan: 5, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'center' } }]);
+                  dataPAC.forEach((d: any) => {
+                      finalRows.push([
+                          rowIndex++,
+                          d.nama || '-',
+                          d.desa || '-',
+                          d.dusun || '-',
+                          '' // Kolom TTD kosong
+                      ]);
+                  });
+              }
+
+              // Generate Rows untuk Desa lainnya
+              dataLain.forEach((d: any) => {
+                  const dDesa = d.desa || '-';
+                  if (dDesa !== currentDesa) {
+                      currentDesa = dDesa;
+                      finalRows.push([{ content: `DESA ${currentDesa.toUpperCase()}`, colSpan: 5, styles: { fillColor: [255, 230, 230], fontStyle: 'bold', halign: 'center', textColor: [200, 0, 0] } }]);
+                  }
+                  finalRows.push([
+                      rowIndex++,
+                      d.nama || '-',
+                      d.desa || '-',
+                      d.dusun || '-',
+                      '' // Kolom TTD kosong
+                  ]);
+              });
+
+              autoTable(doc, {
+                  startY: currentY,
+                  head: [["NO", "NAMA", "DESA", "DUSUN", "TANDA TANGAN"]],
+                  body: finalRows,
+                  headStyles: { fillColor: [220, 38, 38], textColor: 255 },
+                  styles: { fontSize: 9, cellPadding: 3 },
+                  columnStyles: {
+                      0: { cellWidth: 10, halign: 'center' },
+                      1: { cellWidth: 50 },
+                      2: { cellWidth: 40 },
+                      3: { cellWidth: 40 },
+                      4: { cellWidth: 40 }
+                  },
+                  didDrawCell: (data) => {
+                      // Buat baris selang-seling tanda tangan
+                      if (data.section === 'body' && data.column.index === 4 && typeof data.cell.raw !== 'object') {
+                          const isOdd = data.row.index % 2 !== 0;
+                          const ttdText = `${data.row.index + 1}. ....................`;
+                          doc.setFontSize(8);
+                          doc.setTextColor(150, 150, 150);
+                          if (isOdd) {
+                              doc.text(ttdText, data.cell.x + 20, data.cell.y + 5);
+                          } else {
+                              doc.text(ttdText, data.cell.x + 2, data.cell.y + 5);
+                          }
+                      }
+                  }
+              });
+
+              doc.save('Daftar_Hadir.pdf');
+          } else if (docType === 'UNDANGAN') {
+              let currentY = 45;
+              drawHeader(doc);
+              
+              doc.setFontSize(11);
+              doc.setFont("helvetica", "normal");
+              
+              const rightMargin = pageWidth - 14;
+              
+              doc.text(`Nomor : ...... /IN/PAC-KWG/VIII/2026`, 14, currentY);
+              doc.text(`Kawunganten, .......................`, rightMargin, currentY, { align: "right" });
+              currentY += 6;
+              doc.text(`Sifat : Penting`, 14, currentY);
+              currentY += 6;
+              doc.text(`Hal : Undangan`, 14, currentY);
+              currentY += 15;
+              
+              doc.text(`Kepada Yth.`, 14, currentY); currentY += 6;
+              doc.setFont("helvetica", "bold");
+              
+              let targetName = `Seluruh Jajaran Pengurus`;
+              if (docFilterBagian) targetName += ` ${docFilterBagian}`;
+              if (docFilterDesa) targetName += ` Desa ${docFilterDesa}`;
+              if (!docFilterBagian && !docFilterDesa) targetName = `Bapak/Ibu/Sdr/i (Seluruh Pengurus)`;
+              
+              doc.text(targetName, 14, currentY);
+              doc.setFont("helvetica", "normal");
+              currentY += 6;
+              doc.text(`Di - Tempat`, 14, currentY);
+              currentY += 15;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text(`Merdeka !!!`, 14, currentY); currentY += 8;
+              doc.setFont("helvetica", "normal");
+              
+              const introText = `Dipermaklumkan dengan hormat, bersama surat ini kami mengundang kehadiran Bapak/Ibu/Sdr/i pada acara ${docNamaAcara || '...................'}, yang Insya Allah akan dilaksanakan pada:`;
+              const splitIntro = doc.splitTextToSize(introText, pageWidth - 28);
+              doc.text(splitIntro, 14, currentY);
+              currentY += (splitIntro.length * 6) + 5;
+              
+              doc.text(`Hari / Tanggal  : ${docHariTanggal || '...........................................'}`, 25, currentY); currentY += 7;
+              doc.text(`Waktu           : ${docWaktu || '...........................................'}`, 25, currentY); currentY += 7;
+              doc.text(`Tempat          : ${docTempat || '...........................................'}`, 25, currentY); currentY += 7;
+              
+              const splitAgenda = doc.splitTextToSize(`Acara           : ${docAgenda || '...........................................'}`, pageWidth - 40);
+              doc.text(splitAgenda, 25, currentY); 
+              currentY += (splitAgenda.length * 6) + 8;
+              
+              const closingText = `Demikian surat undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, dimohon untuk hadir tepat waktu. Atas perhatian dan kehadirannya kami ucapkan terima kasih.`;
+              const splitClosing = doc.splitTextToSize(closingText, pageWidth - 28);
+              doc.text(splitClosing, 14, currentY);
+              currentY += (splitClosing.length * 6) + 15;
+              
+              doc.setFont("helvetica", "bold");
+              doc.text("PIMPINAN ANAK CABANG", pageWidth / 2, currentY, { align: "center" }); currentY += 6;
+              doc.text("PDI PERJUANGAN KEC. KAWUNGANTEN", pageWidth / 2, currentY, { align: "center" }); currentY += 30;
+              
+              doc.text("KETUA", 50, currentY, { align: "center" });
+              doc.text("SEKRETARIS", pageWidth - 50, currentY, { align: "center" });
+              
+              doc.save('Surat_Undangan.pdf');
+          }
+          
+          showAlert('Dokumen berhasil dicetak!', 'success');
+      } catch (error) {
+          console.error(error);
+          showAlert('Gagal mencetak dokumen', 'error');
+      } finally {
+          setIsExportingDoc(false);
+      }
+  };
+
   const hideKolomEkspor = format === 'EXCEL' && (bagian === 'RANTING' || bagian === 'ANAK RANTING');
   const showDusunFilter = bagian === 'ANAK RANTING' && desa;
 
-  const [activeMenu, setActiveMenu] = useState<'data' | 'foto' | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'data' | 'foto' | 'dokumen' | null>(null);
 
   return (
     <div id="menu-laporan" className="max-w-6xl mx-auto space-y-6">
@@ -498,6 +706,16 @@ export default function LaporanView() {
                 </div>
                 <h3 className={`font-black text-lg ${activeMenu === 'foto' ? 'text-red-800' : 'text-slate-700'}`}>Ekspor Foto Anggota (ZIP)</h3>
                 <p className="text-xs text-slate-500 text-center px-4">Unduh massal Pass Foto dan KTP dalam folder ZIP yang tersusun rapi otomatis.</p>
+            </button>
+
+            <button 
+                onClick={() => setActiveMenu(activeMenu === 'dokumen' ? null : 'dokumen')}
+                className={`p-6 rounded-[2rem] border-2 transition-all duration-300 flex flex-col items-center justify-center gap-3 sm:col-span-2 md:col-span-1 ${activeMenu === 'dokumen' ? 'bg-red-50 border-red-500 shadow-xl scale-[1.02]' : 'bg-white border-slate-100 hover:border-red-200 hover:bg-red-50/50 hover:shadow-md'}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 shadow-sm ${activeMenu === 'dokumen' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-600'}`}>
+                    <span className="material-icons text-3xl">auto_awesome</span>
+                </div>
+                <h3 className={`font-black text-lg ${activeMenu === 'dokumen' ? 'text-red-800' : 'text-slate-700'}`}>Export Ajaib (Dokumen)</h3>
+                <p className="text-xs text-slate-500 text-center px-4">Generate otomatis Daftar Hadir, Undangan, dan dokumen resmi organisasi lainnya.</p>
             </button>
         </div>
 
@@ -630,8 +848,85 @@ export default function LaporanView() {
             </div>
         )}
 
+        {/* EXPORT AJAIB (DOKUMEN) */}
+        {activeMenu === 'dokumen' && (
+            <div className="bg-white p-6 sm:p-10 rounded-[2.5rem] shadow-xl border border-red-100 max-w-2xl mx-auto text-center relative overflow-hidden transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none text-red-600">
+                    <span className="material-icons text-9xl">auto_awesome</span>
+                </div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-red-800 mb-2">Export Ajaib Dokumen</h2>
+                <p className="text-red-400 text-xs md:text-sm mb-6 pb-6 border-b border-red-50">Sistem akan secara cerdas mengisi dokumen dengan data anggota yang dipilih.</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-8 text-left relative z-10">
+                    <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Pilih Jenis Dokumen</label>
+                        <select value={docType} onChange={e => setDocType(e.target.value)} className="w-full p-4 border-2 border-red-200 rounded-2xl bg-white outline-none text-sm font-bold text-red-700 focus:border-red-500 transition shadow-sm hover:shadow-md cursor-pointer">
+                            <option value="DAFTAR_HADIR">Daftar Hadir (Tabel Otomatis)</option>
+                            <option value="UNDANGAN">Surat Undangan Kegiatan</option>
+                        </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Nama Acara / Kegiatan</label>
+                        <input type="text" value={docNamaAcara} onChange={e => setDocNamaAcara(e.target.value)} placeholder="Contoh: Rapat Kerja Cabang PAC Kawunganten" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                    </div>
+
+                    <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal</label>
+                        <input type="text" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} placeholder="Contoh: Minggu, 24 Agustus 2026" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                    </div>
+
+                    <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Tempat</label>
+                        <input type="text" value={docTempat} onChange={e => setDocTempat(e.target.value)} placeholder="Contoh: Kantor PAC" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                    </div>
+
+                    {docType === 'UNDANGAN' && (
+                        <>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Waktu (Jam)</label>
+                                <input type="text" value={docWaktu} onChange={e => setDocWaktu(e.target.value)} placeholder="Contoh: 19.30 WIB - Selesai" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Agenda Pembahasan</label>
+                                <textarea value={docAgenda} onChange={e => setDocAgenda(e.target.value)} placeholder="Contoh: Konsolidasi organisasi dan persiapan Pilkada..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold min-h-[80px]" />
+                            </div>
+                        </>
+                    )}
+
+                    <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100">
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Pilih Data Anggota yang Dimasukkan</h4>
+                    </div>
+
+                    <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Bagian (Opsional)</label>
+                        <select value={docFilterBagian} onChange={e => setDocFilterBagian(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                            <option value="">- Semua Bagian -</option>
+                            <option value="PAC">PAC</option>
+                            <option value="RANTING">RANTING</option>
+                            <option value="ANAK RANTING">ANAK RANTING</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Desa (Opsional)</label>
+                        <select value={docFilterDesa} onChange={e => setDocFilterDesa(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                            <option value="">- Semua Desa -</option>
+                            {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                    </div>
+                </div>
+
+                <button onClick={handleExportDokumen} disabled={isExportingDoc}
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-black flex items-center justify-center space-x-2 w-full shadow-xl shadow-red-600/30 transition-all transform active:scale-95 text-sm disabled:opacity-50 relative z-10">
+                    <span className="material-icons">{isExportingDoc ? 'auto_awesome' : 'picture_as_pdf'}</span>
+                    <span>{isExportingDoc ? 'MERACIK DOKUMEN...' : 'GENERATE DOKUMEN (PDF)'}</span>
+                </button>
+            </div>
+        )}
+
         {/* LOADING OVERLAY MODERN */}
-        {mounted && (isExporting || isExportingPhoto) && createPortal(
+        {mounted && (isExporting || isExportingPhoto || isExportingDoc) && createPortal(
             <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-sm w-full animate-in zoom-in-95 duration-300 border border-slate-100">
                     <div className="relative w-20 h-20 mb-6">
