@@ -364,7 +364,7 @@ export default function LaporanView() {
             XLSX.writeFile(wb, fileName + ".xlsx");
         }
       } else if (format === 'PDF') {
-        const doc = new jsPDF('landscape');
+        const doc = new jsPDF('p', 'mm', 'a4');
 
         if (bagian === 'ANAK RANTING' && desa) {
             const dusunToExport = selectedDusuns.length > 0 ? selectedDusuns : [...Array.from(new Set(rawData.map((d: any) => d.dusun).filter(Boolean)))].sort() as string[];
@@ -527,7 +527,7 @@ export default function LaporanView() {
 
           let rawData = json.data;
 
-          const doc = new jsPDF('portrait');
+          const doc = new jsPDF('p', 'mm', 'a4');
           const pageWidth = doc.internal.pageSize.getWidth();
 
           const drawHeader = (d: jsPDF) => {
