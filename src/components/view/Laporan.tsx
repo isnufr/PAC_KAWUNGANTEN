@@ -6,6 +6,23 @@ import * as XLSX from 'xlsx-js-style';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+const formatDateToIndonesian = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
+
+const formatWaktu = (waktuStr: string) => {
+    if (!waktuStr) return '';
+    if (/^\d{2}:\d{2}$/.test(waktuStr)) {
+        return `${waktuStr.replace(':', '.')} WIB - Selesai`;
+    }
+    return waktuStr;
+};
+
 interface WilayahItem {
   id: number;
   kecamatan: string;
@@ -58,8 +75,11 @@ export default function LaporanView() {
     desa: true,
     dusun: true,
     bagian: true,
-    jabatan: true
+    jabatan: true,
+    tambahan: false
   });
+
+  const [judulKolomTambahan, setJudulKolomTambahan] = useState('');
   
   const { data: wilayahListResponse = [] } = useQuery({
     queryKey: ['wilayah'],
@@ -159,6 +179,7 @@ export default function LaporanView() {
       if (cols.dusun) headers.push("DUSUN");
       if (cols.bagian) headers.push("BAGIAN");
       if (cols.jabatan) headers.push("JABATAN");
+      if (cols.tambahan) headers.push(judulKolomTambahan || "KOLOM TAMBAHAN");
 
       // Common rows
       const commonDataRows = rawData.map((d: any, idx: number) => {
@@ -178,6 +199,7 @@ export default function LaporanView() {
           if (cols.dusun) row.push(d.dusun || '-');
           if (cols.bagian) row.push(d.bagian || '-');
           if (cols.jabatan) row.push(d.jabatan || '-');
+          if (cols.tambahan) row.push("");
           return row;
       });
 
@@ -531,7 +553,7 @@ export default function LaporanView() {
               doc.setFontSize(10);
               doc.setFont("helvetica", "normal");
               doc.text(`Acara: ${docNamaAcara || '...........................................'}`, 14, currentY); currentY += 5;
-              doc.text(`Hari/Tanggal: ${docHariTanggal || '...........................................'}`, 14, currentY); currentY += 5;
+              doc.text(`Hari/Tanggal: ${formatDateToIndonesian(docHariTanggal) || '...........................................'}`, 14, currentY); currentY += 5;
               doc.text(`Tempat: ${docTempat || '...........................................'}`, 14, currentY); currentY += 10;
 
               // Pisahkan PAC dari Ranting/Anak Ranting
@@ -651,8 +673,8 @@ export default function LaporanView() {
               doc.text(splitIntro, 14, currentY);
               currentY += (splitIntro.length * 6) + 5;
               
-              doc.text(`Hari / Tanggal  : ${docHariTanggal || '...........................................'}`, 25, currentY); currentY += 7;
-              doc.text(`Waktu           : ${docWaktu || '...........................................'}`, 25, currentY); currentY += 7;
+              doc.text(`Hari / Tanggal  : ${formatDateToIndonesian(docHariTanggal) || '...........................................'}`, 25, currentY); currentY += 7;
+              doc.text(`Waktu           : ${formatWaktu(docWaktu) || '...........................................'}`, 25, currentY); currentY += 7;
               doc.text(`Tempat          : ${docTempat || '...........................................'}`, 25, currentY); currentY += 7;
               
               const splitAgenda = doc.splitTextToSize(`Acara           : ${docAgenda || '...........................................'}`, pageWidth - 40);
@@ -970,10 +992,24 @@ export default function LaporanView() {
                                 {Object.entries(cols).map(([k, v]) => (
                                     <label key={k} className="flex items-center space-x-2 text-[11px] font-bold text-slate-600 cursor-pointer p-2 rounded-xl bg-white border border-slate-100 hover:border-slate-300 transition hover:bg-slate-50">
                                         <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500" />
-                                        <span className="uppercase">{k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                        <span className="uppercase">{k === 'tambahan' ? 'KOLOM TAMBAHAN' : k.replace(/([A-Z])/g, ' $1').trim()}</span>
                                     </label>
                                 ))}
                             </div>
+                            
+                            {cols.tambahan && (
+                                <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">Judul Kolom Tambahan</label>
+                                    <input 
+                                        type="text" 
+                                        value={judulKolomTambahan} 
+                                        onChange={e => setJudulKolomTambahan(e.target.value)} 
+                                        placeholder="Contoh: Keterangan, Tanda Tangan, dll" 
+                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold"
+                                    />
+                                    <p className="text-[10px] text-slate-400 mt-1">*Kolom ini akan ditambahkan di bagian paling kanan laporan dengan isi baris kosong.</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -1074,7 +1110,7 @@ export default function LaporanView() {
                         <>
                             <div>
                                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal</label>
-                                <input type="text" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} placeholder="Contoh: Minggu, 24 Agustus 2026" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                                <input type="date" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold cursor-pointer" />
                             </div>
 
                             <div>
@@ -1088,7 +1124,7 @@ export default function LaporanView() {
                         <>
                             <div>
                                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Waktu (Jam)</label>
-                                <input type="text" value={docWaktu} onChange={e => setDocWaktu(e.target.value)} placeholder="Contoh: 19.30 WIB - Selesai" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                                <input type="time" value={docWaktu} onChange={e => setDocWaktu(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold cursor-pointer" />
                             </div>
                             <div className="sm:col-span-2">
                                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Agenda Pembahasan</label>
