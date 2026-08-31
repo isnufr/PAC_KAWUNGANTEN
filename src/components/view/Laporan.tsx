@@ -741,7 +741,7 @@ export default function LaporanView() {
                const contentWidth = pw - ml - mr;
 
                const drawUndanganPage = (d: jsPDF, anggota: any) => {
-                   let y = 24;
+                   let y = 15; // Margin atas disamakan dengan margin kiri/kanan (15mm)
 
                    // ===== HEADER WITH LOGO =====
                    // Logo PDI on the left
@@ -772,7 +772,7 @@ export default function LaporanView() {
                    
                    const nomor = undNomor || '......';
                    d.text(`Nomor`, ml, y);
-                   d.text(`: ${nomor}/IDE/PAC/VIII/2026`, ml + 25, y);
+                   d.text(`: ${nomor}/IN/PAC/VIII/2026`, ml + 25, y);
                    d.text(`Kawunganten, ${formatDateWithoutDay(docTanggalSurat) || '.......................'}`, pw - mr, y, { align: "right" });
                    y += 6;
                    d.text(`Lampiran`, ml, y);
@@ -880,9 +880,9 @@ export default function LaporanView() {
                    const leftCol = ml + 35;
                    const rightCol = pw - mr - 35;
 
-                   // Stempel touch Ketua signature (geser ke kiri agar hanya menempel 1/3)
+                   // Stempel touch Ketua signature (geser ke kanan agar 1/3 bagian kiri stempel yang menempel)
                    const stempelSize = 35;
-                   try { d.addImage(stempelB64, 'PNG', leftCol - 22, y - 4, stempelSize, stempelSize); } catch {}
+                   try { d.addImage(stempelB64, 'PNG', leftCol - 2, y - 4, stempelSize, stempelSize); } catch {}
 
                    d.text("Ketua", leftCol, y + 2, { align: "center" });
                    d.text("Sekretaris", rightCol, y + 2, { align: "center" });
