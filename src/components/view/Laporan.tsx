@@ -52,6 +52,7 @@ export default function LaporanView() {
   // States for Dokumen (Ajaib) Export
   const [docType, setDocType] = useState('DAFTAR_HADIR');
   const [docNamaAcara, setDocNamaAcara] = useState('');
+  const [docTanggalSurat, setDocTanggalSurat] = useState('');
   const [docHariTanggal, setDocHariTanggal] = useState('');
   const [docWaktu, setDocWaktu] = useState('');
   const [docTempat, setDocTempat] = useState('');
@@ -723,12 +724,12 @@ export default function LaporanView() {
                    return;
                }
 
-               // Use legal page size to match docx (12242 x 20163 twips)
-               const undDoc = new jsPDF('p', 'mm', [215.9, 355.6]);
+               // Use A4 size with tighter margins
+               const undDoc = new jsPDF('p', 'mm', 'a4');
                const pw = undDoc.internal.pageSize.getWidth();
                const ph = undDoc.internal.pageSize.getHeight();
-               const ml = 24; // margin left
-               const mr = 24; // margin right
+               const ml = 15; // margin left
+               const mr = 15; // margin right
                const contentWidth = pw - ml - mr;
 
                const drawUndanganPage = (d: jsPDF, anggota: any) => {
@@ -764,7 +765,7 @@ export default function LaporanView() {
                    const nomor = undNomor || '......';
                    d.text(`Nomor`, ml, y);
                    d.text(`: ${nomor}/IDE/PAC/VIII/2026`, ml + 25, y);
-                   d.text(`Kawunganten, ${formatDateToIndonesian(docHariTanggal) || '.......................'}`, pw - mr, y, { align: "right" });
+                   d.text(`Kawunganten, ${formatDateToIndonesian(docTanggalSurat) || '.......................'}`, pw - mr, y, { align: "right" });
                    y += 6;
                    d.text(`Lampiran`, ml, y);
                    d.text(`: -`, ml + 25, y);
@@ -785,7 +786,16 @@ export default function LaporanView() {
                    d.setFont("helvetica", "bold");
                    d.text(`      Pengurus ${bagianLabel}`, ml, y);
                    y += 6;
-                   d.text(`      ${anggota.nama || '-'}`, ml, y);
+                   
+                   let honorific = '';
+                   const umur = parseInt(anggota.umur) || 0;
+                   const jk = String(anggota.jenisKelamin).toUpperCase();
+                   if (jk === 'LAKI-LAKI') {
+                       honorific = umur > 40 ? 'Bpk. ' : 'Sdr. ';
+                   } else if (jk === 'PEREMPUAN') {
+                       honorific = umur > 40 ? 'Ibu ' : 'Sdri. ';
+                   }
+                   d.text(`      ${honorific}${anggota.nama || '-'}`, ml, y);
                    y += 8;
 
                    d.setFont("helvetica", "normal");
@@ -833,6 +843,8 @@ export default function LaporanView() {
                    const splitAcara = d.splitTextToSize(acaraText, contentWidth - 45);
                    d.text(splitAcara, colonX, y);
                    y += (splitAcara.length * 6) + 8;
+                   
+                   y += 6; // Spasi baris tambahan
 
                    // Closing text
                    const closingText = `\tDemikian undangan ini kami sampaikan atas perhatian dan kehadirannya kami ucapkan`;
@@ -841,6 +853,8 @@ export default function LaporanView() {
                    y += (splitClosing.length * 6);
                    d.text(`Terima Kasih.`, ml, y);
                    y += 10;
+                   
+                   y += 6; // Spasi baris tambahan
 
                    // ===== SIGNATURE SECTION =====
                    d.setFont("helvetica", "bold");
@@ -852,15 +866,16 @@ export default function LaporanView() {
                    d.text("KECAMATAN KAWUNGANTEN", pw / 2, y, { align: "center" });
                    y += 5;
 
-                   // Stempel in center
-                   const stempelSize = 35;
-                   try { d.addImage(stempelB64, 'PNG', pw / 2 - stempelSize / 2, y - 2, stempelSize, stempelSize); } catch {}
-
                    // Position labels
                    d.setFontSize(12);
                    d.setFont("helvetica", "normal");
                    const leftCol = ml + 35;
                    const rightCol = pw - mr - 35;
+
+                   // Stempel touch Ketua signature
+                   const stempelSize = 35;
+                   try { d.addImage(stempelB64, 'PNG', leftCol - 12, y - 4, stempelSize, stempelSize); } catch {}
+
                    d.text("Ketua", leftCol, y + 2, { align: "center" });
                    d.text("Sekretaris", rightCol, y + 2, { align: "center" });
 
@@ -887,6 +902,8 @@ export default function LaporanView() {
                    const sekNameW = d.getTextWidth("ISNU FADKHUL ROIS");
                    d.line(rightCol - sekNameW / 2, y + 1, rightCol + sekNameW / 2, y + 1);
                    y += 14;
+                   
+                   y += 6; // Spasi baris tambahan
 
                    // ===== TEMBUSAN =====
                    d.setFont("helvetica", "normal");
@@ -895,6 +912,8 @@ export default function LaporanView() {
                    y += 6;
                    d.text(`1. DPC KABUPATEN CILACAP`, ml + 12, y);
                    y += 16;
+                   
+                   y += 6; // Spasi baris tambahan
 
                    // ===== NB =====
                    if (undNB) {
@@ -906,7 +925,7 @@ export default function LaporanView() {
 
                // Generate pages for each selected anggota
                selectedData.forEach((anggota: any, idx: number) => {
-                   if (idx > 0) undDoc.addPage([215.9, 355.6]);
+                   if (idx > 0) undDoc.addPage('a4');
                    drawUndanganPage(undDoc, anggota);
                });
 
@@ -1328,11 +1347,16 @@ export default function LaporanView() {
                     {docType !== 'SURAT_KETERANGAN' && (
                         <>
                             <div>
-                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal</label>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Tanggal Pembuatan Surat</label>
+                                <input type="date" value={docTanggalSurat} onChange={e => setDocTanggalSurat(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold cursor-pointer" />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Hari & Tanggal Kegiatan</label>
                                 <input type="date" value={docHariTanggal} onChange={e => setDocHariTanggal(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold cursor-pointer" />
                             </div>
 
-                            <div>
+                            <div className="sm:col-span-2">
                                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Tempat</label>
                                 <input type="text" value={docTempat} onChange={e => setDocTempat(e.target.value)} placeholder="Contoh: Kantor PAC" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
                             </div>
