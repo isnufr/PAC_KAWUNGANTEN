@@ -65,6 +65,16 @@ export default function LaporanView() {
   const [docFilterDesa, setDocFilterDesa] = useState('');
   const [isExportingDoc, setIsExportingDoc] = useState(false);
 
+  // States for Undangan Export
+  const [undBagian, setUndBagian] = useState('');
+  const [undDesa, setUndDesa] = useState('');
+  const [undDusun, setUndDusun] = useState('');
+  const [undSelectedAnggota, setUndSelectedAnggota] = useState<number[]>([]);
+  const [undAnggotaList, setUndAnggotaList] = useState<any[]>([]);
+  const [undLoadingAnggota, setUndLoadingAnggota] = useState(false);
+  const [undNomor, setUndNomor] = useState('');
+  const [undNB, setUndNB] = useState('PAKAIAN KEMEJA (MERAH/HITAM), CELANA PANJANG DAN BERSEPATU');
+
   const [cols, setCols] = useState({
     nik: true,
     nama: true,
@@ -105,6 +115,53 @@ export default function LaporanView() {
     if (photoDesa) return Array.from(new Set(wilayahList.filter((w) => w.desa === photoDesa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
     return [];
   }, [photoDesa, wilayahList]);
+
+  const undDusunList = useMemo(() => {
+    if (undDesa) return Array.from(new Set(wilayahList.filter((w) => w.desa === undDesa).map((w) => w.dusun).filter(Boolean))).sort() as string[];
+    return [];
+  }, [undDesa, wilayahList]);
+
+  // Fetch anggota for undangan when filters change
+  useEffect(() => {
+    if (docType !== 'UNDANGAN' || !undBagian) {
+      setUndAnggotaList([]);
+      setUndSelectedAnggota([]);
+      return;
+    }
+    if (undBagian === 'RANTING' && !undDesa) {
+      setUndAnggotaList([]);
+      setUndSelectedAnggota([]);
+      return;
+    }
+    if (undBagian === 'ANAK RANTING' && (!undDesa || !undDusun)) {
+      setUndAnggotaList([]);
+      setUndSelectedAnggota([]);
+      return;
+    }
+    const fetchAnggota = async () => {
+      setUndLoadingAnggota(true);
+      try {
+        const params = new URLSearchParams();
+        params.append('bagian', undBagian);
+        if (undDesa) params.append('desa', undDesa);
+        if (undDusun) params.append('dusun', undDusun);
+        params.append('limit', '5000');
+        const res = await fetch(`/api/anggota?${params.toString()}`);
+        const json = await res.json();
+        if (json.success && json.data.length) {
+          setUndAnggotaList(json.data);
+        } else {
+          setUndAnggotaList([]);
+        }
+      } catch {
+        setUndAnggotaList([]);
+      } finally {
+        setUndLoadingAnggota(false);
+      }
+    };
+    fetchAnggota();
+    setUndSelectedAnggota([]);
+  }, [docType, undBagian, undDesa, undDusun]);
 
   // We should clear selectedDusuns when desa changes. We can do this in the select onChange.
 
@@ -633,66 +690,228 @@ export default function LaporanView() {
               });
 
               doc.save('Daftar_Hadir.pdf');
-          } else if (docType === 'UNDANGAN') {
-              let currentY = 45;
-              drawHeader(doc);
-              
-              doc.setFontSize(11);
-              doc.setFont("helvetica", "normal");
-              
-              const rightMargin = pageWidth - 14;
-              
-              doc.text(`Nomor : ...... /IN/PAC-KWG/VIII/2026`, 14, currentY);
-              doc.text(`Kawunganten, .......................`, rightMargin, currentY, { align: "right" });
-              currentY += 6;
-              doc.text(`Sifat : Penting`, 14, currentY);
-              currentY += 6;
-              doc.text(`Hal : Undangan`, 14, currentY);
-              currentY += 15;
-              
-              doc.text(`Kepada Yth.`, 14, currentY); currentY += 6;
-              doc.setFont("helvetica", "bold");
-              
-              let targetName = `Seluruh Jajaran Pengurus`;
-              if (docFilterBagian) targetName += ` ${docFilterBagian}`;
-              if (docFilterDesa) targetName += ` Desa ${docFilterDesa}`;
-              if (!docFilterBagian && !docFilterDesa) targetName = `Bapak/Ibu/Sdr/i (Seluruh Pengurus)`;
-              
-              doc.text(targetName, 14, currentY);
-              doc.setFont("helvetica", "normal");
-              currentY += 6;
-              doc.text(`Di - Tempat`, 14, currentY);
-              currentY += 15;
-              
-              doc.setFont("helvetica", "bold");
-              doc.text(`Merdeka !!!`, 14, currentY); currentY += 8;
-              doc.setFont("helvetica", "normal");
-              
-              const introText = `Dipermaklumkan dengan hormat, bersama surat ini kami mengundang kehadiran Bapak/Ibu/Sdr/i pada acara ${docNamaAcara || '...................'}, yang Insya Allah akan dilaksanakan pada:`;
-              const splitIntro = doc.splitTextToSize(introText, pageWidth - 28);
-              doc.text(splitIntro, 14, currentY);
-              currentY += (splitIntro.length * 6) + 5;
-              
-              doc.text(`Hari / Tanggal  : ${formatDateToIndonesian(docHariTanggal) || '...........................................'}`, 25, currentY); currentY += 7;
-              doc.text(`Waktu           : ${formatWaktu(docWaktu) || '...........................................'}`, 25, currentY); currentY += 7;
-              doc.text(`Tempat          : ${docTempat || '...........................................'}`, 25, currentY); currentY += 7;
-              
-              const splitAgenda = doc.splitTextToSize(`Acara           : ${docAgenda || '...........................................'}`, pageWidth - 40);
-              doc.text(splitAgenda, 25, currentY); 
-              currentY += (splitAgenda.length * 6) + 8;
-              
-              const closingText = `Demikian surat undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, dimohon untuk hadir tepat waktu. Atas perhatian dan kehadirannya kami ucapkan terima kasih.`;
-              const splitClosing = doc.splitTextToSize(closingText, pageWidth - 28);
-              doc.text(splitClosing, 14, currentY);
-              currentY += (splitClosing.length * 6) + 15;
-              
-              doc.setFont("helvetica", "bold");
-              doc.text("PIMPINAN ANAK CABANG", pageWidth / 2, currentY, { align: "center" }); currentY += 6;
-              doc.text("PDI PERJUANGAN KEC. KAWUNGANTEN", pageWidth / 2, currentY, { align: "center" }); currentY += 30;
-              
-              doc.text("KETUA", 50, currentY, { align: "center" });
-              doc.text("SEKRETARIS", pageWidth - 50, currentY, { align: "center" });
-              
+           } else if (docType === 'UNDANGAN') {
+               // Validate
+               if (undSelectedAnggota.length === 0) {
+                   showAlert('Silakan pilih minimal 1 anggota untuk dibuatkan undangan.', 'error');
+                   setIsExportingDoc(false);
+                   return;
+               }
+
+               // Load images as base64
+               const loadImgAsBase64 = async (url: string): Promise<string> => {
+                   const resp = await fetch(url);
+                   const blob = await resp.blob();
+                   return new Promise((resolve) => {
+                       const reader = new FileReader();
+                       reader.onloadend = () => resolve(reader.result as string);
+                       reader.readAsDataURL(blob);
+                   });
+               };
+
+               const [logoB64, stempelB64, ttdKetuaB64, ttdSekretarisB64] = await Promise.all([
+                   loadImgAsBase64('/images/logopdi.png'),
+                   loadImgAsBase64('/images/stempel.png'),
+                   loadImgAsBase64('/images/ttd_ketua.png'),
+                   loadImgAsBase64('/images/ttd_sekretaris.png'),
+               ]);
+
+               const selectedData = undAnggotaList.filter((a: any) => undSelectedAnggota.includes(a.id));
+               if (selectedData.length === 0) {
+                   showAlert('Data anggota terpilih tidak ditemukan.', 'error');
+                   setIsExportingDoc(false);
+                   return;
+               }
+
+               // Use legal page size to match docx (12242 x 20163 twips)
+               const undDoc = new jsPDF('p', 'mm', [215.9, 355.6]);
+               const pw = undDoc.internal.pageSize.getWidth();
+               const ph = undDoc.internal.pageSize.getHeight();
+               const ml = 24; // margin left
+               const mr = 24; // margin right
+               const contentWidth = pw - ml - mr;
+
+               const drawUndanganPage = (d: jsPDF, anggota: any) => {
+                   let y = 24;
+
+                   // ===== HEADER WITH LOGO =====
+                   // Logo PDI on the left
+                   try { d.addImage(logoB64, 'PNG', ml + 5, y - 3, 22, 27); } catch {}
+                   
+                   // Header text (centered)
+                   d.setFont("helvetica", "bold");
+                   d.setFontSize(16);
+                   d.text("PENGURUS ANAK CABANG", pw / 2, y + 2, { align: "center" });
+                   y += 8;
+                   d.text("PARTAI DEMOKRASI INDONESIA", pw / 2, y + 2, { align: "center" });
+                   y += 8;
+                   d.text("( PAC \u2013 PDI PERJUANGAN )", pw / 2, y + 2, { align: "center" });
+                   y += 8;
+                   d.text("KECAMATAN KAWUNGANTEN", pw / 2, y + 2, { align: "center" });
+                   y += 6;
+
+                   // Double line border
+                   d.setLineWidth(0.5);
+                   d.line(ml, y, pw - mr, y);
+                   d.setLineWidth(1.5);
+                   d.line(ml, y + 2, pw - mr, y + 2);
+                   y += 10;
+
+                   // ===== NOMOR, LAMPIRAN, PERIHAL + TANGGAL =====
+                   d.setFont("helvetica", "normal");
+                   d.setFontSize(12);
+                   
+                   const nomor = undNomor || '......';
+                   d.text(`Nomor`, ml, y);
+                   d.text(`: ${nomor}/IDE/PAC/VIII/2026`, ml + 25, y);
+                   d.text(`Kawunganten, ${formatDateToIndonesian(docHariTanggal) || '.......................'}`, pw - mr, y, { align: "right" });
+                   y += 6;
+                   d.text(`Lampiran`, ml, y);
+                   d.text(`: -`, ml + 25, y);
+                   y += 6;
+                   d.text(`Perihal`, ml, y);
+                   d.text(`: Undangan`, ml + 25, y);
+                   y += 12;
+
+                   // ===== PENERIMA =====
+                   d.text(`Kepada Yth.`, ml, y);
+                   y += 6;
+
+                   // Bagian label
+                   let bagianLabel = undBagian || '';
+                   if (undBagian === 'RANTING') bagianLabel = `Ranting Desa ${undDesa || ''}`;
+                   else if (undBagian === 'ANAK RANTING') bagianLabel = `Anak Ranting${undDusun ? ' ' + undDusun : ''} Desa ${undDesa || ''}`;
+                   
+                   d.setFont("helvetica", "bold");
+                   d.text(`      Pengurus ${bagianLabel}`, ml, y);
+                   y += 6;
+                   d.text(`      ${anggota.nama || '-'}`, ml, y);
+                   y += 8;
+
+                   d.setFont("helvetica", "normal");
+                   d.text(`      di-`, ml, y);
+                   y += 6;
+                   d.text(`      TEMPAT`, ml, y);
+                   y += 12;
+
+                   // ===== BODY =====
+                   d.text(`Merdeka ....!!!`, ml, y);
+                   y += 8;
+
+                   const bodyText = `\tBersama ini PAC PDI Perjuangan Kecamatan Kawunganten mengundang Bapak/Ibu untuk hadir pada :`;
+                   const splitBody = d.splitTextToSize(bodyText, contentWidth);
+                   d.text(splitBody, ml, y);
+                   y += (splitBody.length * 6) + 6;
+
+                   // Event details with tabs
+                   const tabX = ml + 8;
+                   const colonX = tabX + 35;
+
+                   d.text(`Hari/Tanggal`, tabX, y);
+                   d.text(`: ${formatDateToIndonesian(docHariTanggal) || '.......................'}`, colonX, y);
+                   y += 7;
+
+                   d.text(`Jam`, tabX, y);
+                   d.text(`: ${formatWaktu(docWaktu) || '.......................'}`, colonX, y);
+                   y += 7;
+
+                   d.text(`Tempat`, tabX, y);
+                   d.text(`: ${docTempat || '.......................'}`, colonX, y);
+                   y += 7;
+
+                   // Tempat line 2 if long
+                   if (docTempat && docTempat.length > 35) {
+                       const tempatLines = d.splitTextToSize(docTempat, contentWidth - 45);
+                       if (tempatLines.length > 1) {
+                           d.text(tempatLines.slice(1).join('\n'), colonX + 2, y);
+                           y += (tempatLines.length - 1) * 6;
+                       }
+                   }
+
+                   d.text(`Acara`, tabX, y);
+                   const acaraText = `: ${docAgenda || docNamaAcara || '.......................'}`;
+                   const splitAcara = d.splitTextToSize(acaraText, contentWidth - 45);
+                   d.text(splitAcara, colonX, y);
+                   y += (splitAcara.length * 6) + 8;
+
+                   // Closing text
+                   const closingText = `\tDemikian undangan ini kami sampaikan atas perhatian dan kehadirannya kami ucapkan`;
+                   const splitClosing = d.splitTextToSize(closingText, contentWidth);
+                   d.text(splitClosing, ml, y);
+                   y += (splitClosing.length * 6);
+                   d.text(`Terima Kasih.`, ml, y);
+                   y += 10;
+
+                   // ===== SIGNATURE SECTION =====
+                   d.setFont("helvetica", "bold");
+                   d.setFontSize(14);
+                   d.text("PENGURUS ANAK CABANG", pw / 2, y, { align: "center" });
+                   y += 7;
+                   d.text("PARTAI DEMOKRASI INDONESIA PERJUANGAN", pw / 2, y, { align: "center" });
+                   y += 7;
+                   d.text("KECAMATAN KAWUNGANTEN", pw / 2, y, { align: "center" });
+                   y += 5;
+
+                   // Stempel in center
+                   const stempelSize = 35;
+                   try { d.addImage(stempelB64, 'PNG', pw / 2 - stempelSize / 2, y - 2, stempelSize, stempelSize); } catch {}
+
+                   // Position labels
+                   d.setFontSize(12);
+                   d.setFont("helvetica", "normal");
+                   const leftCol = ml + 35;
+                   const rightCol = pw - mr - 35;
+                   d.text("Ketua", leftCol, y + 2, { align: "center" });
+                   d.text("Sekretaris", rightCol, y + 2, { align: "center" });
+
+                   // TTD images
+                   const ttdW = 20;
+                   const ttdH = 22;
+                   try { d.addImage(ttdKetuaB64, 'PNG', leftCol - ttdW / 2, y + 4, ttdW, ttdH); } catch {}
+                   try { d.addImage(ttdSekretarisB64, 'PNG', rightCol - ttdW / 2, y + 4, ttdW, ttdH); } catch {}
+
+                   y += ttdH + 7;
+
+                   // Names underlined
+                   d.setFont("helvetica", "bold");
+                   d.setFontSize(12);
+                   
+                   // Ketua name
+                   d.text("TURIJAN", leftCol, y, { align: "center" });
+                   const ketuaNameW = d.getTextWidth("TURIJAN");
+                   d.setLineWidth(0.3);
+                   d.line(leftCol - ketuaNameW / 2, y + 1, leftCol + ketuaNameW / 2, y + 1);
+
+                   // Sekretaris name
+                   d.text("ISNU FADKHUL ROIS", rightCol, y, { align: "center" });
+                   const sekNameW = d.getTextWidth("ISNU FADKHUL ROIS");
+                   d.line(rightCol - sekNameW / 2, y + 1, rightCol + sekNameW / 2, y + 1);
+                   y += 14;
+
+                   // ===== TEMBUSAN =====
+                   d.setFont("helvetica", "normal");
+                   d.setFontSize(12);
+                   d.text(`\tTembusan Kpd. Yth. :`, ml, y);
+                   y += 6;
+                   d.text(`1. DPC KABUPATEN CILACAP`, ml + 12, y);
+                   y += 16;
+
+                   // ===== NB =====
+                   if (undNB) {
+                       d.setFont("helvetica", "italic");
+                       d.setFontSize(12);
+                       d.text(`NB : ${undNB}`, ml, y);
+                   }
+               };
+
+               // Generate pages for each selected anggota
+               selectedData.forEach((anggota: any, idx: number) => {
+                   if (idx > 0) undDoc.addPage([215.9, 355.6]);
+                   drawUndanganPage(undDoc, anggota);
+               });
+
+               undDoc.save('Surat_Undangan.pdf');
+               
           } else if (docType === 'SURAT_TUGAS') {
               let currentY = 45;
               drawHeader(doc);
@@ -1127,9 +1346,108 @@ export default function LaporanView() {
                                 <input type="time" value={docWaktu} onChange={e => setDocWaktu(e.target.value)} className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold cursor-pointer" />
                             </div>
                             <div className="sm:col-span-2">
-                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Agenda Pembahasan</label>
-                                <textarea value={docAgenda} onChange={e => setDocAgenda(e.target.value)} placeholder="Contoh: Konsolidasi organisasi dan persiapan Pilkada..." className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold min-h-[80px]" />
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Agenda / Acara</label>
+                                <textarea value={docAgenda} onChange={e => setDocAgenda(e.target.value)} placeholder="Contoh: Musran dan Musanran PDI Perjuangan Kecamatan Kawunganten" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold min-h-[80px]" />
                             </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Nomor Surat</label>
+                                <input type="text" value={undNomor} onChange={e => setUndNomor(e.target.value)} placeholder="Contoh: 001" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">NB (Catatan Bawah)</label>
+                                <input type="text" value={undNB} onChange={e => setUndNB(e.target.value)} placeholder="Contoh: PAKAIAN KEMEJA (MERAH/HITAM), CELANA PANJANG DAN BERSEPATU" className="w-full p-3.5 border border-slate-200 rounded-xl bg-slate-50 outline-none text-sm focus:border-red-500 transition text-slate-700 font-semibold" />
+                            </div>
+
+                            {/* CASCADING FILTER */}
+                            <div className="sm:col-span-2 pt-4 mt-2 border-t border-slate-100">
+                                <h4 className="text-[11px] font-black text-red-600 uppercase tracking-widest mb-4 text-center">🎯 Pilih Penerima Undangan</h4>
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">1. Pilih Bagian</label>
+                                <select value={undBagian} onChange={e => { setUndBagian(e.target.value); setUndDesa(''); setUndDusun(''); setUndSelectedAnggota([]); }} className="w-full p-3.5 border border-red-200 rounded-xl bg-red-50 outline-none text-sm focus:ring-2 focus:ring-red-100 focus:border-red-500 transition font-bold text-red-800">
+                                    <option value="">- Pilih Bagian -</option>
+                                    <option value="RANTING">RANTING</option>
+                                    <option value="ANAK RANTING">ANAK RANTING</option>
+                                </select>
+                            </div>
+
+                            {undBagian && (
+                                <div className="sm:col-span-2">
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">2. Pilih Desa</label>
+                                    <select value={undDesa} onChange={e => { setUndDesa(e.target.value); setUndDusun(''); setUndSelectedAnggota([]); }} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                                        <option value="">- Pilih Desa -</option>
+                                        {desaList.map(d => <option key={d} value={d}>{d}</option>)}
+                                    </select>
+                                </div>
+                            )}
+
+                            {undBagian === 'ANAK RANTING' && undDesa && (
+                                <div className="sm:col-span-2">
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">3. Pilih Dusun</label>
+                                    <select value={undDusun} onChange={e => { setUndDusun(e.target.value); setUndSelectedAnggota([]); }} className="w-full p-3.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-slate-100 focus:border-slate-400 transition font-bold text-slate-700 text-sm">
+                                        <option value="">- Pilih Dusun -</option>
+                                        {undDusunList.map(d => <option key={d} value={d}>{d}</option>)}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* ANGGOTA LIST */}
+                            {undAnggotaList.length > 0 && (
+                                <div className="sm:col-span-2 mt-2">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">Pilih Anggota ({undSelectedAnggota.length}/{undAnggotaList.length})</label>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                if (undSelectedAnggota.length === undAnggotaList.length) {
+                                                    setUndSelectedAnggota([]);
+                                                } else {
+                                                    setUndSelectedAnggota(undAnggotaList.map((a: any) => a.id));
+                                                }
+                                            }}
+                                            className="text-xs font-bold text-red-600 hover:text-red-800 transition px-3 py-1 rounded-lg hover:bg-red-50"
+                                        >
+                                            {undSelectedAnggota.length === undAnggotaList.length ? '✕ Hapus Semua' : '✓ Pilih Semua'}
+                                        </button>
+                                    </div>
+                                    <div className="max-h-[250px] overflow-y-auto bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
+                                        {undAnggotaList.map((a: any) => (
+                                            <label key={a.id} className={`flex items-center space-x-3 text-xs font-bold cursor-pointer p-2.5 rounded-xl transition ${undSelectedAnggota.includes(a.id) ? 'bg-red-50 text-red-800 border border-red-200' : 'text-slate-700 hover:bg-slate-100 border border-transparent'}`}>
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={undSelectedAnggota.includes(a.id)} 
+                                                    onChange={() => {
+                                                        setUndSelectedAnggota(prev => 
+                                                            prev.includes(a.id) 
+                                                                ? prev.filter(id => id !== a.id) 
+                                                                : [...prev, a.id]
+                                                        );
+                                                    }} 
+                                                    className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500 transition" 
+                                                />
+                                                <span className="flex-1">{a.nama}</span>
+                                                <span className="text-[10px] font-medium text-slate-400">{a.jabatan || '-'}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {undLoadingAnggota && (
+                                <div className="sm:col-span-2 text-center py-6">
+                                    <div className="inline-flex items-center space-x-2 text-red-600">
+                                        <span className="material-icons animate-spin text-xl">autorenew</span>
+                                        <span className="text-sm font-bold">Memuat data anggota...</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!undLoadingAnggota && undAnggotaList.length === 0 && undBagian && ((undBagian === 'RANTING' && undDesa) || (undBagian === 'ANAK RANTING' && undDesa && undDusun)) && (
+                                <div className="sm:col-span-2 text-center py-4">
+                                    <p className="text-sm text-slate-400 font-semibold">Tidak ada data anggota untuk filter ini.</p>
+                                </div>
+                            )}
                         </>
                     )}
 
@@ -1168,7 +1486,7 @@ export default function LaporanView() {
                                 <p className="text-xs text-red-500 mt-2">*Hanya anggota dengan nama yang cocok yang akan dicetakkan surat.</p>
                             </div>
                         </>
-                    ) : docType !== 'SK_PANITIA' && (
+                    ) : docType !== 'SK_PANITIA' && docType !== 'UNDANGAN' && (
                         <>
                             <div>
                                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Filter Bagian (Opsional)</label>
