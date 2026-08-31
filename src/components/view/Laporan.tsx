@@ -15,6 +15,14 @@ const formatDateToIndonesian = (dateStr: string) => {
     return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
 
+const formatDateWithoutDay = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
+
 const formatWaktu = (waktuStr: string) => {
     if (!waktuStr) return '';
     if (/^\d{2}:\d{2}$/.test(waktuStr)) {
@@ -724,8 +732,8 @@ export default function LaporanView() {
                    return;
                }
 
-               // Use A4 size with tighter margins
-               const undDoc = new jsPDF('p', 'mm', 'a4');
+               // Use F4/Legal size to ensure NB fits
+               const undDoc = new jsPDF('p', 'mm', [215.9, 330.2]); // F4 / Legalish
                const pw = undDoc.internal.pageSize.getWidth();
                const ph = undDoc.internal.pageSize.getHeight();
                const ml = 15; // margin left
@@ -740,7 +748,7 @@ export default function LaporanView() {
                    try { d.addImage(logoB64, 'PNG', ml + 5, y - 3, 22, 27); } catch {}
                    
                    // Header text (centered)
-                   d.setFont("helvetica", "bold");
+                   d.setFont("times", "bold");
                    d.setFontSize(16);
                    d.text("PENGURUS ANAK CABANG", pw / 2, y + 2, { align: "center" });
                    y += 8;
@@ -765,7 +773,7 @@ export default function LaporanView() {
                    const nomor = undNomor || '......';
                    d.text(`Nomor`, ml, y);
                    d.text(`: ${nomor}/IDE/PAC/VIII/2026`, ml + 25, y);
-                   d.text(`Kawunganten, ${formatDateToIndonesian(docTanggalSurat) || '.......................'}`, pw - mr, y, { align: "right" });
+                   d.text(`Kawunganten, ${formatDateWithoutDay(docTanggalSurat) || '.......................'}`, pw - mr, y, { align: "right" });
                    y += 6;
                    d.text(`Lampiran`, ml, y);
                    d.text(`: -`, ml + 25, y);
@@ -843,8 +851,6 @@ export default function LaporanView() {
                    const splitAcara = d.splitTextToSize(acaraText, contentWidth - 45);
                    d.text(splitAcara, colonX, y);
                    y += (splitAcara.length * 6) + 8;
-                   
-                   y += 6; // Spasi baris tambahan
 
                    // Closing text
                    const closingText = `\tDemikian undangan ini kami sampaikan atas perhatian dan kehadirannya kami ucapkan`;
@@ -865,6 +871,8 @@ export default function LaporanView() {
                    y += 7;
                    d.text("KECAMATAN KAWUNGANTEN", pw / 2, y, { align: "center" });
                    y += 5;
+                   
+                   y += 6; // Tambahan spasi 1 enter setelah KECAMATAN KAWUNGANTEN
 
                    // Position labels
                    d.setFontSize(12);
@@ -872,9 +880,9 @@ export default function LaporanView() {
                    const leftCol = ml + 35;
                    const rightCol = pw - mr - 35;
 
-                   // Stempel touch Ketua signature
+                   // Stempel touch Ketua signature (geser ke kiri agar hanya menempel 1/3)
                    const stempelSize = 35;
-                   try { d.addImage(stempelB64, 'PNG', leftCol - 12, y - 4, stempelSize, stempelSize); } catch {}
+                   try { d.addImage(stempelB64, 'PNG', leftCol - 22, y - 4, stempelSize, stempelSize); } catch {}
 
                    d.text("Ketua", leftCol, y + 2, { align: "center" });
                    d.text("Sekretaris", rightCol, y + 2, { align: "center" });
@@ -925,7 +933,7 @@ export default function LaporanView() {
 
                // Generate pages for each selected anggota
                selectedData.forEach((anggota: any, idx: number) => {
-                   if (idx > 0) undDoc.addPage('a4');
+                   if (idx > 0) undDoc.addPage([215.9, 330.2]);
                    drawUndanganPage(undDoc, anggota);
                });
 
