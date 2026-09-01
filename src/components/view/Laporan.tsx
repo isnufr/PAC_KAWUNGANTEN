@@ -593,6 +593,27 @@ export default function LaporanView() {
 
           let rawData = json.data;
 
+          const getDokumenFileName = (defaultName: string) => {
+              let nameParts: string[] = [];
+              if (docNamaAcara && ['DAFTAR_HADIR', 'UNDANGAN', 'SK_PANITIA'].includes(docType)) {
+                  nameParts.push(docNamaAcara.toUpperCase());
+              } else {
+                  nameParts.push(defaultName.toUpperCase());
+              }
+              
+              const currentBagian = docType === 'UNDANGAN' ? undBagian : (['DAFTAR_HADIR', 'SURAT_TUGAS'].includes(docType) ? docFilterBagian : '');
+              if (currentBagian) nameParts.push(currentBagian.toUpperCase());
+              
+              const currentDesa = docType === 'UNDANGAN' ? undDesa : (['DAFTAR_HADIR', 'SURAT_TUGAS'].includes(docType) ? docFilterDesa : '');
+              if (currentDesa) nameParts.push(currentDesa.toUpperCase());
+              
+              if (docType === 'UNDANGAN' && currentBagian === 'ANAK RANTING' && undDusun) {
+                  nameParts.push(`(${undDusun.toUpperCase()})`);
+              }
+              
+              return nameParts.join('_') + '.pdf';
+          };
+
           const doc = new jsPDF('p', 'mm', 'a4');
           const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -698,7 +719,7 @@ export default function LaporanView() {
                   }
               });
 
-              doc.save('Daftar_Hadir.pdf');
+              doc.save(getDokumenFileName('Daftar_Hadir'));
            } else if (docType === 'UNDANGAN') {
                // Validate
                if (undSelectedAnggota.length === 0) {
@@ -881,8 +902,8 @@ export default function LaporanView() {
                    const rightCol = pw - mr - 35;
 
                    // Stempel touch Ketua signature (geser ke kanan agar 1/3 bagian kiri stempel yang menempel)
-                   const stempelSize = 35;
-                   try { d.addImage(stempelB64, 'PNG', leftCol - 2, y - 4, stempelSize, stempelSize); } catch {}
+                   const stempelSize = 45;
+                   try { d.addImage(stempelB64, 'PNG', leftCol - 7, y - 9, stempelSize, stempelSize); } catch {}
 
                    d.text("Ketua", leftCol, y + 2, { align: "center" });
                    d.text("Sekretaris", rightCol, y + 2, { align: "center" });
@@ -937,7 +958,7 @@ export default function LaporanView() {
                    drawUndanganPage(undDoc, anggota);
                });
 
-               undDoc.save('Surat_Undangan.pdf');
+               undDoc.save(getDokumenFileName('Surat_Undangan'));
                
           } else if (docType === 'SURAT_TUGAS') {
               let currentY = 45;
@@ -1002,7 +1023,7 @@ export default function LaporanView() {
               doc.text("KETUA", 50, currentY, { align: "center" });
               doc.text("SEKRETARIS", pageWidth - 50, currentY, { align: "center" });
               
-              doc.save('Surat_Tugas.pdf');
+              doc.save(getDokumenFileName('Surat_Tugas'));
           } else if (docType === 'SURAT_KETERANGAN') {
               let targetUser = rawData.find((d: any) => d.nama?.toLowerCase().includes(docTargetNama.toLowerCase()));
               if (!targetUser && docTargetNama) {
@@ -1055,7 +1076,7 @@ export default function LaporanView() {
               doc.text("KEC. KAWUNGANTEN", pageWidth - 14, currentY, { align: "right" }); currentY += 25;
               doc.text("( ................................. )", pageWidth - 14, currentY, { align: "right" });
               
-              doc.save(`Surat_Keterangan_${targetUser.nama?.replace(/\s/g, '_') || 'Anggota'}.pdf`);
+              doc.save(getDokumenFileName(`Surat_Keterangan_${targetUser.nama?.replace(/\s/g, '_') || 'Anggota'}`));
           } else if (docType === 'SK_PANITIA') {
               let currentY = 45;
               drawHeader(doc);
@@ -1128,7 +1149,7 @@ export default function LaporanView() {
               doc.text("PDI PERJUANGAN KEC. KAWUNGANTEN", pageWidth - 14, currentY, { align: "right" }); currentY += 25;
               doc.text("KETUA PAC", pageWidth - 14, currentY, { align: "right" });
               
-              doc.save('SK_Panitia.pdf');
+              doc.save(getDokumenFileName('SK_Panitia'));
           }
           
           showAlert('Dokumen berhasil dicetak!', 'success');
