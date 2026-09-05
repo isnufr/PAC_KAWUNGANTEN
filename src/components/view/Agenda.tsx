@@ -470,9 +470,15 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                   onClick={() => fetchAgendaDetail(agenda.id)}
                   className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
                 >
-                  <div className="h-48 relative bg-slate-100 overflow-hidden">
+                  <div className="h-48 relative bg-slate-900 overflow-hidden">
                     {agenda.fotoUrl ? (
-                      <img src={agenda.fotoUrl} alt={agenda.namaAcara} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <>
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center opacity-40 blur-lg scale-110" 
+                          style={{ backgroundImage: `url(${agenda.fotoUrl})` }} 
+                        />
+                        <img src={agenda.fotoUrl} alt={agenda.namaAcara} className="w-full h-full object-contain relative z-10 group-hover:scale-105 transition-transform duration-500" />
+                      </>
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-red-50 to-slate-100 flex items-center justify-center">
                         <span className="material-icons text-6xl text-slate-300">event_note</span>
@@ -558,11 +564,18 @@ export default function AgendaView({ userRole }: { userRole: string }) {
       {view === 'detail' && selectedAgenda && (
         <div className="space-y-6">
           <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100">
-            {selectedAgenda.fotoUrl ? (
-               <div className="h-64 sm:h-80 relative w-full">
-                 <img src={selectedAgenda.fotoUrl} alt={selectedAgenda.namaAcara} className="w-full h-full object-cover" />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-6 sm:p-8">
-                    <h1 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">{selectedAgenda.namaAcara}</h1>
+             {selectedAgenda.fotoUrl ? (
+               <div className="h-64 sm:h-80 md:h-[400px] relative w-full overflow-hidden bg-slate-900 rounded-t-3xl">
+                 {/* Blurred background for empty space */}
+                 <div 
+                   className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110" 
+                   style={{ backgroundImage: `url(${selectedAgenda.fotoUrl})` }} 
+                 />
+                 {/* Contained image */}
+                 <img src={selectedAgenda.fotoUrl} alt={selectedAgenda.namaAcara} className="w-full h-full object-contain relative z-10" />
+                 {/* Gradient overlay for text visibility */}
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6 sm:p-8 z-20 pointer-events-none">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white drop-shadow-xl">{selectedAgenda.namaAcara}</h1>
                  </div>
                </div>
             ) : (
