@@ -55,6 +55,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
   const [isUploadingLampiran, setIsUploadingLampiran] = useState(false);
   const [previewLampiran, setPreviewLampiran] = useState<any>(null);
   const [deletingLampiranId, setDeletingLampiranId] = useState<number | null>(null);
+  const [showKehadiranList, setShowKehadiranList] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -578,89 +579,105 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                 </div>
                 
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-slate-800">Daftar Kehadiran ({selectedAgenda.kehadiran?.length || 0})</h3>
+                  <div 
+                    className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                    onClick={() => setShowKehadiranList(!showKehadiranList)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-emerald-600 flex-shrink-0">
+                        <span className="material-icons">groups</span>
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-slate-800">Daftar Kehadiran</h3>
+                        <p className="text-xs text-slate-500">{selectedAgenda.kehadiran?.length || 0} anggota hadir</p>
+                      </div>
+                    </div>
                     <div className="flex items-center gap-2">
                       <button 
-                        onClick={handleExportPDF}
-                        className="w-9 h-9 flex items-center justify-center bg-red-50 text-red-700 rounded-lg hover:bg-red-100 border border-red-200 transition-colors"
+                        onClick={(e) => { e.stopPropagation(); handleExportPDF(); }}
+                        className="w-9 h-9 flex items-center justify-center bg-white text-red-700 rounded-lg hover:bg-red-50 border border-red-200 transition-colors"
                         title="Ekspor PDF"
                       >
                         <span className="material-icons text-[20px]">picture_as_pdf</span>
                       </button>
                       {(userRole === 'Super Admin' || userRole === 'Admin') && (
                         <button 
-                          onClick={openKehadiranModal}
-                          className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors border border-slate-200"
+                          onClick={(e) => { e.stopPropagation(); openKehadiranModal(); }}
+                          className="w-9 h-9 flex items-center justify-center bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition-colors border border-slate-200"
                           title="Kelola Absensi"
                         >
                           <span className="material-icons text-[20px]">edit_document</span>
                         </button>
                       )}
+                      <span className={`material-icons text-slate-400 transition-transform duration-300 ${showKehadiranList ? 'rotate-180' : ''}`}>expand_more</span>
                     </div>
                   </div>
                   
-                  {selectedAgenda.kehadiran?.length === 0 ? (
-                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl text-center text-sm text-slate-500">
-                      Belum ada data kehadiran untuk acara ini.
-                    </div>
-                  ) : (
-                    (() => {
-                      const groups: Record<string, any[]> = {};
-                      selectedAgenda.kehadiran.forEach((k: any) => {
-                        const ag = k.anggota;
-                        let groupName = ag.desa || 'Lainnya';
-                        if (ag.bagian && ag.bagian.toUpperCase().includes('PAC')) {
-                          groupName = 'PENGURUS PAC';
-                        }
-                        if (!groups[groupName]) groups[groupName] = [];
-                        groups[groupName].push(k);
-                      });
-                      
-                      return (
-                        <div className="space-y-6">
-                          {Object.entries(groups).map(([groupName, items]) => (
-                            <div key={groupName}>
-                              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> {groupName} ({items.length})
-                              </h4>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {items.map((k: any) => (
-                                  <div key={k.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                      {k.anggota.passFotoUrl ? (
-                                        <img 
-                                          src={getDirectImageUrl(k.anggota.passFotoUrl) || ''} 
-                                          alt={k.anggota.nama} 
-                                          className="w-full h-full object-cover" 
-                                          onError={(e) => { 
-                                            (e.target as HTMLImageElement).style.display = 'none'; 
-                                            (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400"><span class="material-icons text-lg">person</span></div>'; 
-                                          }} 
-                                        />
-                                      ) : (
-                                        <span className="material-icons text-slate-400 text-lg">person</span>
-                                      )}
-                                    </div>
-                                    <div className="overflow-hidden flex-1">
-                                      <p className="text-sm font-bold text-slate-800 truncate">{k.anggota.nama}</p>
-                                      <div className="flex flex-col mt-0.5">
-                                        <p className="text-[11px] text-slate-500 truncate">{k.anggota.nik}</p>
-                                        <p className="text-[10px] font-medium text-slate-500 truncate mt-1">
-                                          <span className="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
-                                            {k.anggota.dusun || '-'} - {k.anggota.bagian || '-'} - {k.anggota.jabatan || '-'}
-                                          </span>
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
+                  {showKehadiranList && (
+                    <div className="mt-4">
+                      {selectedAgenda.kehadiran?.length === 0 ? (
+                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl text-center text-sm text-slate-500">
+                          Belum ada data kehadiran untuk acara ini.
                         </div>
-                      );
-                    })()
+                      ) : (
+                        (() => {
+                          const groups: Record<string, any[]> = {};
+                          selectedAgenda.kehadiran.forEach((k: any) => {
+                            const ag = k.anggota;
+                            let groupName = ag.desa || 'Lainnya';
+                            if (ag.bagian && ag.bagian.toUpperCase().includes('PAC')) {
+                              groupName = 'PENGURUS PAC';
+                            }
+                            if (!groups[groupName]) groups[groupName] = [];
+                            groups[groupName].push(k);
+                          });
+                          
+                          return (
+                            <div className="space-y-6">
+                              {Object.entries(groups).map(([groupName, items]) => (
+                                <div key={groupName}>
+                                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> {groupName} ({items.length})
+                                  </h4>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {items.map((k: any) => (
+                                      <div key={k.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                          {k.anggota.passFotoUrl ? (
+                                            <img 
+                                              src={getDirectImageUrl(k.anggota.passFotoUrl) || ''} 
+                                              alt={k.anggota.nama} 
+                                              className="w-full h-full object-cover" 
+                                              onError={(e) => { 
+                                                (e.target as HTMLImageElement).style.display = 'none'; 
+                                                (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400"><span class="material-icons text-lg">person</span></div>'; 
+                                              }} 
+                                            />
+                                          ) : (
+                                            <span className="material-icons text-slate-400 text-lg">person</span>
+                                          )}
+                                        </div>
+                                        <div className="overflow-hidden flex-1">
+                                          <p className="text-sm font-bold text-slate-800 truncate">{k.anggota.nama}</p>
+                                          <div className="flex flex-col mt-0.5">
+                                            <p className="text-[11px] text-slate-500 truncate">{k.anggota.nik}</p>
+                                            <p className="text-[10px] font-medium text-slate-500 truncate mt-1">
+                                              <span className="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                                {k.anggota.dusun || '-'} - {k.anggota.bagian || '-'} - {k.anggota.jabatan || '-'}
+                                              </span>
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      )}
+                    </div>
                   )}
                 </div>
 
