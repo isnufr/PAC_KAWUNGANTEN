@@ -482,8 +482,25 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                         {isPast ? 'Selesai' : 'Akan Datang'}
                       </span>
                     </div>
+                  </div>
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                    <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-2">{agenda.namaAcara}</h3>
+                    <div className="space-y-2 mt-auto">
+                      <div className="flex items-start gap-2 text-sm text-slate-600">
+                        <span className="material-icons text-[16px] text-red-500 mt-0.5">place</span>
+                        <span className="line-clamp-1">{agenda.tempat}</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm text-slate-600">
+                        <span className="material-icons text-[16px] text-blue-500 mt-0.5">schedule</span>
+                        <span>{formatTanggal(agenda.waktu)}</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm text-slate-600">
+                        <span className="material-icons text-[16px] text-emerald-500 mt-0.5">group</span>
+                        <span>{agenda._count?.kehadiran || 0} Anggota Hadir</span>
+                      </div>
+                    </div>
                     {(userRole === 'Super Admin' || userRole === 'Admin') && (
-                      <div className="absolute top-3 left-3 flex gap-2">
+                      <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -508,10 +525,11 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                             });
                             setShowAddModal(true);
                           }}
-                          className="w-8 h-8 aspect-square flex-shrink-0 rounded-full bg-amber-500 shadow-md flex items-center justify-center text-white hover:bg-amber-600 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold hover:bg-amber-100 transition-colors"
                           title="Edit Agenda"
                         >
-                          <span className="material-icons text-[18px]">edit</span>
+                          <span className="material-icons text-[16px]">edit</span>
+                          <span>Edit</span>
                         </button>
                         <button 
                           onClick={(e) => {
@@ -519,30 +537,14 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                             setAgendaToDelete(agenda);
                             setShowDeleteModal(true);
                           }}
-                          className="w-8 h-8 aspect-square flex-shrink-0 rounded-full bg-amber-500 shadow-md flex items-center justify-center text-white hover:bg-amber-600 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-red-50 text-red-600 border border-red-200 text-xs font-bold hover:bg-red-100 transition-colors"
                           title="Hapus Agenda"
                         >
-                          <span className="material-icons text-[18px]">delete</span>
+                          <span className="material-icons text-[16px]">delete</span>
+                          <span>Hapus</span>
                         </button>
                       </div>
                     )}
-                  </div>
-                  <div className="p-5 flex-1 flex flex-col">
-                    <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-2">{agenda.namaAcara}</h3>
-                    <div className="space-y-2 mt-auto">
-                      <div className="flex items-start gap-2 text-sm text-slate-600">
-                        <span className="material-icons text-[16px] text-red-500 mt-0.5">place</span>
-                        <span className="line-clamp-1">{agenda.tempat}</span>
-                      </div>
-                      <div className="flex items-start gap-2 text-sm text-slate-600">
-                        <span className="material-icons text-[16px] text-blue-500 mt-0.5">schedule</span>
-                        <span>{formatTanggal(agenda.waktu)}</span>
-                      </div>
-                      <div className="flex items-start gap-2 text-sm text-slate-600">
-                        <span className="material-icons text-[16px] text-emerald-500 mt-0.5">group</span>
-                        <span>{agenda._count?.kehadiran || 0} Anggota Hadir</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               );
