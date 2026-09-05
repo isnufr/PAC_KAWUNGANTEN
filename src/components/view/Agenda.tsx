@@ -484,7 +484,7 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                         <span className="material-icons text-6xl text-slate-300">event_note</span>
                       </div>
                     )}
-                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end z-20">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${isPast ? 'bg-slate-800/80 text-white' : 'bg-red-600/90 text-white'}`}>
                         {isPast ? 'Selesai' : 'Akan Datang'}
                       </span>
