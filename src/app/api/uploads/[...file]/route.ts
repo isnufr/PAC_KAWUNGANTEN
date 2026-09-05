@@ -25,6 +25,11 @@ export async function GET(request: Request, { params }: { params: { file: string
     else if (ext === 'gif') contentType = 'image/gif';
     else if (ext === 'webp') contentType = 'image/webp';
     else if (ext === 'pdf') contentType = 'application/pdf';
+    else if (ext === 'doc') contentType = 'application/msword';
+    else if (ext === 'docx') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    else if (ext === 'xls') contentType = 'application/vnd.ms-excel';
+    else if (ext === 'xlsx') contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    else if (ext === 'csv') contentType = 'text/csv';
 
     return new NextResponse(fileBuffer, {
       headers: {

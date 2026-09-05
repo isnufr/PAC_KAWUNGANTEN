@@ -51,6 +51,11 @@ export default function AgendaView({ userRole }: { userRole: string }) {
   const [searchAnggota, setSearchAnggota] = useState('');
   const [selectedAnggotaIds, setSelectedAnggotaIds] = useState<number[]>([]);
 
+  // Data for Lampiran
+  const [isUploadingLampiran, setIsUploadingLampiran] = useState(false);
+  const [previewLampiran, setPreviewLampiran] = useState<any>(null);
+  const [deletingLampiranId, setDeletingLampiranId] = useState<number | null>(null);
+
   // Form State
   const [formData, setFormData] = useState({
     namaAcara: '',
@@ -329,6 +334,86 @@ export default function AgendaView({ userRole }: { userRole: string }) {
     }) + ' WIB';
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const getFileIcon = (tipeFile: string) => {
+    switch (tipeFile) {
+      case 'image': return 'image';
+      case 'pdf': return 'picture_as_pdf';
+      case 'document': return 'description';
+      case 'spreadsheet': return 'table_chart';
+      default: return 'insert_drive_file';
+    }
+  };
+
+  const getFileColor = (tipeFile: string) => {
+    switch (tipeFile) {
+      case 'image': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
+      case 'pdf': return 'text-red-600 bg-red-50 border-red-200';
+      case 'document': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'spreadsheet': return 'text-green-600 bg-green-50 border-green-200';
+      default: return 'text-slate-600 bg-slate-50 border-slate-200';
+    }
+  };
+
+  const handleUploadLampiran = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !selectedAgenda) return;
+
+    setIsUploadingLampiran(true);
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+
+      const res = await fetch(`/api/agenda/${selectedAgenda.id}/lampiran`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchAgendaDetail(selectedAgenda.id);
+        showAlert(`${files.length} file berhasil diunggah!`, 'success');
+      } else {
+        showAlert(data.error || 'Gagal mengunggah file', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showAlert('Terjadi kesalahan saat mengunggah file.', 'error');
+    }
+    setIsUploadingLampiran(false);
+    // Reset input agar bisa upload file yang sama lagi
+    e.target.value = '';
+  };
+
+  const handleDeleteLampiran = async (lampiranId: number) => {
+    if (!selectedAgenda) return;
+    setDeletingLampiranId(lampiranId);
+    try {
+      const res = await fetch(`/api/agenda/${selectedAgenda.id}/lampiran`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lampiranId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchAgendaDetail(selectedAgenda.id);
+        showAlert('Lampiran berhasil dihapus!', 'success');
+      } else {
+        showAlert(data.error || 'Gagal menghapus lampiran', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showAlert('Terjadi kesalahan saat menghapus lampiran.', 'error');
+    }
+    setDeletingLampiranId(null);
+  };
+
   if ((loading && view === 'list') || isDetailLoading) return <LoadingSpinner />;
 
   return (
@@ -576,6 +661,102 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                     })()
                   )}
                 </div>
+
+                {/* SECTION LAMPIRAN / DOKUMEN */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-slate-800">
+                      Lampiran & Dokumen ({selectedAgenda.lampiran?.length || 0})
+                    </h3>
+                    {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                      <label className={`inline-flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg border cursor-pointer transition-all hover:shadow-sm ${isUploadingLampiran ? 'opacity-50 pointer-events-none bg-slate-100 text-slate-400 border-slate-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}>
+                        <span className="material-icons text-[18px]">{isUploadingLampiran ? 'hourglass_empty' : 'upload_file'}</span>
+                        {isUploadingLampiran ? 'Mengunggah...' : 'Upload File'}
+                        <input 
+                          type="file" 
+                          multiple 
+                          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv"
+                          onChange={handleUploadLampiran}
+                          className="hidden"
+                          disabled={isUploadingLampiran}
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  {!selectedAgenda.lampiran || selectedAgenda.lampiran.length === 0 ? (
+                    <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                      <span className="material-icons text-4xl text-slate-300 mb-2">folder_open</span>
+                      <p className="text-sm text-slate-500">Belum ada lampiran untuk agenda ini.</p>
+                      {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                        <p className="text-xs text-slate-400 mt-1">Klik tombol "Upload File" untuk menambahkan.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {selectedAgenda.lampiran.map((lamp: any) => (
+                        <div key={lamp.id} className={`relative group flex items-center gap-3 p-3 rounded-xl border transition-all hover:shadow-md ${getFileColor(lamp.tipeFile)}`}>
+                          {/* Thumbnail atau Icon */}
+                          {lamp.tipeFile === 'image' ? (
+                            <div 
+                              onClick={() => setPreviewLampiran(lamp)}
+                              className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border border-white/50 shadow-sm"
+                            >
+                              <img src={lamp.fileUrl} alt={lamp.namaFile} className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" />
+                            </div>
+                          ) : (
+                            <div className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/70 border border-current/10">
+                              <span className="material-icons text-3xl">{getFileIcon(lamp.tipeFile)}</span>
+                            </div>
+                          )}
+                          
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold truncate text-slate-800">{lamp.namaFile}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">{lamp.tipeFile}</span>
+                              <span className="text-[10px] opacity-50">•</span>
+                              <span className="text-[10px] opacity-70">{formatFileSize(lamp.ukuran)}</span>
+                            </div>
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {lamp.tipeFile === 'image' && (
+                              <button 
+                                onClick={() => setPreviewLampiran(lamp)}
+                                className="w-8 h-8 rounded-lg bg-white/80 flex items-center justify-center text-slate-600 hover:bg-white hover:text-slate-800 transition-colors shadow-sm"
+                                title="Preview"
+                              >
+                                <span className="material-icons text-[16px]">visibility</span>
+                              </button>
+                            )}
+                            <a 
+                              href={lamp.fileUrl} 
+                              download={lamp.namaFile}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-8 h-8 rounded-lg bg-white/80 flex items-center justify-center text-slate-600 hover:bg-white hover:text-slate-800 transition-colors shadow-sm"
+                              title="Download"
+                            >
+                              <span className="material-icons text-[16px]">download</span>
+                            </a>
+                            {(userRole === 'Super Admin' || userRole === 'Admin') && (
+                              <button 
+                                onClick={() => handleDeleteLampiran(lamp.id)}
+                                disabled={deletingLampiranId === lamp.id}
+                                className="w-8 h-8 rounded-lg bg-white/80 flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors shadow-sm disabled:opacity-50"
+                                title="Hapus"
+                              >
+                                <span className="material-icons text-[16px]">{deletingLampiranId === lamp.id ? 'hourglass_empty' : 'delete'}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -605,6 +786,29 @@ export default function AgendaView({ userRole }: { userRole: string }) {
               </div>
             </div>
           </div>
+
+          {/* MODAL PREVIEW LAMPIRAN GAMBAR */}
+          {previewLampiran && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setPreviewLampiran(null)}>
+              <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
+                <button 
+                  onClick={() => setPreviewLampiran(null)}
+                  className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                >
+                  <span className="material-icons">close</span>
+                </button>
+                <img 
+                  src={previewLampiran.fileUrl} 
+                  alt={previewLampiran.namaFile} 
+                  className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-2xl">
+                  <p className="text-white font-bold text-sm truncate">{previewLampiran.namaFile}</p>
+                  <p className="text-white/70 text-xs">{formatFileSize(previewLampiran.ukuran)}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -710,8 +914,58 @@ export default function AgendaView({ userRole }: { userRole: string }) {
                   placeholder="Cari nama atau NIK..." 
                   value={searchAnggota}
                   onChange={(e) => setSearchAnggota(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                  className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
                 />
+                {searchAnggota && (
+                  <button 
+                    onClick={() => setSearchAnggota('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+                    title="Hapus pencarian"
+                  >
+                    <span className="material-icons text-[16px]">close</span>
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <button
+                  onClick={() => {
+                    const filteredIds = semuaAnggota
+                      .filter(a => a.nama.toLowerCase().includes(searchAnggota.toLowerCase()) || a.nik.includes(searchAnggota))
+                      .map(a => a.id);
+                    const allFilteredSelected = filteredIds.length > 0 && filteredIds.every(id => selectedAnggotaIds.includes(id));
+                    if (allFilteredSelected) {
+                      setSelectedAnggotaIds(prev => prev.filter(id => !filteredIds.includes(id)));
+                    } else {
+                      setSelectedAnggotaIds(prev => Array.from(new Set([...prev, ...filteredIds])));
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all hover:shadow-sm"
+                  style={{
+                    ...((() => {
+                      const filteredIds = semuaAnggota
+                        .filter(a => a.nama.toLowerCase().includes(searchAnggota.toLowerCase()) || a.nik.includes(searchAnggota))
+                        .map(a => a.id);
+                      return filteredIds.length > 0 && filteredIds.every(id => selectedAnggotaIds.includes(id));
+                    })() 
+                      ? { color: '#dc2626', borderColor: '#fecaca', backgroundColor: '#fef2f2' }
+                      : { color: '#475569', borderColor: '#e2e8f0', backgroundColor: '#ffffff' })
+                  }}
+                >
+                  <span className="material-icons text-[16px]">
+                    {(() => {
+                      const filteredIds = semuaAnggota
+                        .filter(a => a.nama.toLowerCase().includes(searchAnggota.toLowerCase()) || a.nik.includes(searchAnggota))
+                        .map(a => a.id);
+                      return filteredIds.length > 0 && filteredIds.every(id => selectedAnggotaIds.includes(id));
+                    })() ? 'deselect' : 'select_all'}
+                  </span>
+                  {(() => {
+                    const filteredIds = semuaAnggota
+                      .filter(a => a.nama.toLowerCase().includes(searchAnggota.toLowerCase()) || a.nik.includes(searchAnggota))
+                      .map(a => a.id);
+                    return filteredIds.length > 0 && filteredIds.every(id => selectedAnggotaIds.includes(id));
+                  })() ? 'Batal Pilih Semua' : 'Pilih Semua'}
+                </button>
               </div>
             </div>
             

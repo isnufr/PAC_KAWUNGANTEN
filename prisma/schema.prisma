@@ -87,6 +87,18 @@ model Agenda {
   updatedAt   DateTime @updatedAt
 
   kehadiran   KehadiranAgenda[]
+  lampiran    LampiranAgenda[]
+}
+
+model LampiranAgenda {
+  id         Int      @id @default(autoincrement())
+  agendaId   Int
+  agenda     Agenda   @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  namaFile   String
+  fileUrl    String
+  tipeFile   String   // "image", "pdf", "document", "spreadsheet", "other"
+  ukuran     Int      // ukuran file dalam bytes
+  createdAt  DateTime @default(now())
 }
 
 model KehadiranAgenda {

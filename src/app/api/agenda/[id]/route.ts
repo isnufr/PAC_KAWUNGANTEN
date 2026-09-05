@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { logAktivitas } from '@/lib/logger';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 const prisma = new PrismaClient();
 
@@ -22,6 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             anggota: true
           },
           orderBy: { createdAt: 'asc' }
+        },
+        lampiran: {
+          orderBy: { createdAt: 'desc' }
         }
       }
     });
@@ -89,8 +94,26 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
     const currentAgenda = await prisma.agenda.findUnique({
       where: { id: agendaId },
-      select: { namaAcara: true }
+      select: { namaAcara: true, lampiran: true }
     });
+
+    // Hapus file lampiran dari disk sebelum menghapus agenda
+    if (currentAgenda?.lampiran) {
+      const baseDir = join(
+        process.env.UPLOAD_DIR || join(process.cwd(), 'public', 'uploads'),
+        'agenda'
+      );
+      for (const lamp of currentAgenda.lampiran) {
+        try {
+          const fileName = lamp.fileUrl.split('/').pop();
+          if (fileName) {
+            await unlink(join(baseDir, fileName));
+          }
+        } catch (err) {
+          // File mungkin sudah tidak ada, abaikan
+        }
+      }
+    }
 
     await prisma.agenda.delete({
       where: { id: agendaId }
