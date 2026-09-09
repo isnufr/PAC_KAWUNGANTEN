@@ -19,7 +19,6 @@
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
-    "mysql2": "^3.11.3",
     "next": "^14.2.15",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
@@ -27,7 +26,6 @@
     "react-easy-crop": "^6.2.3",
     "sharp": "^0.35.3",
     "tesseract.js": "^7.0.0",
-    "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
@@ -37,7 +35,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "adm-zip": "^0.6.0",
     "autoprefixer": "^10.5.4",
     "eslint": "^8",
     "eslint-config-next": "^14.2.15",

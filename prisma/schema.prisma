@@ -111,3 +111,34 @@ model KehadiranAgenda {
 
   @@unique([agendaId, anggotaId])
 }
+
+model SuratMasuk {
+  id            Int      @id @default(autoincrement())
+  nomorSurat    String               // Nomor surat dari pengirim
+  nomorAgenda   String   @unique     // Nomor agenda internal (auto: 001/IN/PAC/IX/2026)
+  tanggalSurat  DateTime             // Tanggal pada surat
+  tanggalTerima DateTime             // Tanggal surat diterima
+  pengirim      String               // Instansi/Orang pengirim
+  perihal       String
+  isiRingkas    String?  @db.Text    // Ringkasan isi surat (opsional)
+  lampiranUrl   String?              // URL file scan surat (opsional)
+  disposisi     String?  @db.Text    // Catatan disposisi
+  status        String   @default("BELUM_DIBACA") // BELUM_DIBACA, DIBACA, DIPROSES, SELESAI
+  operator      String?              // Siapa yang menginput
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SuratKeluar {
+  id            Int      @id @default(autoincrement())
+  nomorSurat    String   @unique     // Nomor surat otomatis (auto: 001/EX/PAC/IX/2026)
+  tanggalSurat  DateTime             // Tanggal surat
+  tujuan        String               // Tujuan surat (ke siapa/instansi)
+  perihal       String
+  jenisSurat    String               // UNDANGAN, SURAT_TUGAS, SURAT_KETERANGAN, SURAT_EDARAN, SK_PANITIA, LAINNYA
+  isiRingkas    String?  @db.Text    // Ringkasan isi surat (opsional)
+  status        String   @default("DRAFT") // DRAFT, TERKIRIM, SELESAI
+  operator      String?              // Siapa yang membuat
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

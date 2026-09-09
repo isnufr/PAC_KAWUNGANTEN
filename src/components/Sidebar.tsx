@@ -150,6 +150,13 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
             <span className="material-icons text-[18px] shrink-0">event</span> <span className="flex-1 text-left">Agenda</span>
           </button>
 
+          {/* ARSIP SURAT — Super Admin Only */}
+          {userRole === 'Super Admin' && (
+            <button onClick={() => handleMenuClick('arsip_surat')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'arsip_surat' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
+              <span className="material-icons text-[18px] shrink-0">mail</span> <span className="flex-1 text-left">Arsip Surat</span>
+            </button>
+          )}
+
           {/* STRUKTUR ORGANISASI */}
           <button onClick={() => handleMenuClick('struktur_organisasi')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'struktur_organisasi' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
             <span className="material-icons text-[18px] shrink-0">account_tree</span> <span className="flex-1 text-left">Struktur Organisasi</span>
