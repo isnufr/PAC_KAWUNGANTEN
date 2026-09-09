@@ -130,15 +130,7 @@ export default function Sidebar({ isOpen, activeMenu, setActiveMenu, userRole, u
             <span className="material-icons text-[18px] shrink-0">dashboard</span> <span className="flex-1 text-left">Dashboard</span>
           </button>
           
-          {/* VERIFIKASI DATA */}
-          <button onClick={() => handleMenuClick('verifikasi_data')} className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'verifikasi_data' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>
-            <div className="flex items-center gap-3 flex-1">
-               <span className="material-icons text-[18px] shrink-0">fact_check</span> <span className="flex-1 text-left">Verifikasi Data</span>
-            </div>
-            {verificationCount > 0 && (
-              <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{verificationCount}</span>
-            )}
-          </button>
+
           
           {/* DATA ANGGOTA */}
           <button onClick={() => handleMenuClick('data_anggota')} className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${activeMenu === 'data_anggota' ? 'active-menu' : 'text-slate-600 hover:bg-red-50 hover:text-red-700'}`}>

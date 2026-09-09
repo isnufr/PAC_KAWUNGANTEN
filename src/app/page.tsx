@@ -78,7 +78,7 @@ function DashboardContent() {
   // Listener untuk global-add-action dari TopHeader pada menu non-native
   useEffect(() => {
     const handleGlobalAdd = () => {
-      const nativeAddMenus = ['data_anggota', 'kas_organisasi', 'manajemen_akun', 'verifikasi_data'];
+      const nativeAddMenus = ['data_anggota', 'kas_organisasi', 'manajemen_akun'];
       if (!nativeAddMenus.includes(activeMenu)) {
         setActiveMenu('data_anggota');
         setTimeout(() => {
@@ -128,7 +128,7 @@ function DashboardContent() {
            {/* key={activeMenu} forces re-mount → triggers page-transition animation on each menu change */}
            <div key={activeMenu} className="page-transition max-w-7xl mx-auto">
              {activeMenu === 'beranda' && <DashboardView />}
-             {activeMenu === 'verifikasi_data' && <DataAnggotaView filter="verifikasi" userRole={userRole} />}
+
              {activeMenu === 'data_anggota' && <DataAnggotaView filter={searchParams?.get('filter') || ''} userRole={userRole} />}
              {activeMenu === 'agenda' && <AgendaView userRole={userRole} />}
              {activeMenu === 'arsip_surat' && <ArsipSuratView />}
