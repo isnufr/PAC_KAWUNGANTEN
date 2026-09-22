@@ -44,6 +44,9 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
   const [dusun, setDusun] = useState('');
   const [selectedAnggota, setSelectedAnggota] = useState<any>(null);
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+  const [showKehadiran, setShowKehadiran] = useState(false);
+  const [kehadiranData, setKehadiranData] = useState<any[]>([]);
+  const [kehadiranLoading, setKehadiranLoading] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const { data: wilayahListResponse = [] } = useQuery({
@@ -623,7 +626,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 const jk = item.jenisKelamin ? item.jenisKelamin.toUpperCase() : '';
                                 const jkShort = jk === 'LAKI-LAKI' ? 'L' : jk === 'PEREMPUAN' ? 'P' : item.jenisKelamin || '-';
                                 return (
-                                    <div key={item.id} onClick={() => setSelectedAnggota(item)} className="flex items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group gap-2 cursor-pointer">
+                                    <div key={item.id} onClick={() => { setSelectedAnggota(item); setShowKehadiran(false); setKehadiranData([]); }} className="flex items-center justify-between p-3 bg-white hover:bg-red-50/30 rounded-2xl border border-slate-100 transition duration-200 group gap-2 cursor-pointer">
                                         <div className="flex items-center gap-3 flex-1 min-w-0">
                                             {/* Foto */}
                                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 overflow-hidden border border-red-200 shadow-sm flex-shrink-0">
@@ -708,7 +711,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                         <div className="bg-red-700 h-28 w-full absolute top-0 left-0 rounded-b-[30%]"></div>
                         
                         {/* Close Button */}
-                        <button onClick={() => setSelectedAnggota(null)} className="absolute top-4 right-4 z-10 text-red-100 hover:text-white transition bg-red-800/50 hover:bg-red-800 p-1.5 rounded-full backdrop-blur-md">
+                        <button onClick={() => { setSelectedAnggota(null); setShowKehadiran(false); setKehadiranData([]); }} className="absolute top-4 right-4 z-10 text-red-100 hover:text-white transition bg-red-800/50 hover:bg-red-800 p-1.5 rounded-full backdrop-blur-md">
                             <span className="material-icons text-sm block">close</span>
                         </button>
 
@@ -748,16 +751,89 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                     <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-5 scrollbar-hide">
                         {/* Details Grid */}
                         <div className="space-y-2 mb-2">
-                            {/* Card 0: Partisipasi */}
+                            {/* Card 0: Partisipasi (Expandable) */}
                             {selectedAnggota._count?.kehadiran > 0 && (
-                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shadow-sm">
-                                            <span className="material-icons text-xl">emoji_events</span>
+                                <div className="mb-3">
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            const next = !showKehadiran;
+                                            setShowKehadiran(next);
+                                            if (next && kehadiranData.length === 0) {
+                                                setKehadiranLoading(true);
+                                                try {
+                                                    const res = await fetch(`/api/anggota/${selectedAnggota.id}/kehadiran`);
+                                                    const json = await res.json();
+                                                    if (json.success) setKehadiranData(json.data);
+                                                } catch (err) { console.error(err); }
+                                                finally { setKehadiranLoading(false); }
+                                            }
+                                        }}
+                                        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md hover:border-amber-200 transition-all duration-300 group"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-amber-200 transition-colors">
+                                                <span className="material-icons text-xl">emoji_events</span>
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-0.5">TINGKAT PARTISIPASI</p>
+                                                <p className="font-black text-slate-800 text-sm">Telah hadir di <span className="text-amber-600">{selectedAnggota._count.kehadiran} Agenda</span></p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-0.5">TINGKAT PARTISIPASI</p>
-                                            <p className="font-black text-slate-800 text-sm">Telah hadir di <span className="text-amber-600">{selectedAnggota._count.kehadiran} Agenda</span></p>
+                                        <span className={`material-icons text-amber-500 text-xl transition-transform duration-300 ${showKehadiran ? 'rotate-180' : ''}`}>expand_more</span>
+                                    </button>
+
+                                    {/* Expandable Agenda List */}
+                                    <div className={`overflow-hidden transition-all duration-400 ease-in-out ${showKehadiran ? 'max-h-[400px] opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0'}`}>
+                                        <div className="bg-white rounded-2xl border border-amber-100/70 shadow-inner overflow-hidden">
+                                            {/* List Header */}
+                                            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-2 flex items-center gap-2">
+                                                <span className="material-icons text-white text-sm">event_available</span>
+                                                <span className="text-[10px] font-black text-white uppercase tracking-widest">Daftar Agenda Dihadiri</span>
+                                            </div>
+                                            
+                                            <div className="max-h-[320px] overflow-y-auto scrollbar-hide">
+                                                {kehadiranLoading ? (
+                                                    <div className="flex items-center justify-center gap-2 py-6">
+                                                        <div className="w-4 h-4 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin"></div>
+                                                        <span className="text-xs font-bold text-amber-600">Memuat data...</span>
+                                                    </div>
+                                                ) : kehadiranData.length === 0 ? (
+                                                    <p className="text-center text-slate-400 py-6 text-xs font-bold">Tidak ada data kehadiran.</p>
+                                                ) : (
+                                                    <div className="divide-y divide-amber-50">
+                                                        {kehadiranData.map((item: any, idx: number) => {
+                                                            const agenda = item.agenda;
+                                                            const waktu = agenda?.waktu ? new Date(agenda.waktu) : null;
+                                                            const tanggalStr = waktu ? waktu.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                                                            const jamStr = waktu ? waktu.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                                                            return (
+                                                                <div key={item.id} className="flex items-start gap-3 px-3 py-2.5 hover:bg-amber-50/50 transition-colors">
+                                                                    <div className="w-7 h-7 bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                                                                        <span className="text-[10px] font-black">{idx + 1}</span>
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="font-bold text-slate-800 text-xs leading-snug truncate">{agenda?.namaAcara || '-'}</p>
+                                                                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                                            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md">
+                                                                                <span className="material-icons !text-[10px]">calendar_today</span>
+                                                                                {tanggalStr}{jamStr ? `, ${jamStr}` : ''}
+                                                                            </span>
+                                                                            {agenda?.tempat && (
+                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded-md">
+                                                                                    <span className="material-icons !text-[10px]">location_on</span>
+                                                                                    <span className="truncate max-w-[120px]">{agenda.tempat}</span>
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                    <span className="material-icons text-emerald-400 !text-[16px] flex-shrink-0 mt-0.5">check_circle</span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
