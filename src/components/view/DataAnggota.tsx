@@ -660,6 +660,8 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                     <span className="text-red-500 whitespace-nowrap">{jkShort}</span>
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-500 whitespace-nowrap">{item.umur ? `${item.umur} THN` : '-'}</span>
+                                                    <span className="text-red-200">|</span>
+                                                    <span className="text-slate-500 font-black whitespace-nowrap" title="Ukuran Baju">{item.ukuranBaju || '-'}</span>
                                                 </div>
                                                 <div className="text-[8.5px] md:text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                                     <span className="material-icons text-[10px] md:text-[12px] text-red-400">location_on</span>
@@ -745,7 +747,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <div className="flex justify-center gap-2">
                                 <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
                                 <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
-                                {selectedAnggota.ukuranBaju && <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">Ukuran: {selectedAnggota.ukuranBaju}</span>}
+                                {selectedAnggota.ukuranBaju && <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm" title="Ukuran Baju">{selectedAnggota.ukuranBaju}</span>}
                             </div>
                         </div>
                     </div>
