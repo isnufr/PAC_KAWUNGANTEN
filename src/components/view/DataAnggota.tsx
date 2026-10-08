@@ -399,6 +399,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         rw: formData.rw || null,
         fotoKtpUrl: formData.fotoKtpUrl || null,
         passFotoUrl: formData.passFotoUrl || null,
+        ukuranBaju: formData.ukuranBaju || null,
       };
 
       const method = editId ? 'PUT' : 'POST';
@@ -1042,7 +1043,15 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 </div>
                                 <div className="sm:col-span-2">
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Ukuran Baju</label>
-                                    <input type="text" value={formData.ukuranBaju || ''} onChange={e => handleFormChange('ukuranBaju', e.target.value.toUpperCase())} placeholder="S, M, L, XL, XXL, dll" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
+                                    <select value={formData.ukuranBaju || ''} onChange={e => handleFormChange('ukuranBaju', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white">
+                                        <option value="">- Pilih -</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                        <option value="XXXL">XXXL</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
