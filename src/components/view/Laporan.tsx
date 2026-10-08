@@ -465,6 +465,8 @@ export default function LaporanView() {
                     if (cols.dusun) row.push(d.dusun || '-');
                     if (cols.bagian) row.push(d.bagian || '-');
                     if (cols.jabatan) row.push(d.jabatan || '-');
+                    if (cols.ukuranBaju) row.push(d.ukuranBaju || '-');
+                    if (cols.tambahan) row.push("");
                     return row;
                 });
 
