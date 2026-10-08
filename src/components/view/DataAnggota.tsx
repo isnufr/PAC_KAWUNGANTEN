@@ -74,7 +74,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
     nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '',
     nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '',
     rt: '', rw: '',
-    fotoKtpUrl: '', passFotoUrl: ''
+    fotoKtpUrl: '', passFotoUrl: '', ukuranBaju: ''
   });
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -323,7 +323,8 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
           rt: itemToEdit.rt || '',
           rw: itemToEdit.rw || '',
           fotoKtpUrl: itemToEdit.fotoKtpUrl || '',
-          passFotoUrl: itemToEdit.passFotoUrl || ''
+          passFotoUrl: itemToEdit.passFotoUrl || '',
+          ukuranBaju: itemToEdit.ukuranBaju || ''
       });
       setFileKtp(null);
       setFilePassFoto(null);
@@ -743,6 +744,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <div className="flex justify-center gap-2">
                                 <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
                                 <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
+                                {selectedAnggota.ukuranBaju && <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">Ukuran: {selectedAnggota.ukuranBaju}</span>}
                             </div>
                         </div>
                     </div>
@@ -948,7 +950,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <span className="material-icons text-white text-lg">edit_document</span>
                             <h3 className="font-extrabold text-sm sm:text-base tracking-wide">{editId ? 'Edit Data Anggota' : 'Input Data Anggota Baru'}</h3>
                         </div>
-                        <button onClick={() => { setIsModalOpen(false); setEditId(null); setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '' }); }} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
+                        <button onClick={() => { setIsModalOpen(false); setEditId(null); setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '', ukuranBaju: '' }); }} className="text-red-100 hover:text-white transition bg-red-800 p-1.5 rounded-lg"><span className="material-icons text-sm block">close</span></button>
                     </div>
                     <form onSubmit={handleSubmitAnggota} className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs sm:text-sm text-slate-800 bg-red-50/30">
                         {formError && <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center font-bold text-xs">{formError}</div>}
@@ -1037,6 +1039,10 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                         <option value="BENDAHARA">BENDAHARA</option>
                                         <option value="ANGGOTA">ANGGOTA</option>
                                     </select>
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Ukuran Baju</label>
+                                    <input type="text" value={formData.ukuranBaju || ''} onChange={e => handleFormChange('ukuranBaju', e.target.value.toUpperCase())} placeholder="S, M, L, XL, XXL, dll" className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700" />
                                 </div>
                             </div>
                         </div>

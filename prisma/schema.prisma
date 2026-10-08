@@ -41,6 +41,8 @@ model Anggota {
   wilayahId     Int?
   wilayah       Wilayah? @relation(fields: [wilayahId], references: [id])
   
+  ukuranBaju    String?
+  
   // Agar kompatibel dengan script lama jika wilayah tidak ter-map ke id
   kecamatan     String?
   desa          String?
