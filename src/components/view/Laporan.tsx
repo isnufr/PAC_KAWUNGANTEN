@@ -95,6 +95,7 @@ export default function LaporanView() {
     dusun: true,
     bagian: true,
     jabatan: true,
+    ukuranBaju: false,
     tambahan: false
   });
 
@@ -245,6 +246,7 @@ export default function LaporanView() {
       if (cols.dusun) headers.push("DUSUN");
       if (cols.bagian) headers.push("BAGIAN");
       if (cols.jabatan) headers.push("JABATAN");
+      if (cols.ukuranBaju) headers.push("UKURAN BAJU");
       if (cols.tambahan) headers.push(judulKolomTambahan || "KOLOM TAMBAHAN");
 
       // Common rows
@@ -265,6 +267,7 @@ export default function LaporanView() {
           if (cols.dusun) row.push(d.dusun || '-');
           if (cols.bagian) row.push(d.bagian || '-');
           if (cols.jabatan) row.push(d.jabatan || '-');
+          if (cols.ukuranBaju) row.push(d.ukuranBaju || '-');
           if (cols.tambahan) row.push("");
           return row;
       });
@@ -1259,7 +1262,7 @@ export default function LaporanView() {
                                 {Object.entries(cols).map(([k, v]) => (
                                     <label key={k} className="flex items-center space-x-2 text-[11px] font-bold text-slate-600 cursor-pointer p-2 rounded-xl bg-white border border-slate-100 hover:border-slate-300 transition hover:bg-slate-50">
                                         <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500" />
-                                        <span className="uppercase">{k === 'tambahan' ? 'KOLOM TAMBAHAN' : k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                        <span className="uppercase">{k === 'tambahan' ? 'KOLOM TAMBAHAN' : k === 'ukuranBaju' ? 'UKURAN BAJU' : k.replace(/([A-Z])/g, ' $1').trim()}</span>
                                     </label>
                                 ))}
                             </div>
