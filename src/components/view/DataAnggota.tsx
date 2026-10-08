@@ -440,7 +440,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
             
         }
 
-        setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '' });
+        setFormData({ nik: '', nama: '', tanggalLahir: '', jenisKelamin: '', umur: '', nomorHp: '', bagian: '', jabatan: '', kecamatan: '', desa: '', dusun: '', rt: '', rw: '', fotoKtpUrl: '', passFotoUrl: '', ukuranBaju: '' });
         setFileKtp(null);
         setFilePassFoto(null);
         setOcrStatus('');
