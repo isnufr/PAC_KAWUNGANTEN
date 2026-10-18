@@ -299,6 +299,11 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         }
         newData.umur = age >= 0 ? age.toString() : '0';
       }
+
+      // Jika bagian EKSTERNAL, jabatan tidak berlaku (dikosongkan)
+      if (field === 'bagian' && value === 'EKSTERNAL') {
+        newData.jabatan = '';
+      }
       
       return newData;
     });
@@ -316,7 +321,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
           umur: itemToEdit.umur?.toString() || '',
           nomorHp: itemToEdit.nomorHp || '',
           bagian: itemToEdit.bagian || '',
-          jabatan: itemToEdit.jabatan || '',
+          jabatan: itemToEdit.bagian === 'EKSTERNAL' ? '' : (itemToEdit.jabatan || ''),
           kecamatan: itemToEdit.kecamatan || '',
           desa: itemToEdit.desa || '',
           dusun: itemToEdit.dusun || '',
@@ -391,7 +396,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
         umur: formData.umur ? parseInt(formData.umur) : null,
         nomorHp: formData.nomorHp || null,
         bagian: formData.bagian || null,
-        jabatan: formData.jabatan || null,
+        jabatan: formData.bagian === 'EKSTERNAL' ? null : (formData.jabatan || null),
         kecamatan: formData.kecamatan || null,
         desa: formData.desa || null,
         dusun: formData.dusun || null,
@@ -484,20 +489,40 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                     className="flex-1 px-3 py-2 md:p-2.5 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition bg-white text-[11px] md:text-xs text-slate-700 shadow-inner placeholder:text-slate-400 font-medium" />
 
                 <div className="grid grid-cols-2 md:flex gap-2 w-full md:w-auto">
-                    <select value={bagian} onChange={e => setBagian(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm">
+                    <select 
+                        value={bagian} 
+                        onChange={e => {
+                            const val = e.target.value;
+                            setBagian(val);
+                            if (val === 'EKSTERNAL') {
+                                setJabatan('');
+                            }
+                        }} 
+                        className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm"
+                    >
                         <option value="">Bagian</option>
                         <option value="PAC">PAC</option>
                         <option value="RANTING">RANTING</option>
                         <option value="ANAK RANTING">ANAK RANTING</option>
                         <option value="SATGAS">SATGAS</option>
+                        <option value="EKSTERNAL">EKSTERNAL</option>
                     </select>
 
-                    <select value={jabatan} onChange={e => setJabatan(e.target.value)} className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm">
-                        <option value="">Jabatan</option>
-                        <option value="KETUA">KETUA</option>
-                        <option value="SEKRETARIS">SEKRETARIS</option>
-                        <option value="BENDAHARA">BENDAHARA</option>
-                        <option value="ANGGOTA">ANGGOTA</option>
+                    <select 
+                        value={bagian === 'EKSTERNAL' ? '' : jabatan} 
+                        onChange={e => setJabatan(e.target.value)} 
+                        disabled={bagian === 'EKSTERNAL'}
+                        className="w-full md:w-28 px-2.5 py-2 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-400 transition font-bold text-slate-700 text-[10px] md:text-xs cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <option value="">{bagian === 'EKSTERNAL' ? '-' : 'Jabatan'}</option>
+                        {bagian !== 'EKSTERNAL' && (
+                            <>
+                                <option value="KETUA">KETUA</option>
+                                <option value="SEKRETARIS">SEKRETARIS</option>
+                                <option value="BENDAHARA">BENDAHARA</option>
+                                <option value="ANGGOTA">ANGGOTA</option>
+                            </>
+                        )}
                     </select>
 
                     {/* Filter Desa */}
@@ -654,8 +679,12 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                                 </div>
                                                 <div className="text-[9px] md:text-[10px] font-bold tracking-wider flex items-center flex-wrap gap-1 mb-1">
                                                     <span className="text-red-500 whitespace-nowrap">{item.bagian || '-'}</span>
-                                                    <span className="text-red-200">|</span>
-                                                    <span className="text-red-700 whitespace-nowrap">{item.jabatan || '-'}</span>
+                                                    {item.bagian !== 'EKSTERNAL' && (
+                                                        <>
+                                                            <span className="text-red-200">|</span>
+                                                            <span className="text-red-700 whitespace-nowrap">{item.jabatan || '-'}</span>
+                                                        </>
+                                                    )}
                                                     <span className="text-red-200">|</span>
                                                     <span className="text-red-500 whitespace-nowrap">{jkShort}</span>
                                                     <span className="text-red-200">|</span>
@@ -746,7 +775,9 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                             <h3 className="font-black text-base sm:text-lg text-slate-800 tracking-tight mb-2 truncate px-2">{selectedAnggota.nama}</h3>
                             <div className="flex justify-center gap-2">
                                 <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.bagian || '-'}</span>
-                                <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
+                                {selectedAnggota.bagian !== 'EKSTERNAL' && (
+                                    <span className="bg-white text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{selectedAnggota.jabatan || '-'}</span>
+                                )}
                                 {selectedAnggota.ukuranBaju && <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm" title="Ukuran Baju">{selectedAnggota.ukuranBaju}</span>}
                             </div>
                         </div>
@@ -1025,22 +1056,36 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Posisi Bagian</label>
-                                    <select value={formData.bagian} onChange={e => handleFormChange('bagian', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
+                                    <select value={formData.bagian} onChange={e => handleFormChange('bagian', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700 bg-white">
                                         <option value="">- Pilih -</option>
                                         <option value="PAC">PAC</option>
                                         <option value="RANTING">RANTING</option>
                                         <option value="ANAK RANTING">ANAK RANTING</option>
                                         <option value="SATGAS">SATGAS</option>
+                                        <option value="EKSTERNAL">EKSTERNAL</option>
                                     </select>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">Jabatan Struktural</label>
-                                    <select value={formData.jabatan} onChange={e => handleFormChange('jabatan', e.target.value)} className="w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold text-slate-700">
-                                        <option value="">- Pilih -</option>
-                                        <option value="KETUA">KETUA</option>
-                                        <option value="SEKRETARIS">SEKRETARIS</option>
-                                        <option value="BENDAHARA">BENDAHARA</option>
-                                        <option value="ANGGOTA">ANGGOTA</option>
+                                    <label className="block text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1.5">
+                                        Jabatan Struktural {formData.bagian === 'EKSTERNAL' && <span className="text-slate-400 font-normal lowercase">(tidak berlaku untuk eksternal)</span>}
+                                    </label>
+                                    <select 
+                                        value={formData.bagian === 'EKSTERNAL' ? '' : formData.jabatan} 
+                                        onChange={e => handleFormChange('jabatan', e.target.value)} 
+                                        disabled={formData.bagian === 'EKSTERNAL'}
+                                        className={`w-full p-2.5 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-100 transition text-xs font-semibold ${formData.bagian === 'EKSTERNAL' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'text-slate-700 bg-white'}`}
+                                    >
+                                        {formData.bagian === 'EKSTERNAL' ? (
+                                            <option value="">- Tidak Ada Jabatan (Eksternal) -</option>
+                                        ) : (
+                                            <>
+                                                <option value="">- Pilih -</option>
+                                                <option value="KETUA">KETUA</option>
+                                                <option value="SEKRETARIS">SEKRETARIS</option>
+                                                <option value="BENDAHARA">BENDAHARA</option>
+                                                <option value="ANGGOTA">ANGGOTA</option>
+                                            </>
+                                        )}
                                     </select>
                                 </div>
                                 <div className="sm:col-span-2">
@@ -1190,7 +1235,7 @@ export default function DataAnggotaView({ filter, userRole }: { filter?: string,
                                     <tr><td className="w-14 text-slate-500 font-semibold uppercase">Tgl Lahir</td><td>: {selectedAnggota.tanggalLahir ? selectedAnggota.tanggalLahir.split('-').reverse().join('-') : '-'}</td></tr>
                                     <tr><td className="text-slate-500 font-semibold uppercase">J. Kelamin</td><td>: {selectedAnggota.jenisKelamin || '-'}</td></tr>
                                     <tr><td className="text-slate-500 font-semibold uppercase">Bagian</td><td>: {selectedAnggota.bagian || '-'}</td></tr>
-                                    <tr><td className="text-slate-500 font-semibold uppercase">Jabatan</td><td>: {selectedAnggota.jabatan || '-'}</td></tr>
+                                    <tr><td className="text-slate-500 font-semibold uppercase">Jabatan</td><td>: {selectedAnggota.bagian === 'EKSTERNAL' ? '-' : (selectedAnggota.jabatan || '-')}</td></tr>
                                     <tr><td className="text-slate-500 font-semibold uppercase">Alamat</td><td className="truncate max-w-[30mm]">: Dsn. {selectedAnggota.dusun || '-'}, Ds. {selectedAnggota.desa || '-'}</td></tr>
                                     <tr><td className="text-slate-500 font-semibold uppercase">Kecamatan</td><td>: {selectedAnggota.kecamatan || 'KAWUNGANTEN'}</td></tr>
                                 </tbody>

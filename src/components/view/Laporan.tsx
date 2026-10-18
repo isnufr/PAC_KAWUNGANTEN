@@ -1232,6 +1232,7 @@ export default function LaporanView() {
                             <option value="RANTING">RANTING</option>
                             <option value="ANAK RANTING">ANAK RANTING</option>
                             <option value="SATGAS">SATGAS</option>
+                            <option value="EKSTERNAL">EKSTERNAL</option>
                         </select>
                     </div>
 
@@ -1310,6 +1311,7 @@ export default function LaporanView() {
                             <option value="RANTING">RANTING</option>
                             <option value="ANAK RANTING">ANAK RANTING</option>
                             <option value="SATGAS">SATGAS</option>
+                            <option value="EKSTERNAL">EKSTERNAL</option>
                         </select>
                     </div>
 
@@ -1553,6 +1555,8 @@ export default function LaporanView() {
                                     <option value="PAC">PAC</option>
                                     <option value="RANTING">RANTING</option>
                                     <option value="ANAK RANTING">ANAK RANTING</option>
+                                    <option value="SATGAS">SATGAS</option>
+                                    <option value="EKSTERNAL">EKSTERNAL</option>
                                 </select>
                             </div>
 

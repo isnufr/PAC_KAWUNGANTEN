@@ -12,6 +12,7 @@ export async function GET() {
     const totalRanting = await prisma.anggota.count({ where: { bagian: 'RANTING' } });
     const totalAnakRanting = await prisma.anggota.count({ where: { bagian: 'ANAK RANTING' } });
     const totalSatgas = await prisma.anggota.count({ where: { bagian: 'SATGAS' } });
+    const totalEksternal = await prisma.anggota.count({ where: { bagian: 'EKSTERNAL' } });
 
     // Gender stats
     const pria = await prisma.anggota.count({ where: { jenisKelamin: 'LAKI-LAKI' } });
@@ -118,7 +119,8 @@ export async function GET() {
           pac: totalPac,
           ranting: totalRanting,
           anakRanting: totalAnakRanting,
-          satgas: totalSatgas
+          satgas: totalSatgas,
+          eksternal: totalEksternal
         },
         gender: {
           LAKI_LAKI: pria,

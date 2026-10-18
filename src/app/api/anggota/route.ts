@@ -114,6 +114,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'NIK sudah terdaftar di sistem' }, { status: 400 });
     }
 
+    // Jika bagian EKSTERNAL maka tidak ada jabatan
+    if (body.bagian === 'EKSTERNAL') {
+      body.jabatan = null;
+    }
+
     const newAnggota = await prisma.anggota.create({
       data: body
     });

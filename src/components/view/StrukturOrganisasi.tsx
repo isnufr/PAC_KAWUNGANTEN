@@ -75,6 +75,7 @@ export default function StrukturOrganisasiView() {
                         <option value="RANTING">Ranting (Desa)</option>
                         <option value="ANAK RANTING">Anak Ranting (Dusun)</option>
                         <option value="SATGAS">Satgas</option>
+                        <option value="EKSTERNAL">Eksternal</option>
                     </select>
                 </div>
                 {bagian !== 'PAC' && (
@@ -198,7 +199,7 @@ function OrgCard({ person, color, small = false }: { person: AnggotaItem; color:
       <p className={`${small ? 'text-[11px]' : 'text-[13px]'} font-black text-slate-800 truncate w-full mb-1.5 relative z-10`}>{person.nama}</p>
       
       <span className={`relative z-10 inline-flex items-center justify-center ${c.badgeGradient} text-white ${small ? 'text-[8px] px-2 py-0.5' : 'text-[10px] px-3 py-1'} rounded-full font-bold uppercase tracking-widest shadow-md`}>
-        {person.jabatan}
+        {person.jabatan || (person.bagian === 'EKSTERNAL' ? 'EKSTERNAL' : '-')}
       </span>
       
       {person.desa && (

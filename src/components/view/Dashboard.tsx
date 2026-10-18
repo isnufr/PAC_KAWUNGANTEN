@@ -64,7 +64,8 @@ export default function DashboardView() {
     pac: dashboardData?.stats?.pac || 0,
     ranting: dashboardData?.stats?.ranting || 0,
     anakRanting: dashboardData?.stats?.anakRanting || 0,
-    satgas: dashboardData?.stats?.satgas || 0
+    satgas: dashboardData?.stats?.satgas || 0,
+    eksternal: dashboardData?.stats?.eksternal || 0
   };
 
   const gender = {
@@ -186,13 +187,14 @@ export default function DashboardView() {
       </div>
 
       {/* Dashboard Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 relative">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 relative">
           {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl"><span className="text-red-600 font-bold">Memuat data...</span></div>}
           <StatCard title="Anggota" subtitle="Total" icon="groups" value={stats.total} />
           <StatCard title="Pengurus" subtitle="PAC" icon="account_balance" value={stats.pac} />
           <StatCard title="Pengurus" subtitle="Ranting" icon="store" value={stats.ranting} />
           <StatCard title="Pengurus" subtitle="Anak Ranting" icon="holiday_village" value={stats.anakRanting} />
-          <StatCard title="Anggota" subtitle="Satgas" icon="security" value={stats.satgas} isWide />
+          <StatCard title="Anggota" subtitle="Satgas" icon="security" value={stats.satgas} />
+          <StatCard title="Anggota" subtitle="Eksternal" icon="badge" value={stats.eksternal} />
       </div>
 
               {/* MONITORING KUOTA KEPENGURUSAN */}

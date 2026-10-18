@@ -24,6 +24,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         }
     }
 
+    // Jika bagian EKSTERNAL maka tidak ada jabatan
+    if (body.bagian === 'EKSTERNAL') {
+      body.jabatan = null;
+    }
+
     const updatedAnggota = await prisma.anggota.update({
       where: { id },
       data: body
