@@ -93,6 +93,7 @@ export default function LaporanView() {
     nomorHp: true,
     desa: true,
     dusun: true,
+    rtRw: true,
     bagian: true,
     jabatan: true,
     ukuranBaju: false,
@@ -183,6 +184,21 @@ export default function LaporanView() {
     setSelectedDusuns(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
   };
 
+  const formatRtRw = (rt?: string | null, rw?: string | null) => {
+    const rawRt = rt ? String(rt).trim() : '';
+    const rawRw = rw ? String(rw).trim() : '';
+
+    if (!rawRt && !rawRw) return '-';
+
+    const cleanRt = /^\d+$/.test(rawRt) ? rawRt.padStart(3, '0') : rawRt;
+    const cleanRw = /^\d+$/.test(rawRw) ? rawRw.padStart(3, '0') : rawRw;
+
+    if (cleanRt && cleanRw) return `${cleanRt}/${cleanRw}`;
+    if (cleanRt) return `RT ${cleanRt}`;
+    if (cleanRw) return `RW ${cleanRw}`;
+    return '-';
+  };
+
   const handleExport = async () => {
     setIsExporting(true);
     try {
@@ -244,6 +260,7 @@ export default function LaporanView() {
       if (cols.nomorHp) headers.push("NOMOR HP");
       if (cols.desa) headers.push("DESA");
       if (cols.dusun) headers.push("DUSUN");
+      if (cols.rtRw) headers.push("RT/RW");
       if (cols.bagian) headers.push("BAGIAN");
       if (cols.jabatan) headers.push("JABATAN");
       if (cols.ukuranBaju) headers.push("UKURAN BAJU");
@@ -265,6 +282,7 @@ export default function LaporanView() {
           if (cols.nomorHp) row.push(d.nomorHp || '-');
           if (cols.desa) row.push(d.desa || '-');
           if (cols.dusun) row.push(d.dusun || '-');
+          if (cols.rtRw) row.push(formatRtRw(d.rt, d.rw));
           if (cols.bagian) row.push(d.bagian || '-');
           if (cols.jabatan) row.push(d.jabatan || '-');
           if (cols.ukuranBaju) row.push(d.ukuranBaju || '-');
@@ -426,7 +444,7 @@ export default function LaporanView() {
                     ws[cellRef].s = { font: { bold: true, sz: 12 }, alignment: { horizontal: 'center', vertical: 'center' } };
                 }
             });
-            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length, 5) + 2 }));
+            ws['!cols'] = headers.map(h => ({ wch: h === 'RT/RW' ? 10 : Math.max(h.length, 5) + 2 }));
             
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Laporan");
@@ -463,6 +481,7 @@ export default function LaporanView() {
                     if (cols.nomorHp) row.push(d.nomorHp || '-');
                     if (cols.desa) row.push(d.desa || '-');
                     if (cols.dusun) row.push(d.dusun || '-');
+                    if (cols.rtRw) row.push(formatRtRw(d.rt, d.rw));
                     if (cols.bagian) row.push(d.bagian || '-');
                     if (cols.jabatan) row.push(d.jabatan || '-');
                     if (cols.ukuranBaju) row.push(d.ukuranBaju || '-');
@@ -1265,7 +1284,7 @@ export default function LaporanView() {
                                 {Object.entries(cols).map(([k, v]) => (
                                     <label key={k} className="flex items-center space-x-2 text-[11px] font-bold text-slate-600 cursor-pointer p-2 rounded-xl bg-white border border-slate-100 hover:border-slate-300 transition hover:bg-slate-50">
                                         <input type="checkbox" checked={v} onChange={() => toggleCol(k as keyof typeof cols)} className="form-checkbox h-4 w-4 text-red-600 rounded border-slate-300 focus:ring-red-500" />
-                                        <span className="uppercase">{k === 'tambahan' ? 'KOLOM TAMBAHAN' : k === 'ukuranBaju' ? 'UKURAN BAJU' : k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                        <span className="uppercase">{k === 'tambahan' ? 'KOLOM TAMBAHAN' : k === 'ukuranBaju' ? 'UKURAN BAJU' : k === 'rtRw' ? 'RT / RW' : k.replace(/([A-Z])/g, ' $1').trim()}</span>
                                     </label>
                                 ))}
                             </div>
